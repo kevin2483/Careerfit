@@ -13,3 +13,5 @@ __pycache__/
 
 # OS
 .DS_Store
+data/labeled/*.jsonl
+logs_*.txt
