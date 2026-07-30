@@ -1,0 +1,15 @@
+# 공고 원문 — 저작권/재배포 문제로 제외 (크롤러로 재수집 가능)
+data/raw/*/wanted_*.jsonl
+data/raw/*/*.failed.txt
+
+# 파이썬 캐시
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# 환경/비밀
+.env
+*.key
+
+# OS
+.DS_Store

@@ -1,0 +1,333 @@
+# CareerFit 역량 태그 사전 (온톨로지) v0
+# ----------------------------------------------------------------------------
+# 만든 방법: 수집된 150개 공고(ds/de/mle) 본문을 훑어 '실제로 등장한' 표현만 수록.
+# 상상으로 넣은 태그 없음. alias 는 본문에서 관찰된 표기 변형.
+#
+# 구조:
+#   canonical: 정규화된 단일 태그 (정답셋·집계의 기준)
+#   aliases:   본문에 나타나는 표기 변형들 (regex 베이스라인이 이걸로 매칭)
+#   field:     주로 어느 필드에서 나오는가 (1=명시스택 2=서술역량 3=암묵조건)
+#   parent:    상위 개념 (상위개념 매핑 별도 집계용, 계획서 4번)
+#
+# 주의: 이건 v0다. 라벨링하면서 빠진 태그·잘못된 alias 가 나온다.
+#       그때마다 여기 고치고 lab_log 에 버전 변경을 남긴다.
+# ============================================================================
+
+# ── ① 프로그래밍 언어 (명시적, 난이도 낮음) ──────────────────────────────
+languages:
+  - canonical: Python
+    aliases: [python, 파이썬]
+    field: 1
+  - canonical: Java
+    aliases: [java, 자바]
+    field: 1
+  - canonical: Kotlin
+    aliases: [kotlin, 코틀린]
+    field: 1
+  - canonical: Go
+    aliases: [go, golang, 고랭]
+    field: 1
+  - canonical: Rust
+    aliases: [rust, 러스트]
+    field: 1
+  - canonical: 'C++'
+    aliases: ['c++', cpp, 'c/c++']
+    field: 1
+  - canonical: 'C#'
+    aliases: ['c#', csharp]
+    field: 1
+  - canonical: SQL
+    aliases: [sql]
+    field: 1
+  - canonical: TypeScript
+    aliases: [typescript, ts]
+    field: 1
+  - canonical: JavaScript
+    aliases: [javascript, js, es6]
+    field: 1
+  - canonical: R
+    aliases: [] # "Python 또는 R" 형태로 등장. 단독 R 은 오탐 위험 → 라벨링서 검증
+    field: 1
+  - canonical: Scala
+    aliases: [scala]
+    field: 1
+
+# ── ① ML/DL 프레임워크 (명시적) ─────────────────────────────────────────
+ml_frameworks:
+  - canonical: PyTorch
+    aliases: [pytorch, torch]
+    field: 1
+    parent: ML/DL
+  - canonical: TensorFlow
+    aliases: [tensorflow, tf]
+    field: 1
+    parent: ML/DL
+  - canonical: scikit-learn
+    aliases: [scikit-learn, sklearn, 'scikit learn']
+    field: 1
+    parent: ML/DL
+  - canonical: HuggingFace
+    aliases: [huggingface, 'hugging face', transformers]
+    field: 1
+    parent: ML/DL
+  - canonical: ONNX
+    aliases: [onnx]
+    field: 1
+    parent: 모델경량화
+  - canonical: RDKit
+    aliases: [rdkit] # 신약 도메인 특화. 도메인 태그로 뺄지 라벨링서 판단
+    field: 1
+
+# ── ① 데이터 처리·파이프라인 (명시적) ───────────────────────────────────
+data_pipeline:
+  - canonical: Spark
+    aliases: [spark, pyspark, 'apache spark']
+    field: 1
+    parent: 분산처리
+  - canonical: Airflow
+    aliases: [airflow, 'apache airflow']
+    field: 1
+    parent: 워크플로우오케스트레이션
+  - canonical: Kafka
+    aliases: [kafka, 'apache kafka']
+    field: 1
+    parent: 스트리밍
+  - canonical: dbt
+    aliases: [dbt]
+    field: 1
+  - canonical: Databricks
+    aliases: [databricks]
+    field: 1
+  - canonical: Iceberg
+    aliases: [iceberg, 'apache iceberg']
+    field: 1
+  - canonical: Nifi
+    aliases: [nifi]
+    field: 1
+  - canonical: ETL/ELT
+    aliases: [etl, elt, 'etl/elt']
+    field: 2 # 서술형으로도 자주 등장 ("ETL 파이프라인 설계")
+    parent: 데이터파이프라인
+
+# ── ① 데이터 저장소 (명시적) ────────────────────────────────────────────
+datastores:
+  - canonical: PostgreSQL
+    aliases: [postgresql, postgres, pgvector]
+    field: 1
+    parent: RDBMS
+  - canonical: MySQL
+    aliases: [mysql, mariadb]
+    field: 1
+    parent: RDBMS
+  - canonical: Oracle
+    aliases: [oracle]
+    field: 1
+    parent: RDBMS
+  - canonical: Redis
+    aliases: [redis]
+    field: 1
+  - canonical: MongoDB
+    aliases: [mongodb, mongo]
+    field: 1
+    parent: NoSQL
+  - canonical: ElasticSearch
+    aliases: [elasticsearch, 'elastic search', elk]
+    field: 1
+  - canonical: BigQuery
+    aliases: [bigquery]
+    field: 1
+    parent: 데이터웨어하우스
+  - canonical: Snowflake
+    aliases: [snowflake]
+    field: 1
+    parent: 데이터웨어하우스
+  - canonical: Redshift
+    aliases: [redshift]
+    field: 1
+    parent: 데이터웨어하우스
+  - canonical: VectorDB
+    aliases:
+      [vectordb, 'vector db', milvus, neo4j, graphdb, '벡터 db', 벡터검색]
+    field: 1
+    parent: 벡터검색
+
+# ── ① 인프라·클라우드·MLOps (명시적) ────────────────────────────────────
+infra:
+  - canonical: AWS
+    aliases: [aws, bedrock, sagemaker]
+    field: 1
+    parent: 클라우드
+  - canonical: GCP
+    aliases: [gcp, 'google cloud']
+    field: 1
+    parent: 클라우드
+  - canonical: Azure
+    aliases: [azure]
+    field: 1
+    parent: 클라우드
+  - canonical: Docker
+    aliases: [docker, 도커]
+    field: 1
+    parent: 컨테이너
+  - canonical: Kubernetes
+    aliases: [kubernetes, k8s, 쿠버네티스, gke, eks]
+    field: 1
+    parent: 컨테이너오케스트레이션
+  - canonical: Terraform
+    aliases: [terraform, iac, ansible]
+    field: 1
+    parent: IaC
+  - canonical: CI/CD
+    aliases:
+      ['ci/cd', cicd, jenkins, argocd, gitops, 'github actions', 'gitlab ci']
+    field: 1
+  - canonical: Git
+    aliases: [git, github, gitlab]
+    field: 1
+    parent: 형상관리
+  - canonical: Linux
+    aliases: [linux, 리눅스]
+    field: 1
+  - canonical: vLLM
+    aliases: [vllm, triton, litellm]
+    field: 1
+    parent: 모델서빙
+  - canonical: MLflow
+    aliases: [mlflow, clearml]
+    field: 1
+    parent: 실험관리
+
+# ── ② LLM/생성형 AI 개념 (서술형 다수) ──────────────────────────────────
+llm_genai:
+  - canonical: LLM
+    aliases: [llm, '대형언어모델', '대규모 언어모델', '언어모델']
+    field: 2
+  - canonical: RAG
+    aliases: [rag, '검색 증강', 'retrieval augmented']
+    field: 2
+    parent: LLM응용
+  - canonical: AI Agent
+    aliases:
+      [agent, agentic, 'ai agent', 에이전트, 'multi-agent', '멀티 에이전트']
+    field: 2
+    parent: LLM응용
+  - canonical: 프롬프트엔지니어링
+    aliases: ['프롬프트 엔지니어링', 'prompt engineering', '프롬프트 최적화']
+    field: 2
+    parent: LLM응용
+  - canonical: 파인튜닝
+    aliases: [파인튜닝, 'fine-tuning', finetuning, sft, 'preference tuning']
+    field: 2
+    parent: LLM응용
+  - canonical: 임베딩
+    aliases: [임베딩, embedding, '벡터화']
+    field: 2
+  - canonical: MCP
+    aliases: [mcp, 'model context protocol']
+    field: 2
+    parent: LLM응용
+  - canonical: Tool Use
+    aliases:
+      ['tool use', 'tool calling', 'tool 연동', '함수 호출', 'tool planning']
+    field: 2
+    parent: LLM응용
+  - canonical: LLM평가
+    aliases:
+      [
+        'llm-as-a-judge',
+        '응답 품질 평가',
+        eval,
+        '평가 체계',
+        '정량 평가',
+        가드레일,
+        guardrail,
+      ]
+    field: 2
+    parent: LLM응용
+  - canonical: NLP
+    aliases: [nlp, '자연어 처리', ner, '개체명 인식']
+    field: 2
+
+# ── ② 컴퓨터비전 (서술형) ───────────────────────────────────────────────
+cv:
+  - canonical: ComputerVision
+    aliases:
+      [
+        'computer vision',
+        '컴퓨터 비전',
+        cv,
+        '객체 검출',
+        'object detection',
+        segmentation,
+        ocr,
+        re-id,
+        '이미지 생성',
+      ]
+    field: 2
+  - canonical: VLM
+    aliases: [vlm, 'vision-language', '비전-언어']
+    field: 2
+    parent: 멀티모달
+  - canonical: 멀티모달
+    aliases: [멀티모달, multimodal]
+    field: 2
+
+# ── ② 서술형 요구 경험 (regex 로 못 잡음. LLM 우세 예상 구간) ────────────
+# 이 카테고리가 계획서 4번 ②③ 의 핵심 측정 대상. 개선 효과를 여기서 본다.
+experience_narrative:
+  - canonical: 대용량데이터처리
+    aliases:
+      ['대용량 데이터', '대규모 데이터', '대용량 데이터 처리', '대규모 정형']
+    field: 2
+  - canonical: 시계열분석
+    aliases: [시계열, 'time series', '센서 데이터']
+    field: 2
+  - canonical: 이상탐지
+    aliases: [이상탐지, '이상 탐지', 'anomaly detection', '고장 예측', 예지보전]
+    field: 2
+  - canonical: 파이프라인설계운영
+    aliases:
+      ['파이프라인 구축', '파이프라인 설계', '파이프라인 운영', 'end-to-end']
+    field: 2
+  - canonical: 데이터모델링
+    aliases: ['데이터 모델링', '스키마 설계', '데이터 웨어하우스 모델링']
+    field: 2
+  - canonical: 데이터품질관리
+    aliases:
+      [
+        '데이터 품질',
+        '정합성',
+        '품질 관리',
+        dqm,
+        '데이터 거버넌스',
+        'data governance',
+      ]
+    field: 2
+  - canonical: ABテスト
+    aliases: ['a/b 테스트', 'ab test', '실험 설계', '인과 추론']
+    field: 2
+  - canonical: 대시보드
+    aliases: [대시보드, dashboard, looker, '데이터 시각화', '리포트 작성']
+    field: 2
+  - canonical: 통계분석
+    aliases: ['통계 분석', '통계적', 가설검정, '가설 수립', aarrr, 코호트, 퍼널]
+    field: 2
+  - canonical: 모델서빙배포
+    aliases:
+      [
+        '모델 서빙',
+        '모델 배포',
+        '추론 최적화',
+        '모델 경량화',
+        quantization,
+        pruning,
+        distillation,
+      ]
+    field: 2
+    parent: MLOps
+  - canonical: MLOps
+    aliases: [mlops, llmops, '재학습', '성능 드리프트', '모델 모니터링']
+    field: 2
+  - canonical: 협업커뮤니케이션
+    aliases: ['커뮤니케이션', '협업', '설득', '이해관계자', '직군과 협업']
+    field: 3 # 거의 모든 공고에 등장 → 변별력 낮음. 집계 시 별도 처리 검토

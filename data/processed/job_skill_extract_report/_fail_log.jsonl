@@ -1,0 +1,11 @@
+{"file": "data/raw/ds/wanted_2026-07-25.jsonl", "line": 1, "job_id": "376932", "reason": "section_missing:preferred_points"}
+{"file": "data/raw/ds/wanted_2026-07-25.jsonl", "line": 38, "job_id": "375233", "reason": "section_missing:preferred_points"}
+{"file": "data/raw/de/wanted_2026-07-25.jsonl", "line": 10, "job_id": "376828", "reason": "zero_tags_matched"}
+{"file": "data/raw/de/wanted_2026-07-25.jsonl", "line": 59, "job_id": "375454", "reason": "zero_tags_matched"}
+{"file": "data/raw/de/wanted_2026-07-25.jsonl", "line": 60, "job_id": "375455", "reason": "zero_tags_matched"}
+{"file": "data/raw/mle/wanted_2026-07-25.jsonl", "line": 1, "job_id": "376923", "reason": "section_missing:preferred_points"}
+{"file": "data/raw/mle/wanted_2026-07-25.jsonl", "line": 31, "job_id": "376652", "reason": "section_missing:preferred_points"}
+{"file": "data/raw/da/wanted_2026-07-25.jsonl", "line": 20, "job_id": "375936", "reason": "section_missing:preferred_points"}
+{"file": "data/raw/da/wanted_2026-07-25.jsonl", "line": 37, "job_id": "357335", "reason": "section_missing:preferred_points"}
+{"file": "data/raw/da/wanted_2026-07-25.jsonl", "line": 59, "job_id": "357336", "reason": "section_missing:preferred_points"}
+{"file": "data/raw/da/wanted_2026-07-25.jsonl", "line": 60, "job_id": "373281", "reason": "section_missing:preferred_points"}
