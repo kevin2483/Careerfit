@@ -1,0 +1,46 @@
+﻿유형,태그,건수
+FP_오탐,ABテスト,9
+FP_오탐,대시보드,2
+FP_오탐,통계분석,1
+FN_누락,A/B테스트,5
+FN_누락,REST API,2
+FN_누락,Tableau,2
+FN_누락,MSA,1
+FN_누락,Pandas,1
+FN_누락,NumPy,1
+FN_누락,PySpark,1
+FN_누락,SpringBoot,1
+FN_누락,Flink,1
+FN_누락,ArgoCD,1
+FN_누락,FastAPI,1
+FN_누락,apache kafaka,1
+FN_누락,QuickSight,1
+FN_누락,Athena,1
+FN_누락,Node.js,1
+FN_누락,CNN,1
+FN_누락,분류,1
+FN_누락,RNN,1
+FN_누락,회귀,1
+FN_누락,모바일,1
+FN_누락,EdgeAI,1
+FN_누락,임베디드,1
+FN_누락,ai acceleratior,1
+FN_누락,IoT,1
+FN_누락,sprong,1
+FN_누락,Prometheus,1
+FN_누락,ELK,1
+FN_누락,Grafana,1
+FN_누락,SQLP,1
+FN_누락,DAP,1
+FN_누락,DASP,1
+FN_누락,sqld 등 자격증,1
+FN_누락,ansys,1
+FN_누락,MariaDB,1
+FN_누락,MSSQL,1
+FN_누락,C,1
+FN_누락,LLM API,1
+FN_누락,polarization,1
+FN_누락,quantitative phase,1
+FN_누락,label-free imaging(holotomography,1
+FN_누락,Excel,1
+FN_누락,PowerBI,1

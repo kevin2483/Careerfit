@@ -86,7 +86,7 @@ def is_data_job(title: str) -> bool:
 
 
 def run(raw_dir: Path = RAW_DIR, dict_path: Path = DICT_PATH,
-        out_dir: Path = OUT_DIR) -> dict:
+        out_dir: Path = OUT_DIR, date: str = "2026-07-30") -> dict:
     """
     regex 베이스라인으로 채용공고에서 역량 태그를 추출하고 4개 표를 저장한다.
     입력 경로를 인자로 받아 MCP 도구가 감쌀 수 있게 했다(기본값은 프로젝트 표준 경로).
@@ -109,7 +109,7 @@ def run(raw_dir: Path = RAW_DIR, dict_path: Path = DICT_PATH,
     freq: dict[str, Counter] = defaultdict(Counter)  # canonical -> {job: count}
 
     for job in JOBS:
-        path = raw_dir / job / "wanted_2026-07-25.jsonl"
+        path = raw_dir / job / f"wanted_{date}.jsonl"
         counts = Counter()
         if not path.exists():
             validation_rows[job] = [0, 0, 0, 0, 0]
