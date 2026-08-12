@@ -1,6 +1,6 @@
 """
 채용 역량 추출 리포트 (job-skill-extract-report)
-data/raw/{ds,de,mle,da}/*.jsonl + data/raw/dict/skill_tags_v0.yaml
+data/raw/{ds,de,mle,da}/*.jsonl + data/raw/dict/skill_tags_v1.yaml
 -> data/processed/job_skill_extract_report/{validation_summary.csv, extracted_tags.jsonl,
    tag_frequency_by_job.csv, field_difficulty_summary.csv}
 regex 베이스라인만 사용 (결정적: 같은 입력 = 같은 출력). LLM 추출·정확도 비교는 4회차로 이관.
@@ -17,7 +17,7 @@ import yaml
 
 JOBS = ["ds", "de", "mle", "da"]
 RAW_DIR = Path("data/raw")
-DICT_PATH = RAW_DIR / "dict" / "skill_tags_v0.yaml"
+DICT_PATH = RAW_DIR / "dict" / "skill_tags_v1.yaml"
 OUT_DIR = Path("data/processed/job_skill_extract_report")
 SECTION_KEYS = ["main_tasks", "requirements", "preferred_points"]
 # STEP 0-5: da(경영·비즈니스 직군) 유입 공고를 제목 키워드로 데이터 직무 여부 판정.

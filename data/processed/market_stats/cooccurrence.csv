@@ -1,0 +1,121 @@
+tag_a,tag_b,동시출현수,직무
+Python,협업커뮤니케이션,69,ds
+Python,파이프라인설계운영,55,ds
+AI Agent,LLM,48,ds
+Python,SQL,45,ds
+파이프라인설계운영,협업커뮤니케이션,44,ds
+LLM,Python,43,ds
+AI Agent,Python,39,ds
+PyTorch,Python,37,ds
+SQL,협업커뮤니케이션,36,ds
+LLM,파이프라인설계운영,34,ds
+MLOps,Python,33,ds
+LLM,협업커뮤니케이션,33,ds
+Python,시계열분석,32,ds
+PyTorch,TensorFlow,32,ds
+AWS,Python,30,ds
+SQL,데이터품질관리,30,ds
+SQL,파이프라인설계운영,30,ds
+AI Agent,RAG,30,ds
+Python,통계분석,30,ds
+데이터품질관리,협업커뮤니케이션,29,ds
+LLM,RAG,29,ds
+A/B테스트,Python,29,ds
+Python,데이터품질관리,28,ds
+A/B테스트,협업커뮤니케이션,27,ds
+Python,대시보드,27,ds
+Python,모델서빙배포,27,ds
+데이터품질관리,파이프라인설계운영,27,ds
+Git,Python,26,ds
+통계분석,협업커뮤니케이션,25,ds
+MLOps,협업커뮤니케이션,25,ds
+Python,협업커뮤니케이션,88,de
+Python,파이프라인설계운영,87,de
+AWS,Python,77,de
+파이프라인설계운영,협업커뮤니케이션,71,de
+AI Agent,LLM,69,de
+AWS,파이프라인설계운영,66,de
+데이터품질관리,파이프라인설계운영,64,de
+LLM,Python,64,de
+Python,SQL,61,de
+Python,데이터품질관리,60,de
+Airflow,Python,58,de
+LLM,파이프라인설계운영,58,de
+AWS,협업커뮤니케이션,57,de
+AI Agent,Python,57,de
+LLM,RAG,55,de
+AWS,GCP,55,de
+데이터품질관리,협업커뮤니케이션,52,de
+SQL,데이터품질관리,50,de
+AI Agent,파이프라인설계운영,49,de
+SQL,협업커뮤니케이션,49,de
+AWS,Airflow,48,de
+Airflow,파이프라인설계운영,48,de
+대용량데이터처리,파이프라인설계운영,47,de
+SQL,파이프라인설계운영,47,de
+LLM,협업커뮤니케이션,45,de
+Airflow,데이터품질관리,44,de
+AI Agent,RAG,44,de
+GCP,Python,44,de
+ETL/ELT,파이프라인설계운영,43,de
+Kubernetes,Python,43,de
+AI Agent,LLM,182,mle
+LLM,Python,146,mle
+Python,파이프라인설계운영,124,mle
+LLM,RAG,122,mle
+AI Agent,Python,118,mle
+PyTorch,Python,117,mle
+Python,협업커뮤니케이션,114,mle
+AI Agent,RAG,112,mle
+LLM,파이프라인설계운영,109,mle
+LLM,협업커뮤니케이션,100,mle
+Python,모델서빙배포,90,mle
+PyTorch,파이프라인설계운영,90,mle
+LLM,PyTorch,88,mle
+PyTorch,모델서빙배포,86,mle
+LLM,모델서빙배포,83,mle
+AI Agent,파이프라인설계운영,83,mle
+AI Agent,협업커뮤니케이션,83,mle
+파이프라인설계운영,협업커뮤니케이션,80,mle
+Python,RAG,80,mle
+PyTorch,TensorFlow,77,mle
+ComputerVision,Python,77,mle
+AWS,LLM,75,mle
+ComputerVision,PyTorch,74,mle
+모델서빙배포,파이프라인설계운영,73,mle
+PyTorch,협업커뮤니케이션,71,mle
+AWS,Python,69,mle
+MLOps,Python,69,mle
+Git,Python,66,mle
+LLM,파인튜닝,66,mle
+모델서빙배포,협업커뮤니케이션,63,mle
+SQL,협업커뮤니케이션,22,da
+Python,SQL,19,da
+SQL,Tableau,17,da
+Tableau,대시보드,17,da
+SQL,대시보드,16,da
+대시보드,협업커뮤니케이션,16,da
+Python,협업커뮤니케이션,15,da
+A/B테스트,대시보드,14,da
+A/B테스트,통계분석,14,da
+SQL,데이터품질관리,13,da
+Tableau,협업커뮤니케이션,13,da
+대시보드,통계분석,13,da
+Python,대시보드,13,da
+SQL,통계분석,12,da
+Tableau,통계분석,12,da
+데이터품질관리,협업커뮤니케이션,12,da
+Python,Tableau,12,da
+Python,통계분석,12,da
+A/B테스트,Tableau,11,da
+통계분석,협업커뮤니케이션,10,da
+A/B테스트,SQL,10,da
+대시보드,데이터품질관리,9,da
+A/B테스트,협업커뮤니케이션,9,da
+A/B테스트,Python,8,da
+Python,데이터품질관리,8,da
+AI Agent,협업커뮤니케이션,7,da
+A/B테스트,BigQuery,7,da
+Tableau,데이터품질관리,7,da
+데이터품질관리,통계분석,7,da
+A/B테스트,데이터품질관리,7,da
