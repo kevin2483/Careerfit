@@ -14,6 +14,7 @@ import re
 from collections import Counter, defaultdict
 from pathlib import Path
 import yaml
+from src.extract.boundary import build_alias_pattern
 
 JOBS = ["ds", "de", "mle", "da"]
 RAW_DIR = Path("data/raw")
@@ -54,15 +55,13 @@ def load_dict(path: Path) -> list[dict]:
         print(f"[로그] ④ 집계 제외 태그(field=3, 암묵조건) {len(excluded)}개: {excluded}")
     return tags
 
-
 def compile_patterns(tags: list[dict]):
     patterns = []
     for t in tags:
         alts = sorted({a for a in [*t["aliases"], t["canonical"]] if a}, key=len, reverse=True)
-        alts = [re.escape(a) for a in alts]
         if not alts:
             continue
-        pat = re.compile(r"\b(?:" + "|".join(alts) + r")\b", re.IGNORECASE)
+        pat = re.compile("|".join(build_alias_pattern(a) for a in alts), re.IGNORECASE)
         patterns.append((t["canonical"], t["category"], t["field"], pat))
     return patterns
 

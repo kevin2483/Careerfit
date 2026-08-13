@@ -3,8 +3,6 @@
 {"file": "data/raw/ds/wanted_2026-07-30.jsonl", "line": 71, "job_id": "374439", "reason": "section_missing:preferred_points"}
 {"file": "data/raw/ds/wanted_2026-07-30.jsonl", "line": 147, "job_id": "363895", "reason": "section_missing:preferred_points"}
 {"file": "data/raw/ds/wanted_2026-07-30.jsonl", "line": 150, "job_id": "302011", "reason": "zero_tags_matched"}
-{"file": "data/raw/ds/wanted_2026-07-30.jsonl", "line": 172, "job_id": "315877", "reason": "zero_tags_matched"}
-{"file": "data/raw/ds/wanted_2026-07-30.jsonl", "line": 173, "job_id": "315881", "reason": "zero_tags_matched"}
 {"file": "data/raw/ds/wanted_2026-07-30.jsonl", "line": 179, "job_id": "357199", "reason": "zero_tags_matched"}
 {"file": "data/raw/ds/wanted_2026-07-30.jsonl", "line": 180, "job_id": "357253", "reason": "zero_tags_matched"}
 {"file": "data/raw/ds/wanted_2026-07-30.jsonl", "line": 181, "job_id": "357264", "reason": "zero_tags_matched"}
@@ -12,17 +10,15 @@
 {"file": "data/raw/ds/wanted_2026-07-30.jsonl", "line": 185, "job_id": "356614", "reason": "section_missing:preferred_points"}
 {"file": "data/raw/ds/wanted_2026-07-30.jsonl", "line": 185, "job_id": "356614", "reason": "zero_tags_matched"}
 {"file": "data/raw/ds/wanted_2026-07-30.jsonl", "line": 187, "job_id": "307163", "reason": "zero_tags_matched"}
-{"file": "data/raw/ds/wanted_2026-07-30.jsonl", "line": 214, "job_id": "290982", "reason": "zero_tags_matched"}
 {"file": "data/raw/de/wanted_2026-07-30.jsonl", "line": 99, "job_id": "375233", "reason": "section_missing:preferred_points"}
 {"file": "data/raw/de/wanted_2026-07-30.jsonl", "line": 129, "job_id": "371533", "reason": "zero_tags_matched"}
-{"file": "data/raw/de/wanted_2026-07-30.jsonl", "line": 137, "job_id": "372493", "reason": "zero_tags_matched"}
 {"file": "data/raw/de/wanted_2026-07-30.jsonl", "line": 166, "job_id": "371459", "reason": "section_missing:preferred_points"}
 {"file": "data/raw/de/wanted_2026-07-30.jsonl", "line": 169, "job_id": "371391", "reason": "section_missing:preferred_points"}
 {"file": "data/raw/de/wanted_2026-07-30.jsonl", "line": 202, "job_id": "369152", "reason": "section_missing:preferred_points"}
 {"file": "data/raw/de/wanted_2026-07-30.jsonl", "line": 206, "job_id": "368726", "reason": "section_missing:preferred_points"}
 {"file": "data/raw/de/wanted_2026-07-30.jsonl", "line": 244, "job_id": "363895", "reason": "section_missing:preferred_points"}
 {"file": "data/raw/de/wanted_2026-07-30.jsonl", "line": 247, "job_id": "302011", "reason": "zero_tags_matched"}
-{"file": "data/raw/de/wanted_2026-07-30.jsonl", "line": 277, "job_id": "315881", "reason": "zero_tags_matched"}
+{"file": "data/raw/de/wanted_2026-07-30.jsonl", "line": 255, "job_id": "362610", "reason": "zero_tags_matched"}
 {"file": "data/raw/de/wanted_2026-07-30.jsonl", "line": 279, "job_id": "357538", "reason": "section_missing:preferred_points"}
 {"file": "data/raw/de/wanted_2026-07-30.jsonl", "line": 279, "job_id": "357538", "reason": "zero_tags_matched"}
 {"file": "data/raw/de/wanted_2026-07-30.jsonl", "line": 281, "job_id": "357199", "reason": "zero_tags_matched"}
@@ -34,7 +30,6 @@
 {"file": "data/raw/de/wanted_2026-07-30.jsonl", "line": 312, "job_id": "307163", "reason": "zero_tags_matched"}
 {"file": "data/raw/mle/wanted_2026-07-30.jsonl", "line": 59, "job_id": "376923", "reason": "section_missing:preferred_points"}
 {"file": "data/raw/mle/wanted_2026-07-30.jsonl", "line": 83, "job_id": "376652", "reason": "section_missing:preferred_points"}
-{"file": "data/raw/mle/wanted_2026-07-30.jsonl", "line": 111, "job_id": "361686", "reason": "zero_tags_matched"}
 {"file": "data/raw/mle/wanted_2026-07-30.jsonl", "line": 190, "job_id": "374439", "reason": "section_missing:preferred_points"}
 {"file": "data/raw/mle/wanted_2026-07-30.jsonl", "line": 257, "job_id": "372033", "reason": "section_missing:preferred_points"}
 {"file": "data/raw/mle/wanted_2026-07-30.jsonl", "line": 286, "job_id": "371878", "reason": "section_missing:preferred_points"}

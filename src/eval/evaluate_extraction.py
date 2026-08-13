@@ -111,15 +111,32 @@ def main() -> None:
     p.add_argument("--out-dir", default="data/processed/evaluation")
     p.add_argument("--use-stored", action="store_true",
                    help="regex 재실행 없이 라벨 파일에 저장된 값으로 평가(과거 사전 기준 비교용)")
+    p.add_argument("--pred-file", default=None,
+                   help="미리 계산된 예측 jsonl. 지정하면 regex 재실행 안 함(LLM 평가용).")
+    p.add_argument("--tag-key", default="tags")
     args = p.parse_args()
 
-    rows = [json.loads(l) for l in Path(args.infile).read_text(encoding="utf-8").splitlines() if l.strip()]
+    with Path(args.infile).open(encoding="utf-8") as fh:
+        rows = [json.loads(l) for l in fh if l.strip()]
     rows = [r for r in rows if r.get("reviewed")]
     if not rows:
         raise SystemExit("[중단] 검수 완료(reviewed=true) 항목이 없습니다.")
 
     field_map = load_field_map(Path(args.dict_path))
-    if not args.use_stored:
+    if args.pred_file:
+        pred_map = {}
+        with Path(args.pred_file).open(encoding="utf-8") as fh:
+            for line in fh:
+                if line.strip():
+                    rec = json.loads(line)
+                    pred_map[str(rec["job_id"])] = list(rec.get(args.tag_key) or [])
+        missing = [r["job_id"] for r in rows if str(r["job_id"]) not in pred_map]
+        if missing:
+            raise SystemExit(f"[중단] 예측 없는 정답 {len(missing)}건: {missing[:5]}")
+        for r in rows:
+            r["_pred"] = sorted(pred_map[str(r["job_id"])])
+        print(f"[정보] 예측파일로 평가합니다: {args.pred_file}")
+    elif not args.use_stored:
         rerun_regex(rows, Path(args.dict_path))
         print(f"[정보] 사전 {Path(args.dict_path).name} 로 regex 재실행 후 평가합니다.")
     else:

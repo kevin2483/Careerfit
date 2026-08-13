@@ -1,680 +1,679 @@
 languages:
-- canonical: Python
-  aliases:
-  - python
-  - 파이썬
-  field: 1
-- canonical: Java
-  aliases:
-  - java
-  - 자바
-  field: 1
-- canonical: Kotlin
-  aliases:
-  - kotlin
-  - 코틀린
-  field: 1
-- canonical: Go
-  aliases:
-  - go
-  - golang
-  - 고랭
-  field: 1
-- canonical: Rust
-  aliases:
-  - rust
-  - 러스트
-  field: 1
-- canonical: C++
-  aliases:
-  - c++
-  - cpp
-  - c/c++
-  field: 1
-- canonical: C#
-  aliases:
-  - c#
-  - csharp
-  field: 1
-- canonical: SQL
-  aliases:
-  - sql
-  field: 1
-- canonical: TypeScript
-  aliases:
-  - typescript
-  - ts
-  field: 1
-- canonical: JavaScript
-  aliases:
-  - javascript
-  - js
-  - es6
-  field: 1
-- canonical: R
-  aliases: []
-  field: 1
-- canonical: Scala
-  aliases:
-  - scala
-  field: 1
-- canonical: C
-  aliases:
-  - c언어
-  field: 1
+  - canonical: Python
+    aliases:
+      - python
+      - 파이썬
+    field: 1
+  - canonical: Java
+    aliases:
+      - java
+      - 자바
+    field: 1
+  - canonical: Kotlin
+    aliases:
+      - kotlin
+      - 코틀린
+    field: 1
+  - canonical: Go
+    aliases:
+      - go
+      - golang
+      - 고랭
+    field: 1
+  - canonical: Rust
+    aliases:
+      - rust
+      - 러스트
+    field: 1
+  - canonical: C++
+    aliases:
+      - c++
+      - cpp
+      - c/c++
+    field: 1
+  - canonical: C#
+    aliases:
+      - c#
+      - csharp
+    field: 1
+  - canonical: SQL
+    aliases:
+      - sql
+    field: 1
+  - canonical: TypeScript
+    aliases:
+      - typescript
+      - ts
+    field: 1
+  - canonical: JavaScript
+    aliases:
+      - javascript
+      - js
+      - es6
+    field: 1
+  - canonical: R
+    aliases: []
+    field: 1
+  - canonical: Scala
+    aliases:
+      - scala
+    field: 1
+  - canonical: C
+    aliases:
+      - c언어
+    field: 1
 ml_frameworks:
-- canonical: PyTorch
-  aliases:
-  - pytorch
-  - torch
-  field: 1
-  parent: ML/DL
-- canonical: TensorFlow
-  aliases:
-  - tensorflow
-  - tf
-  field: 1
-  parent: ML/DL
-- canonical: scikit-learn
-  aliases:
-  - scikit-learn
-  - sklearn
-  - scikit learn
-  field: 1
-  parent: ML/DL
-- canonical: HuggingFace
-  aliases:
-  - huggingface
-  - hugging face
-  - transformers
-  field: 1
-  parent: ML/DL
-- canonical: ONNX
-  aliases:
-  - onnx
-  field: 1
-  parent: 모델경량화
-- canonical: RDKit
-  aliases:
-  - rdkit
-  field: 1
-- canonical: Pandas
-  aliases:
-  - pandas
-  - 판다스
-  field: 1
-- canonical: NumPy
-  aliases:
-  - numpy
-  - 넘파이
-  field: 1
+  - canonical: PyTorch
+    aliases:
+      - pytorch
+      - torch
+    field: 1
+    parent: ML/DL
+  - canonical: TensorFlow
+    aliases:
+      - tensorflow
+      - tf
+    field: 1
+    parent: ML/DL
+  - canonical: scikit-learn
+    aliases:
+      - scikit-learn
+      - sklearn
+      - scikit learn
+    field: 1
+    parent: ML/DL
+  - canonical: HuggingFace
+    aliases:
+      - huggingface
+      - hugging face
+      - transformers
+    field: 1
+    parent: ML/DL
+  - canonical: ONNX
+    aliases:
+      - onnx
+    field: 1
+    parent: 모델경량화
+  - canonical: RDKit
+    aliases:
+      - rdkit
+    field: 1
+  - canonical: Pandas
+    aliases:
+      - pandas
+      - 판다스
+    field: 1
+  - canonical: NumPy
+    aliases:
+      - numpy
+      - 넘파이
+    field: 1
 data_pipeline:
-- canonical: Spark
-  aliases:
-  - spark
-  - pyspark
-  - apache spark
-  field: 1
-  parent: 분산처리
-- canonical: Airflow
-  aliases:
-  - airflow
-  - apache airflow
-  field: 1
-  parent: 워크플로우오케스트레이션
-- canonical: Kafka
-  aliases:
-  - apache kafka
-  - kafka
-  - 카프카
-  field: 1
-  parent: 스트리밍
-- canonical: dbt
-  aliases:
-  - dbt
-  field: 1
-- canonical: Databricks
-  aliases:
-  - databricks
-  field: 1
-- canonical: Iceberg
-  aliases:
-  - iceberg
-  - apache iceberg
-  field: 1
-- canonical: Nifi
-  aliases:
-  - nifi
-  field: 1
-- canonical: ETL/ELT
-  aliases:
-  - etl
-  - elt
-  - etl/elt
-  field: 2
-  parent: 데이터파이프라인
-- canonical: PySpark
-  aliases:
-  - pyspark
-  field: 1
-  parent: 분산처리
-- canonical: Flink
-  aliases:
-  - flink
-  - apache flink
-  field: 1
-  parent: 스트리밍
+  - canonical: Spark
+    aliases:
+      - spark
+      - pyspark
+      - apache spark
+    field: 1
+    parent: 분산처리
+  - canonical: Airflow
+    aliases:
+      - airflow
+      - apache airflow
+    field: 1
+    parent: 워크플로우오케스트레이션
+  - canonical: Kafka
+    aliases:
+      - apache kafka
+      - kafka
+      - 카프카
+    field: 1
+    parent: 스트리밍
+  - canonical: dbt
+    aliases:
+      - dbt
+    field: 1
+  - canonical: Databricks
+    aliases:
+      - databricks
+    field: 1
+  - canonical: Iceberg
+    aliases:
+      - iceberg
+      - apache iceberg
+    field: 1
+  - canonical: Nifi
+    aliases:
+      - nifi
+    field: 1
+  - canonical: ETL/ELT
+    aliases:
+      - etl
+      - elt
+      - etl/elt
+    field: 2
+    parent: 데이터파이프라인
+  - canonical: PySpark
+    aliases:
+      - pyspark
+    field: 1
+    parent: 분산처리
+  - canonical: Flink
+    aliases:
+      - flink
+      - apache flink
+    field: 1
+    parent: 스트리밍
 datastores:
-- canonical: PostgreSQL
-  aliases:
-  - postgresql
-  - postgres
-  - pgvector
-  field: 1
-  parent: RDBMS
-- canonical: MySQL
-  aliases:
-  - mysql
-  - mariadb
-  field: 1
-  parent: RDBMS
-- canonical: Oracle
-  aliases:
-  - oracle
-  field: 1
-  parent: RDBMS
-- canonical: Redis
-  aliases:
-  - redis
-  field: 1
-- canonical: MongoDB
-  aliases:
-  - mongodb
-  - mongo
-  field: 1
-  parent: NoSQL
-- canonical: ElasticSearch
-  aliases:
-  - elasticsearch
-  - elastic search
-  - elk
-  field: 1
-- canonical: BigQuery
-  aliases:
-  - bigquery
-  field: 1
-  parent: 데이터웨어하우스
-- canonical: Snowflake
-  aliases:
-  - snowflake
-  field: 1
-  parent: 데이터웨어하우스
-- canonical: Redshift
-  aliases:
-  - redshift
-  field: 1
-  parent: 데이터웨어하우스
-- canonical: VectorDB
-  aliases:
-  - vectordb
-  - vector db
-  - milvus
-  - neo4j
-  - graphdb
-  - 벡터 db
-  - 벡터검색
-  field: 1
-  parent: 벡터검색
-- canonical: MSSQL
-  aliases:
-  - mssql
-  - sql server
-  field: 1
-  parent: RDBMS
-- canonical: MariaDB
-  aliases:
-  - mariadb
-  field: 1
-  parent: RDBMS
+  - canonical: PostgreSQL
+    aliases:
+      - postgresql
+      - postgres
+      - pgvector
+    field: 1
+    parent: RDBMS
+  - canonical: MySQL
+    aliases:
+      - mysql
+      - mariadb
+    field: 1
+    parent: RDBMS
+  - canonical: Oracle
+    aliases:
+      - oracle
+    field: 1
+    parent: RDBMS
+  - canonical: Redis
+    aliases:
+      - redis
+    field: 1
+  - canonical: MongoDB
+    aliases:
+      - mongodb
+      - mongo
+    field: 1
+    parent: NoSQL
+  - canonical: ElasticSearch
+    aliases:
+      - elasticsearch
+      - elastic search
+      - elk
+    field: 1
+  - canonical: BigQuery
+    aliases:
+      - bigquery
+    field: 1
+    parent: 데이터웨어하우스
+  - canonical: Snowflake
+    aliases:
+      - snowflake
+    field: 1
+    parent: 데이터웨어하우스
+  - canonical: Redshift
+    aliases:
+      - redshift
+    field: 1
+    parent: 데이터웨어하우스
+  - canonical: VectorDB
+    aliases:
+      - vectordb
+      - vector db
+      - milvus
+      - neo4j
+      - graphdb
+      - 벡터 db
+      - 벡터검색
+    field: 1
+    parent: 벡터검색
+  - canonical: MSSQL
+    aliases:
+      - mssql
+      - sql server
+    field: 1
+    parent: RDBMS
+  - canonical: MariaDB
+    aliases:
+      - mariadb
+    field: 1
+    parent: RDBMS
 infra:
-- canonical: AWS
-  aliases:
-  - aws
-  - bedrock
-  - sagemaker
-  field: 1
-  parent: 클라우드
-- canonical: GCP
-  aliases:
-  - gcp
-  - google cloud
-  field: 1
-  parent: 클라우드
-- canonical: Azure
-  aliases:
-  - azure
-  field: 1
-  parent: 클라우드
-- canonical: Docker
-  aliases:
-  - docker
-  - 도커
-  field: 1
-  parent: 컨테이너
-- canonical: Kubernetes
-  aliases:
-  - kubernetes
-  - k8s
-  - 쿠버네티스
-  - gke
-  - eks
-  field: 1
-  parent: 컨테이너오케스트레이션
-- canonical: Terraform
-  aliases:
-  - terraform
-  - iac
-  - ansible
-  field: 1
-  parent: IaC
-- canonical: CI/CD
-  aliases:
-  - ci/cd
-  - cicd
-  - jenkins
-  - argocd
-  - gitops
-  - github actions
-  - gitlab ci
-  field: 1
-- canonical: Git
-  aliases:
-  - git
-  - github
-  - gitlab
-  field: 1
-  parent: 형상관리
-- canonical: Linux
-  aliases:
-  - linux
-  - 리눅스
-  field: 1
-- canonical: vLLM
-  aliases:
-  - vllm
-  - triton
-  - litellm
-  field: 1
-  parent: 모델서빙
-- canonical: MLflow
-  aliases:
-  - mlflow
-  - clearml
-  field: 1
-  parent: 실험관리
-- canonical: ArgoCD
-  aliases:
-  - argocd
-  - argo cd
-  field: 1
-  parent: CI/CD
-- canonical: Prometheus
-  aliases:
-  - prometheus
-  - 프로메테우스
-  field: 1
-  parent: 모니터링
-- canonical: ELK
-  aliases:
-  - elk
-  - loki
-  - elk/loki
-  field: 1
-  parent: 모니터링
-- canonical: Athena
-  aliases:
-  - athena
-  field: 1
+  - canonical: AWS
+    aliases:
+      - aws
+      - bedrock
+      - sagemaker
+    field: 1
+    parent: 클라우드
+  - canonical: GCP
+    aliases:
+      - gcp
+      - google cloud
+    field: 1
+    parent: 클라우드
+  - canonical: Azure
+    aliases:
+      - azure
+    field: 1
+    parent: 클라우드
+  - canonical: Docker
+    aliases:
+      - docker
+      - 도커
+    field: 1
+    parent: 컨테이너
+  - canonical: Kubernetes
+    aliases:
+      - kubernetes
+      - k8s
+      - 쿠버네티스
+      - gke
+      - eks
+    field: 1
+    parent: 컨테이너오케스트레이션
+  - canonical: Terraform
+    aliases:
+      - terraform
+      - iac
+      - ansible
+    field: 1
+    parent: IaC
+  - canonical: CI/CD
+    aliases:
+      - ci/cd
+      - cicd
+      - jenkins
+      - argocd
+      - gitops
+      - github actions
+      - gitlab ci
+    field: 1
+  - canonical: Git
+    aliases:
+      - git
+      - github
+      - gitlab
+    field: 1
+    parent: 형상관리
+  - canonical: Linux
+    aliases:
+      - linux
+      - 리눅스
+    field: 1
+  - canonical: vLLM
+    aliases:
+      - vllm
+      - triton
+      - litellm
+    field: 1
+    parent: 모델서빙
+  - canonical: MLflow
+    aliases:
+      - mlflow
+      - clearml
+    field: 1
+    parent: 실험관리
+  - canonical: ArgoCD
+    aliases:
+      - argocd
+      - argo cd
+    field: 1
+    parent: CI/CD
+  - canonical: Prometheus
+    aliases:
+      - prometheus
+      - 프로메테우스
+    field: 1
+    parent: 모니터링
+  - canonical: ELK
+    aliases:
+      - elk
+      - loki
+      - elk/loki
+    field: 1
+    parent: 모니터링
+  - canonical: Athena
+    aliases:
+      - athena
+    field: 1
 llm_genai:
-- canonical: LLM
-  aliases:
-  - llm
-  - 대형언어모델
-  - 대규모 언어모델
-  - 언어모델
-  field: 2
-- canonical: RAG
-  aliases:
-  - rag
-  - 검색 증강
-  - retrieval augmented
-  field: 2
-  parent: LLM응용
-- canonical: AI Agent
-  aliases:
-  - agent
-  - agentic
-  - ai agent
-  - 에이전트
-  - multi-agent
-  - 멀티 에이전트
-  field: 2
-  parent: LLM응용
-- canonical: 프롬프트엔지니어링
-  aliases:
-  - 프롬프트 엔지니어링
-  - prompt engineering
-  - 프롬프트 최적화
-  field: 2
-  parent: LLM응용
-- canonical: 파인튜닝
-  aliases:
-  - 파인튜닝
-  - fine-tuning
-  - finetuning
-  - sft
-  - preference tuning
-  field: 2
-  parent: LLM응용
-- canonical: 임베딩
-  aliases:
-  - 임베딩
-  - embedding
-  - 벡터화
-  field: 2
-- canonical: MCP
-  aliases:
-  - mcp
-  - model context protocol
-  field: 2
-  parent: LLM응용
-- canonical: Tool Use
-  aliases:
-  - tool use
-  - tool calling
-  - tool 연동
-  - 함수 호출
-  - tool planning
-  field: 2
-  parent: LLM응용
-- canonical: LLM평가
-  aliases:
-  - llm-as-a-judge
-  - 응답 품질 평가
-  - eval
-  - 평가 체계
-  - 정량 평가
-  - 가드레일
-  - guardrail
-  field: 2
-  parent: LLM응용
-- canonical: NLP
-  aliases:
-  - nlp
-  - 자연어 처리
-  - ner
-  - 개체명 인식
-  field: 2
-- canonical: LLM API
-  aliases:
-  - llm api
-  - openai api
-  - claude api
-  field: 2
-  parent: LLM응용
+  - canonical: LLM
+    aliases:
+      - llm
+      - 대형언어모델
+      - 대규모 언어모델
+      - 언어모델
+    field: 2
+  - canonical: RAG
+    aliases:
+      - rag
+      - 검색 증강
+      - retrieval augmented
+    field: 2
+    parent: LLM응용
+  - canonical: AI Agent
+    aliases:
+      - agent
+      - agentic
+      - ai agent
+      - 에이전트
+      - multi-agent
+      - 멀티 에이전트
+    field: 2
+    parent: LLM응용
+  - canonical: 프롬프트엔지니어링
+    aliases:
+      - 프롬프트 엔지니어링
+      - prompt engineering
+      - 프롬프트 최적화
+    field: 2
+    parent: LLM응용
+  - canonical: 파인튜닝
+    aliases:
+      - 파인튜닝
+      - fine-tuning
+      - finetuning
+      - sft
+      - preference tuning
+    field: 2
+    parent: LLM응용
+  - canonical: 임베딩
+    aliases:
+      - 임베딩
+      - embedding
+      - 벡터화
+    field: 2
+  - canonical: MCP
+    aliases:
+      - mcp
+      - model context protocol
+    field: 2
+    parent: LLM응용
+  - canonical: Tool Use
+    aliases:
+      - tool use
+      - tool calling
+      - tool 연동
+      - 함수 호출
+      - tool planning
+    field: 2
+    parent: LLM응용
+  - canonical: LLM평가
+    aliases:
+      - llm-as-a-judge
+      - 응답 품질 평가
+      - eval
+      - 평가 체계
+      - 정량 평가
+      - 가드레일
+      - guardrail
+    field: 2
+    parent: LLM응용
+  - canonical: NLP
+    aliases:
+      - nlp
+      - 자연어 처리
+      - ner
+      - 개체명 인식
+    field: 2
+  - canonical: LLM API
+    aliases:
+      - llm api
+      - openai api
+      - claude api
+    field: 2
+    parent: LLM응용
 cv:
-- canonical: ComputerVision
-  aliases:
-  - computer vision
-  - 컴퓨터 비전
-  - cv
-  - 객체 검출
-  - object detection
-  - segmentation
-  - ocr
-  - re-id
-  - 이미지 생성
-  field: 2
-- canonical: VLM
-  aliases:
-  - vlm
-  - vision-language
-  - 비전-언어
-  field: 2
-  parent: 멀티모달
-- canonical: 멀티모달
-  aliases:
-  - 멀티모달
-  - multimodal
-  field: 2
+  - canonical: ComputerVision
+    aliases:
+      - computer vision
+      - 컴퓨터 비전
+      - cv
+      - 객체 검출
+      - object detection
+      - segmentation
+      - ocr
+      - re-id
+      - 이미지 생성
+    field: 2
+  - canonical: VLM
+    aliases:
+      - vlm
+      - vision-language
+      - 비전-언어
+    field: 2
+    parent: 멀티모달
+  - canonical: 멀티모달
+    aliases:
+      - 멀티모달
+      - multimodal
+    field: 2
 experience_narrative:
-- canonical: 대용량데이터처리
-  aliases:
-  - 대용량 데이터
-  - 대규모 데이터
-  - 대용량 데이터 처리
-  - 대규모 정형
-  field: 2
-- canonical: 시계열분석
-  aliases:
-  - 시계열
-  - time series
-  - 센서 데이터
-  field: 2
-- canonical: 이상탐지
-  aliases:
-  - 이상탐지
-  - 이상 탐지
-  - anomaly detection
-  - 고장 예측
-  - 예지보전
-  field: 2
-- canonical: 파이프라인설계운영
-  aliases:
-  - 파이프라인 구축
-  - 파이프라인 설계
-  - 파이프라인 운영
-  - end-to-end
-  field: 2
-- canonical: 데이터모델링
-  aliases:
-  - 데이터 모델링
-  - 스키마 설계
-  - 데이터 웨어하우스 모델링
-  field: 2
-- canonical: 데이터품질관리
-  aliases:
-  - 데이터 품질
-  - 정합성
-  - 품질 관리
-  - dqm
-  - 데이터 거버넌스
-  - data governance
-  field: 2
-- canonical: A/B테스트
-  aliases:
-  - a/b test
-  - a/b 테스트
-  - ab test
-  - 가설 검정
-  - 가설검정
-  - 실험 설계
-  - 인과 추론
-  field: 2
-- canonical: 대시보드
-  aliases:
-  - 대시보드
-  - dashboard
-  - looker
-  - 데이터 시각화
-  - 리포트 작성
-  field: 2
-- canonical: 통계분석
-  aliases:
-  - 통계 분석
-  - 통계적
-  - 가설검정
-  - 가설 수립
-  - aarrr
-  - 코호트
-  - 퍼널
-  field: 2
-- canonical: 모델서빙배포
-  aliases:
-  - distillation
-  - low-bit
-  - model compression
-  - pruning
-  - quantization
-  - 경량화
-  - 모델 경량화
-  - 모델 배포
-  - 모델 서빙
-  - 양자화
-  - 추론 최적화
-  field: 2
-  parent: MLOps
-- canonical: MLOps
-  aliases:
-  - mlops
-  - llmops
-  - 재학습
-  - 성능 드리프트
-  - 모델 모니터링
-  field: 2
-- canonical: 협업커뮤니케이션
-  aliases:
-  - 커뮤니케이션
-  - 협업
-  - 설득
-  - 이해관계자
-  - 직군과 협업
-  field: 3
+  - canonical: 대용량데이터처리
+    aliases:
+      - 대용량 데이터
+      - 대규모 데이터
+      - 대용량 데이터 처리
+      - 대규모 정형
+    field: 2
+  - canonical: 시계열분석
+    aliases:
+      - 시계열
+      - time series
+      - 센서 데이터
+    field: 2
+  - canonical: 이상탐지
+    aliases:
+      - 이상탐지
+      - 이상 탐지
+      - anomaly detection
+      - 고장 예측
+      - 예지보전
+    field: 2
+  - canonical: 파이프라인설계운영
+    aliases:
+      - 파이프라인 구축
+      - 파이프라인 설계
+      - 파이프라인 운영
+      - end-to-end
+    field: 2
+  - canonical: 데이터모델링
+    aliases:
+      - 데이터 모델링
+      - 스키마 설계
+      - 데이터 웨어하우스 모델링
+    field: 2
+  - canonical: 데이터품질관리
+    aliases:
+      - 데이터 품질
+      - 정합성
+      - 품질 관리
+      - dqm
+      - 데이터 거버넌스
+      - data governance
+    field: 2
+  - canonical: A/B테스트
+    aliases:
+      - a/b test
+      - a/b 테스트
+      - ab test
+      - 실험 설계
+      - 인과 추론
+    field: 2
+  - canonical: 대시보드
+    aliases:
+      - 대시보드
+      - dashboard
+      - looker
+      - 데이터 시각화
+      - 리포트 작성
+    field: 2
+  - canonical: 통계분석
+    aliases:
+      - 통계 분석
+      - 통계적
+      - 가설검정
+      - 가설 검정
+      - 가설 수립
+      - aarrr
+      - 코호트
+      - 퍼널
+    field: 2
+  - canonical: 모델서빙배포
+    aliases:
+      - distillation
+      - low-bit
+      - model compression
+      - pruning
+      - quantization
+      - 경량화
+      - 모델 경량화
+      - 모델 배포
+      - 모델 서빙
+      - 양자화
+      - 추론 최적화
+    field: 2
+    parent: MLOps
+  - canonical: MLOps
+    aliases:
+      - mlops
+      - llmops
+      - 재학습
+      - 성능 드리프트
+      - 모델 모니터링
+    field: 2
+  - canonical: 협업커뮤니케이션
+    aliases:
+      - 커뮤니케이션
+      - 협업
+      - 설득
+      - 이해관계자
+      - 직군과 협업
+    field: 3
 bi_viz:
-- canonical: Tableau
-  aliases:
-  - tableau
-  - 태블로
-  field: 1
-  parent: BI
-- canonical: PowerBI
-  aliases:
-  - power bi
-  - powerbi
-  - 파워비아이
-  field: 1
-  parent: BI
-- canonical: QuickSight
-  aliases:
-  - quicksight
-  field: 1
-  parent: BI
-- canonical: Grafana
-  aliases:
-  - grafana
-  - 그라파나
-  field: 1
-  parent: 모니터링
-- canonical: Excel
-  aliases:
-  - excel
-  - 엑셀
-  field: 1
+  - canonical: Tableau
+    aliases:
+      - tableau
+      - 태블로
+    field: 1
+    parent: BI
+  - canonical: PowerBI
+    aliases:
+      - power bi
+      - powerbi
+      - 파워비아이
+    field: 1
+    parent: BI
+  - canonical: QuickSight
+    aliases:
+      - quicksight
+    field: 1
+    parent: BI
+  - canonical: Grafana
+    aliases:
+      - grafana
+      - 그라파나
+    field: 1
+    parent: 모니터링
+  - canonical: Excel
+    aliases:
+      - excel
+      - 엑셀
+    field: 1
 backend:
-- canonical: FastAPI
-  aliases:
-  - fastapi
-  field: 1
-  parent: 웹프레임워크
-- canonical: SpringBoot
-  aliases:
-  - spring boot
-  - springboot
-  - 스프링부트
-  - spring
-  field: 1
-  parent: 웹프레임워크
-- canonical: Node.js
-  aliases:
-  - node.js
-  - nodejs
-  - 노드js
-  field: 1
-  parent: 웹프레임워크
-- canonical: REST API
-  aliases:
-  - rest api
-  - restful
-  - rest
-  field: 1
-- canonical: MSA
-  aliases:
-  - msa
-  - 마이크로서비스
-  field: 1
+  - canonical: FastAPI
+    aliases:
+      - fastapi
+    field: 1
+    parent: 웹프레임워크
+  - canonical: SpringBoot
+    aliases:
+      - spring boot
+      - springboot
+      - 스프링부트
+      - spring
+    field: 1
+    parent: 웹프레임워크
+  - canonical: Node.js
+    aliases:
+      - node.js
+      - nodejs
+      - 노드js
+    field: 1
+    parent: 웹프레임워크
+  - canonical: REST API
+    aliases:
+      - rest api
+      - restful
+      - rest
+    field: 1
+  - canonical: MSA
+    aliases:
+      - msa
+      - 마이크로서비스
+    field: 1
 ml_concepts:
-- canonical: 분류
-  aliases:
-  - 분류
-  - classification
-  field: 2
-- canonical: 회귀
-  aliases:
-  - 회귀
-  - regression
-  field: 2
-- canonical: CNN
-  aliases:
-  - cnn
-  - 합성곱
-  field: 2
-  parent: 딥러닝
-- canonical: RNN
-  aliases:
-  - rnn
-  - lstm
-  field: 2
-  parent: 딥러닝
-- canonical: EdgeAI
-  aliases:
-  - edge ai
-  - efficient ai
-  - ai accelerator
-  - 엣지 ai
-  field: 2
-- canonical: 임베디드
-  aliases:
-  - 임베디드
-  - embedded
-  field: 2
-- canonical: IoT
-  aliases:
-  - iot
-  - 사물인터넷
-  field: 2
+  - canonical: 분류
+    aliases:
+      - 분류
+      - classification
+    field: 2
+  - canonical: 회귀
+    aliases:
+      - 회귀
+      - regression
+    field: 2
+  - canonical: CNN
+    aliases:
+      - cnn
+      - 합성곱
+    field: 2
+    parent: 딥러닝
+  - canonical: RNN
+    aliases:
+      - rnn
+      - lstm
+    field: 2
+    parent: 딥러닝
+  - canonical: EdgeAI
+    aliases:
+      - edge ai
+      - efficient ai
+      - ai accelerator
+      - 엣지 ai
+    field: 2
+  - canonical: 임베디드
+    aliases:
+      - 임베디드
+      - embedded
+    field: 2
+  - canonical: IoT
+    aliases:
+      - iot
+      - 사물인터넷
+    field: 2
 certifications:
-- canonical: SQLD
-  aliases:
-  - sqld
-  field: 1
-  parent: 자격증
-- canonical: SQLP
-  aliases:
-  - sqlp
-  field: 1
-  parent: 자격증
-- canonical: DAP
-  aliases:
-  - dap
-  field: 1
-  parent: 자격증
-- canonical: DASP
-  aliases:
-  - dasp
-  field: 1
-  parent: 자격증
-- canonical: ADsP
-  aliases:
-  - adsp
-  field: 1
-  parent: 자격증
+  - canonical: SQLD
+    aliases:
+      - sqld
+    field: 1
+    parent: 자격증
+  - canonical: SQLP
+    aliases:
+      - sqlp
+    field: 1
+    parent: 자격증
+  - canonical: DAP
+    aliases:
+      - dap
+    field: 1
+    parent: 자격증
+  - canonical: DASP
+    aliases:
+      - dasp
+    field: 1
+    parent: 자격증
+  - canonical: ADsP
+    aliases:
+      - adsp
+    field: 1
+    parent: 자격증

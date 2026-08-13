@@ -18,3 +18,14 @@ __pycache__/
 .DS_Store
 data/labeled/*.jsonl
 logs_*.txt
+
+*.bak_*
+__pycache__/
+.venv/
+
+*.bak_*
+__pycache__/
+.venv/
+data/labeled/label_draft.jsonl
+data/labeled/label_draft_backup.jsonl
+!data/labeled/label_draft.public.jsonl
