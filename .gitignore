@@ -29,3 +29,5 @@ __pycache__/
 data/labeled/label_draft.jsonl
 data/labeled/label_draft_backup.jsonl
 !data/labeled/label_draft.public.jsonl
+!data/labeled/pool_candidates.jsonl
+!data/labeled/pool_key.jsonl

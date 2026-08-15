@@ -1,0 +1,407 @@
+{"job_id": "202695", "tag": "Kubernetes", "sources": ["regex", "llm"]}
+{"job_id": "202695", "tag": "SpringBoot", "sources": ["regex", "llm"]}
+{"job_id": "202695", "tag": "AWS", "sources": ["regex", "llm"]}
+{"job_id": "202695", "tag": "CI/CD", "sources": ["regex", "llm"]}
+{"job_id": "202695", "tag": "Java", "sources": ["regex", "llm"]}
+{"job_id": "202695", "tag": "MSA", "sources": ["llm"]}
+{"job_id": "202695", "tag": "REST API", "sources": ["regex", "llm"]}
+{"job_id": "202695", "tag": "협업커뮤니케이션", "sources": ["llm"]}
+{"job_id": "282256", "tag": "Python", "sources": ["regex", "llm"]}
+{"job_id": "282256", "tag": "대용량데이터처리", "sources": ["regex"]}
+{"job_id": "282256", "tag": "데이터모델링", "sources": ["llm"]}
+{"job_id": "282256", "tag": "SQL", "sources": ["regex", "llm"]}
+{"job_id": "282256", "tag": "BigQuery", "sources": ["regex", "llm"]}
+{"job_id": "282256", "tag": "대시보드", "sources": ["regex", "llm"]}
+{"job_id": "282256", "tag": "A/B테스트", "sources": ["regex", "llm"]}
+{"job_id": "292454", "tag": "Python", "sources": ["llm"]}
+{"job_id": "292454", "tag": "데이터모델링", "sources": ["regex", "llm"]}
+{"job_id": "292454", "tag": "협업커뮤니케이션", "sources": ["regex", "llm"]}
+{"job_id": "292454", "tag": "SQL", "sources": ["llm"]}
+{"job_id": "292454", "tag": "데이터품질관리", "sources": ["regex", "llm"]}
+{"job_id": "292454", "tag": "MLOps", "sources": ["regex", "llm"]}
+{"job_id": "292454", "tag": "모델서빙배포", "sources": ["regex", "llm"]}
+{"job_id": "292454", "tag": "파이프라인설계운영", "sources": ["regex", "llm"]}
+{"job_id": "303122", "tag": "Python", "sources": ["regex", "llm"]}
+{"job_id": "303122", "tag": "AWS", "sources": ["regex", "llm"]}
+{"job_id": "303122", "tag": "Tableau", "sources": ["regex", "llm"]}
+{"job_id": "303122", "tag": "SQL", "sources": ["regex", "llm"]}
+{"job_id": "303122", "tag": "통계분석", "sources": ["regex", "llm"]}
+{"job_id": "303122", "tag": "MySQL", "sources": ["regex", "llm"]}
+{"job_id": "303122", "tag": "A/B테스트", "sources": ["regex", "llm"]}
+{"job_id": "303122", "tag": "협업커뮤니케이션", "sources": ["llm"]}
+{"job_id": "303122", "tag": "Airflow", "sources": ["regex", "llm"]}
+{"job_id": "303122", "tag": "Athena", "sources": ["regex", "llm"]}
+{"job_id": "303122", "tag": "대시보드", "sources": ["regex", "llm"]}
+{"job_id": "303122", "tag": "R", "sources": ["regex", "llm"]}
+{"job_id": "321087", "tag": "Python", "sources": ["regex", "llm"]}
+{"job_id": "321087", "tag": "Excel", "sources": ["regex", "llm"]}
+{"job_id": "321087", "tag": "Tableau", "sources": ["regex", "llm"]}
+{"job_id": "321087", "tag": "데이터모델링", "sources": ["llm"]}
+{"job_id": "321087", "tag": "SQL", "sources": ["regex", "llm"]}
+{"job_id": "321087", "tag": "대시보드", "sources": ["regex"]}
+{"job_id": "321087", "tag": "ETL/ELT", "sources": ["regex", "llm"]}
+{"job_id": "321087", "tag": "PowerBI", "sources": ["regex", "llm"]}
+{"job_id": "321087", "tag": "협업커뮤니케이션", "sources": ["regex", "llm"]}
+{"job_id": "322002", "tag": "Python", "sources": ["regex", "llm"]}
+{"job_id": "322002", "tag": "대용량데이터처리", "sources": ["regex"]}
+{"job_id": "322002", "tag": "데이터모델링", "sources": ["llm"]}
+{"job_id": "322002", "tag": "SQL", "sources": ["regex", "llm"]}
+{"job_id": "322002", "tag": "BigQuery", "sources": ["regex", "llm"]}
+{"job_id": "322002", "tag": "대시보드", "sources": ["regex", "llm"]}
+{"job_id": "322002", "tag": "A/B테스트", "sources": ["regex", "llm"]}
+{"job_id": "330731", "tag": "Python", "sources": ["llm"]}
+{"job_id": "330731", "tag": "ArgoCD", "sources": ["regex", "llm"]}
+{"job_id": "330731", "tag": "AWS", "sources": ["regex", "llm"]}
+{"job_id": "330731", "tag": "GCP", "sources": ["regex", "llm"]}
+{"job_id": "330731", "tag": "LLM", "sources": ["regex", "llm"]}
+{"job_id": "330731", "tag": "ElasticSearch", "sources": ["regex", "llm"]}
+{"job_id": "330731", "tag": "LLM평가", "sources": ["regex", "llm"]}
+{"job_id": "330731", "tag": "A/B테스트", "sources": ["regex", "llm"]}
+{"job_id": "330731", "tag": "AI Agent", "sources": ["regex", "llm"]}
+{"job_id": "330731", "tag": "파이프라인설계운영", "sources": ["regex", "llm"]}
+{"job_id": "330731", "tag": "Kubernetes", "sources": ["regex", "llm"]}
+{"job_id": "330731", "tag": "CI/CD", "sources": ["regex"]}
+{"job_id": "330731", "tag": "데이터품질관리", "sources": ["regex", "llm"]}
+{"job_id": "330731", "tag": "Tool Use", "sources": ["llm"]}
+{"job_id": "330731", "tag": "MLOps", "sources": ["regex"]}
+{"job_id": "330731", "tag": "모델서빙배포", "sources": ["llm"]}
+{"job_id": "330731", "tag": "RAG", "sources": ["regex", "llm"]}
+{"job_id": "330731", "tag": "프롬프트엔지니어링", "sources": ["llm"]}
+{"job_id": "348118", "tag": "Python", "sources": ["regex", "llm"]}
+{"job_id": "348118", "tag": "파이프라인설계운영", "sources": ["llm"]}
+{"job_id": "348118", "tag": "통계분석", "sources": ["llm"]}
+{"job_id": "348118", "tag": "MLOps", "sources": ["regex", "llm"]}
+{"job_id": "348118", "tag": "시계열분석", "sources": ["regex", "llm"]}
+{"job_id": "348118", "tag": "A/B테스트", "sources": ["regex", "llm"]}
+{"job_id": "348118", "tag": "협업커뮤니케이션", "sources": ["regex"]}
+{"job_id": "351569", "tag": "Python", "sources": ["regex", "llm"]}
+{"job_id": "351569", "tag": "Tableau", "sources": ["regex", "llm"]}
+{"job_id": "351569", "tag": "데이터모델링", "sources": ["llm"]}
+{"job_id": "351569", "tag": "SQL", "sources": ["regex", "llm"]}
+{"job_id": "351569", "tag": "통계분석", "sources": ["regex", "llm"]}
+{"job_id": "351569", "tag": "데이터품질관리", "sources": ["regex"]}
+{"job_id": "351569", "tag": "대시보드", "sources": ["regex", "llm"]}
+{"job_id": "351569", "tag": "A/B테스트", "sources": ["regex", "llm"]}
+{"job_id": "351569", "tag": "협업커뮤니케이션", "sources": ["llm"]}
+{"job_id": "352642", "tag": "Prometheus", "sources": ["regex", "llm"]}
+{"job_id": "352642", "tag": "Grafana", "sources": ["regex", "llm"]}
+{"job_id": "352642", "tag": "대용량데이터처리", "sources": ["llm"]}
+{"job_id": "352642", "tag": "파이프라인설계운영", "sources": ["regex", "llm"]}
+{"job_id": "352642", "tag": "협업커뮤니케이션", "sources": ["llm"]}
+{"job_id": "352642", "tag": "ELK", "sources": ["regex", "llm"]}
+{"job_id": "352642", "tag": "PostgreSQL", "sources": ["regex", "llm"]}
+{"job_id": "352642", "tag": "Kafka", "sources": ["regex", "llm"]}
+{"job_id": "352642", "tag": "Airflow", "sources": ["regex", "llm"]}
+{"job_id": "352642", "tag": "Redis", "sources": ["regex", "llm"]}
+{"job_id": "352642", "tag": "Docker", "sources": ["regex", "llm"]}
+{"job_id": "352642", "tag": "데이터모델링", "sources": ["regex", "llm"]}
+{"job_id": "352642", "tag": "데이터품질관리", "sources": ["regex", "llm"]}
+{"job_id": "352642", "tag": "Linux", "sources": ["regex", "llm"]}
+{"job_id": "352642", "tag": "ElasticSearch", "sources": ["regex"]}
+{"job_id": "352642", "tag": "IoT", "sources": ["regex"]}
+{"job_id": "352814", "tag": "Python", "sources": ["regex", "llm"]}
+{"job_id": "352814", "tag": "LLM", "sources": ["regex", "llm"]}
+{"job_id": "352814", "tag": "임베디드", "sources": ["regex"]}
+{"job_id": "352814", "tag": "AI Agent", "sources": ["regex", "llm"]}
+{"job_id": "352814", "tag": "회귀", "sources": ["regex", "llm"]}
+{"job_id": "352814", "tag": "협업커뮤니케이션", "sources": ["regex", "llm"]}
+{"job_id": "352814", "tag": "파이프라인설계운영", "sources": ["llm"]}
+{"job_id": "352814", "tag": "MLOps", "sources": ["regex", "llm"]}
+{"job_id": "352814", "tag": "분류", "sources": ["regex", "llm"]}
+{"job_id": "352814", "tag": "모델서빙배포", "sources": ["llm"]}
+{"job_id": "352814", "tag": "시계열분석", "sources": ["regex", "llm"]}
+{"job_id": "352814", "tag": "이상탐지", "sources": ["regex", "llm"]}
+{"job_id": "352814", "tag": "IoT", "sources": ["regex", "llm"]}
+{"job_id": "355021", "tag": "Python", "sources": ["regex", "llm"]}
+{"job_id": "355021", "tag": "대용량데이터처리", "sources": ["regex"]}
+{"job_id": "355021", "tag": "LLM", "sources": ["regex", "llm"]}
+{"job_id": "355021", "tag": "SQL", "sources": ["regex", "llm"]}
+{"job_id": "355021", "tag": "통계분석", "sources": ["regex", "llm"]}
+{"job_id": "355021", "tag": "scikit-learn", "sources": ["regex", "llm"]}
+{"job_id": "355021", "tag": "A/B테스트", "sources": ["regex", "llm"]}
+{"job_id": "355021", "tag": "회귀", "sources": ["llm"]}
+{"job_id": "355021", "tag": "협업커뮤니케이션", "sources": ["regex", "llm"]}
+{"job_id": "355021", "tag": "파이프라인설계운영", "sources": ["regex", "llm"]}
+{"job_id": "355021", "tag": "데이터모델링", "sources": ["llm"]}
+{"job_id": "355021", "tag": "데이터품질관리", "sources": ["regex"]}
+{"job_id": "355021", "tag": "Pandas", "sources": ["regex", "llm"]}
+{"job_id": "355021", "tag": "Snowflake", "sources": ["regex", "llm"]}
+{"job_id": "355021", "tag": "NLP", "sources": ["llm"]}
+{"job_id": "355021", "tag": "분류", "sources": ["regex", "llm"]}
+{"job_id": "356898", "tag": "모델서빙배포", "sources": ["llm"]}
+{"job_id": "356898", "tag": "파인튜닝", "sources": ["regex", "llm"]}
+{"job_id": "356898", "tag": "LLM", "sources": ["regex", "llm"]}
+{"job_id": "357204", "tag": "Excel", "sources": ["regex"]}
+{"job_id": "357236", "tag": "Excel", "sources": ["regex"]}
+{"job_id": "358727", "tag": "Python", "sources": ["regex", "llm"]}
+{"job_id": "358727", "tag": "Node.js", "sources": ["regex", "llm"]}
+{"job_id": "358727", "tag": "대용량데이터처리", "sources": ["llm"]}
+{"job_id": "358727", "tag": "JavaScript", "sources": ["regex"]}
+{"job_id": "358727", "tag": "MSA", "sources": ["regex", "llm"]}
+{"job_id": "358727", "tag": "AI Agent", "sources": ["regex", "llm"]}
+{"job_id": "358727", "tag": "협업커뮤니케이션", "sources": ["regex", "llm"]}
+{"job_id": "358727", "tag": "MCP", "sources": ["regex", "llm"]}
+{"job_id": "358727", "tag": "Kubernetes", "sources": ["regex", "llm"]}
+{"job_id": "358727", "tag": "Kafka", "sources": ["regex", "llm"]}
+{"job_id": "358727", "tag": "Docker", "sources": ["regex", "llm"]}
+{"job_id": "358727", "tag": "REST API", "sources": ["regex", "llm"]}
+{"job_id": "360141", "tag": "Python", "sources": ["regex", "llm"]}
+{"job_id": "360141", "tag": "대용량데이터처리", "sources": ["regex"]}
+{"job_id": "360141", "tag": "SQLP", "sources": ["regex", "llm"]}
+{"job_id": "360141", "tag": "LLM", "sources": ["regex", "llm"]}
+{"job_id": "360141", "tag": "BigQuery", "sources": ["regex", "llm"]}
+{"job_id": "360141", "tag": "SQL", "sources": ["regex", "llm"]}
+{"job_id": "360141", "tag": "DASP", "sources": ["regex", "llm"]}
+{"job_id": "360141", "tag": "Redshift", "sources": ["regex", "llm"]}
+{"job_id": "360141", "tag": "협업커뮤니케이션", "sources": ["regex", "llm"]}
+{"job_id": "360141", "tag": "파이프라인설계운영", "sources": ["regex"]}
+{"job_id": "360141", "tag": "데이터모델링", "sources": ["regex", "llm"]}
+{"job_id": "360141", "tag": "데이터품질관리", "sources": ["regex", "llm"]}
+{"job_id": "360141", "tag": "Snowflake", "sources": ["regex", "llm"]}
+{"job_id": "360141", "tag": "SQLD", "sources": ["regex", "llm"]}
+{"job_id": "360141", "tag": "DAP", "sources": ["regex", "llm"]}
+{"job_id": "361511", "tag": "Git", "sources": ["regex", "llm"]}
+{"job_id": "361511", "tag": "Python", "sources": ["regex", "llm"]}
+{"job_id": "361511", "tag": "대용량데이터처리", "sources": ["regex", "llm"]}
+{"job_id": "361511", "tag": "Oracle", "sources": ["regex", "llm"]}
+{"job_id": "361511", "tag": "Tableau", "sources": ["regex", "llm"]}
+{"job_id": "361511", "tag": "SQL", "sources": ["regex", "llm"]}
+{"job_id": "361511", "tag": "dbt", "sources": ["regex", "llm"]}
+{"job_id": "361511", "tag": "통계분석", "sources": ["regex"]}
+{"job_id": "361511", "tag": "MySQL", "sources": ["regex", "llm"]}
+{"job_id": "361511", "tag": "협업커뮤니케이션", "sources": ["regex", "llm"]}
+{"job_id": "361511", "tag": "Airflow", "sources": ["regex", "llm"]}
+{"job_id": "361511", "tag": "데이터모델링", "sources": ["llm"]}
+{"job_id": "361511", "tag": "Spark", "sources": ["regex"]}
+{"job_id": "361511", "tag": "데이터품질관리", "sources": ["regex", "llm"]}
+{"job_id": "361511", "tag": "Snowflake", "sources": ["regex", "llm"]}
+{"job_id": "361511", "tag": "PySpark", "sources": ["regex", "llm"]}
+{"job_id": "361511", "tag": "이상탐지", "sources": ["regex"]}
+{"job_id": "361662", "tag": "Python", "sources": ["regex", "llm"]}
+{"job_id": "361662", "tag": "AWS", "sources": ["regex", "llm"]}
+{"job_id": "361662", "tag": "Go", "sources": ["regex", "llm"]}
+{"job_id": "361662", "tag": "vLLM", "sources": ["regex", "llm"]}
+{"job_id": "361662", "tag": "MongoDB", "sources": ["llm"]}
+{"job_id": "361662", "tag": "AI Agent", "sources": ["regex"]}
+{"job_id": "361662", "tag": "파이프라인설계운영", "sources": ["regex", "llm"]}
+{"job_id": "361662", "tag": "VectorDB", "sources": ["regex", "llm"]}
+{"job_id": "361662", "tag": "Kubernetes", "sources": ["regex", "llm"]}
+{"job_id": "361662", "tag": "Terraform", "sources": ["regex"]}
+{"job_id": "361662", "tag": "PostgreSQL", "sources": ["regex", "llm"]}
+{"job_id": "361662", "tag": "Airflow", "sources": ["regex", "llm"]}
+{"job_id": "361662", "tag": "데이터모델링", "sources": ["llm"]}
+{"job_id": "361662", "tag": "Docker", "sources": ["llm"]}
+{"job_id": "361662", "tag": "Databricks", "sources": ["regex", "llm"]}
+{"job_id": "361662", "tag": "Snowflake", "sources": ["regex", "llm"]}
+{"job_id": "361662", "tag": "Azure", "sources": ["regex", "llm"]}
+{"job_id": "361662", "tag": "REST API", "sources": ["regex", "llm"]}
+{"job_id": "361662", "tag": "TypeScript", "sources": ["regex", "llm"]}
+{"job_id": "361662", "tag": "Grafana", "sources": ["regex", "llm"]}
+{"job_id": "361662", "tag": "GCP", "sources": ["regex", "llm"]}
+{"job_id": "361662", "tag": "SQL", "sources": ["regex", "llm"]}
+{"job_id": "361662", "tag": "협업커뮤니케이션", "sources": ["llm"]}
+{"job_id": "361662", "tag": "CI/CD", "sources": ["regex", "llm"]}
+{"job_id": "361662", "tag": "Rust", "sources": ["regex", "llm"]}
+{"job_id": "361662", "tag": "MLOps", "sources": ["regex"]}
+{"job_id": "361662", "tag": "모델서빙배포", "sources": ["regex", "llm"]}
+{"job_id": "362485", "tag": "Python", "sources": ["regex", "llm"]}
+{"job_id": "362485", "tag": "AWS", "sources": ["regex", "llm"]}
+{"job_id": "362485", "tag": "LLM", "sources": ["regex", "llm"]}
+{"job_id": "362485", "tag": "JavaScript", "sources": ["regex", "llm"]}
+{"job_id": "362485", "tag": "AI Agent", "sources": ["regex", "llm"]}
+{"job_id": "362485", "tag": "파이프라인설계운영", "sources": ["regex", "llm"]}
+{"job_id": "362485", "tag": "VectorDB", "sources": ["regex", "llm"]}
+{"job_id": "362485", "tag": "Kafka", "sources": ["regex", "llm"]}
+{"job_id": "362485", "tag": "Airflow", "sources": ["regex", "llm"]}
+{"job_id": "362485", "tag": "Docker", "sources": ["llm"]}
+{"job_id": "362485", "tag": "데이터품질관리", "sources": ["llm"]}
+{"job_id": "362485", "tag": "Azure", "sources": ["regex", "llm"]}
+{"job_id": "362485", "tag": "NLP", "sources": ["regex", "llm"]}
+{"job_id": "362485", "tag": "RAG", "sources": ["regex", "llm"]}
+{"job_id": "364754", "tag": "Python", "sources": ["regex", "llm"]}
+{"job_id": "364754", "tag": "PyTorch", "sources": ["regex", "llm"]}
+{"job_id": "364754", "tag": "협업커뮤니케이션", "sources": ["regex", "llm"]}
+{"job_id": "364754", "tag": "데이터품질관리", "sources": ["regex"]}
+{"job_id": "364754", "tag": "파이프라인설계운영", "sources": ["regex"]}
+{"job_id": "366274", "tag": "Python", "sources": ["llm"]}
+{"job_id": "366274", "tag": "C++", "sources": ["regex", "llm"]}
+{"job_id": "366274", "tag": "NLP", "sources": ["regex"]}
+{"job_id": "366274", "tag": "Linux", "sources": ["llm"]}
+{"job_id": "366274", "tag": "임베디드", "sources": ["regex", "llm"]}
+{"job_id": "366274", "tag": "협업커뮤니케이션", "sources": ["regex", "llm"]}
+{"job_id": "367361", "tag": "Python", "sources": ["regex", "llm"]}
+{"job_id": "367361", "tag": "대용량데이터처리", "sources": ["regex", "llm"]}
+{"job_id": "367361", "tag": "NumPy", "sources": ["regex", "llm"]}
+{"job_id": "367361", "tag": "Tableau", "sources": ["regex", "llm"]}
+{"job_id": "367361", "tag": "SQL", "sources": ["regex", "llm"]}
+{"job_id": "367361", "tag": "통계분석", "sources": ["regex", "llm"]}
+{"job_id": "367361", "tag": "A/B테스트", "sources": ["regex", "llm"]}
+{"job_id": "367361", "tag": "협업커뮤니케이션", "sources": ["regex", "llm"]}
+{"job_id": "367361", "tag": "데이터모델링", "sources": ["llm"]}
+{"job_id": "367361", "tag": "Spark", "sources": ["regex"]}
+{"job_id": "367361", "tag": "Pandas", "sources": ["regex", "llm"]}
+{"job_id": "367361", "tag": "PySpark", "sources": ["regex", "llm"]}
+{"job_id": "367361", "tag": "대시보드", "sources": ["regex", "llm"]}
+{"job_id": "368120", "tag": "Python", "sources": ["regex", "llm"]}
+{"job_id": "368120", "tag": "LLM", "sources": ["regex", "llm"]}
+{"job_id": "368120", "tag": "프롬프트엔지니어링", "sources": ["llm"]}
+{"job_id": "368120", "tag": "LLM평가", "sources": ["regex", "llm"]}
+{"job_id": "368120", "tag": "RAG", "sources": ["regex", "llm"]}
+{"job_id": "368120", "tag": "AI Agent", "sources": ["regex", "llm"]}
+{"job_id": "368120", "tag": "회귀", "sources": ["regex"]}
+{"job_id": "368120", "tag": "협업커뮤니케이션", "sources": ["llm"]}
+{"job_id": "368521", "tag": "Python", "sources": ["regex", "llm"]}
+{"job_id": "368521", "tag": "파인튜닝", "sources": ["regex", "llm"]}
+{"job_id": "368521", "tag": "ComputerVision", "sources": ["regex", "llm"]}
+{"job_id": "368521", "tag": "통계분석", "sources": ["regex", "llm"]}
+{"job_id": "368521", "tag": "데이터품질관리", "sources": ["llm"]}
+{"job_id": "368521", "tag": "분류", "sources": ["llm"]}
+{"job_id": "368521", "tag": "LLM평가", "sources": ["regex"]}
+{"job_id": "368521", "tag": "PyTorch", "sources": ["regex", "llm"]}
+{"job_id": "368521", "tag": "파이프라인설계운영", "sources": ["regex"]}
+{"job_id": "368805", "tag": "Python", "sources": ["llm"]}
+{"job_id": "368805", "tag": "LLM", "sources": ["regex", "llm"]}
+{"job_id": "368805", "tag": "협업커뮤니케이션", "sources": ["regex", "llm"]}
+{"job_id": "368805", "tag": "통계분석", "sources": ["regex", "llm"]}
+{"job_id": "368805", "tag": "모델서빙배포", "sources": ["regex", "llm"]}
+{"job_id": "368805", "tag": "프롬프트엔지니어링", "sources": ["regex", "llm"]}
+{"job_id": "368805", "tag": "RAG", "sources": ["regex", "llm"]}
+{"job_id": "368805", "tag": "AI Agent", "sources": ["regex", "llm"]}
+{"job_id": "368805", "tag": "파이프라인설계운영", "sources": ["regex", "llm"]}
+{"job_id": "370344", "tag": "Oracle", "sources": ["regex", "llm"]}
+{"job_id": "370344", "tag": "MariaDB", "sources": ["regex", "llm"]}
+{"job_id": "370344", "tag": "SQL", "sources": ["regex", "llm"]}
+{"job_id": "370344", "tag": "MySQL", "sources": ["regex"]}
+{"job_id": "370344", "tag": "MSSQL", "sources": ["regex", "llm"]}
+{"job_id": "370786", "tag": "Python", "sources": ["regex", "llm"]}
+{"job_id": "370786", "tag": "SpringBoot", "sources": ["regex", "llm"]}
+{"job_id": "370786", "tag": "ArgoCD", "sources": ["regex", "llm"]}
+{"job_id": "370786", "tag": "AWS", "sources": ["regex", "llm"]}
+{"job_id": "370786", "tag": "FastAPI", "sources": ["regex", "llm"]}
+{"job_id": "370786", "tag": "Flink", "sources": ["regex", "llm"]}
+{"job_id": "370786", "tag": "파이프라인설계운영", "sources": ["llm"]}
+{"job_id": "370786", "tag": "Terraform", "sources": ["regex", "llm"]}
+{"job_id": "370786", "tag": "PostgreSQL", "sources": ["regex", "llm"]}
+{"job_id": "370786", "tag": "Kafka", "sources": ["regex", "llm"]}
+{"job_id": "370786", "tag": "Airflow", "sources": ["regex", "llm"]}
+{"job_id": "370786", "tag": "데이터모델링", "sources": ["regex", "llm"]}
+{"job_id": "370786", "tag": "Snowflake", "sources": ["regex", "llm"]}
+{"job_id": "370786", "tag": "대시보드", "sources": ["regex", "llm"]}
+{"job_id": "370786", "tag": "SQL", "sources": ["regex", "llm"]}
+{"job_id": "370786", "tag": "dbt", "sources": ["regex", "llm"]}
+{"job_id": "370786", "tag": "MySQL", "sources": ["regex", "llm"]}
+{"job_id": "370786", "tag": "협업커뮤니케이션", "sources": ["regex"]}
+{"job_id": "370786", "tag": "CI/CD", "sources": ["regex"]}
+{"job_id": "370786", "tag": "Java", "sources": ["regex", "llm"]}
+{"job_id": "370786", "tag": "데이터품질관리", "sources": ["regex"]}
+{"job_id": "373015", "tag": "C", "sources": ["regex", "llm"]}
+{"job_id": "373015", "tag": "Linux", "sources": ["regex", "llm"]}
+{"job_id": "373015", "tag": "Java", "sources": ["regex", "llm"]}
+{"job_id": "373409", "tag": "AWS", "sources": ["regex", "llm"]}
+{"job_id": "373409", "tag": "GCP", "sources": ["regex", "llm"]}
+{"job_id": "373409", "tag": "SQL", "sources": ["regex", "llm"]}
+{"job_id": "373409", "tag": "통계분석", "sources": ["llm"]}
+{"job_id": "373409", "tag": "Athena", "sources": ["regex", "llm"]}
+{"job_id": "373409", "tag": "Azure", "sources": ["regex", "llm"]}
+{"job_id": "373409", "tag": "QuickSight", "sources": ["regex", "llm"]}
+{"job_id": "373409", "tag": "대시보드", "sources": ["regex"]}
+{"job_id": "373409", "tag": "협업커뮤니케이션", "sources": ["regex"]}
+{"job_id": "373719", "tag": "Prometheus", "sources": ["regex", "llm"]}
+{"job_id": "373719", "tag": "Python", "sources": ["regex", "llm"]}
+{"job_id": "373719", "tag": "TensorFlow", "sources": ["regex", "llm"]}
+{"job_id": "373719", "tag": "SpringBoot", "sources": ["regex", "llm"]}
+{"job_id": "373719", "tag": "AWS", "sources": ["regex", "llm"]}
+{"job_id": "373719", "tag": "PyTorch", "sources": ["regex", "llm"]}
+{"job_id": "373719", "tag": "파이프라인설계운영", "sources": ["regex", "llm"]}
+{"job_id": "373719", "tag": "Kubernetes", "sources": ["regex", "llm"]}
+{"job_id": "373719", "tag": "Kafka", "sources": ["regex", "llm"]}
+{"job_id": "373719", "tag": "Airflow", "sources": ["regex", "llm"]}
+{"job_id": "373719", "tag": "Docker", "sources": ["regex", "llm"]}
+{"job_id": "373719", "tag": "REST API", "sources": ["llm"]}
+{"job_id": "373719", "tag": "Git", "sources": ["regex", "llm"]}
+{"job_id": "373719", "tag": "Grafana", "sources": ["regex", "llm"]}
+{"job_id": "373719", "tag": "대용량데이터처리", "sources": ["regex"]}
+{"job_id": "373719", "tag": "MLflow", "sources": ["regex", "llm"]}
+{"job_id": "373719", "tag": "scikit-learn", "sources": ["regex", "llm"]}
+{"job_id": "373719", "tag": "회귀", "sources": ["llm"]}
+{"job_id": "373719", "tag": "협업커뮤니케이션", "sources": ["regex"]}
+{"job_id": "373719", "tag": "CI/CD", "sources": ["regex", "llm"]}
+{"job_id": "373719", "tag": "Spark", "sources": ["regex", "llm"]}
+{"job_id": "373719", "tag": "MLOps", "sources": ["regex", "llm"]}
+{"job_id": "373719", "tag": "분류", "sources": ["llm"]}
+{"job_id": "373719", "tag": "모델서빙배포", "sources": ["regex", "llm"]}
+{"job_id": "373719", "tag": "시계열분석", "sources": ["regex", "llm"]}
+{"job_id": "373757", "tag": "Python", "sources": ["regex", "llm"]}
+{"job_id": "373757", "tag": "VectorDB", "sources": ["regex", "llm"]}
+{"job_id": "373757", "tag": "Node.js", "sources": ["regex", "llm"]}
+{"job_id": "373757", "tag": "LLM", "sources": ["regex", "llm"]}
+{"job_id": "373757", "tag": "협업커뮤니케이션", "sources": ["regex", "llm"]}
+{"job_id": "373757", "tag": "REST API", "sources": ["llm"]}
+{"job_id": "373757", "tag": "RAG", "sources": ["regex", "llm"]}
+{"job_id": "373757", "tag": "AI Agent", "sources": ["regex", "llm"]}
+{"job_id": "373757", "tag": "파이프라인설계운영", "sources": ["regex"]}
+{"job_id": "374399", "tag": "파인튜닝", "sources": ["regex", "llm"]}
+{"job_id": "374399", "tag": "LLM API", "sources": ["regex", "llm"]}
+{"job_id": "374399", "tag": "LLM", "sources": ["regex"]}
+{"job_id": "374399", "tag": "임베디드", "sources": ["regex", "llm"]}
+{"job_id": "374399", "tag": "RAG", "sources": ["regex", "llm"]}
+{"job_id": "374399", "tag": "AI Agent", "sources": ["llm"]}
+{"job_id": "374421", "tag": "Kubernetes", "sources": ["regex", "llm"]}
+{"job_id": "374421", "tag": "Terraform", "sources": ["regex", "llm"]}
+{"job_id": "374421", "tag": "AWS", "sources": ["regex", "llm"]}
+{"job_id": "374421", "tag": "Docker", "sources": ["llm"]}
+{"job_id": "374421", "tag": "Linux", "sources": ["regex", "llm"]}
+{"job_id": "374560", "tag": "Python", "sources": ["regex", "llm"]}
+{"job_id": "374560", "tag": "TensorFlow", "sources": ["regex", "llm"]}
+{"job_id": "374560", "tag": "Node.js", "sources": ["regex", "llm"]}
+{"job_id": "374560", "tag": "LLM", "sources": ["regex"]}
+{"job_id": "374560", "tag": "HuggingFace", "sources": ["regex"]}
+{"job_id": "374560", "tag": "FastAPI", "sources": ["regex", "llm"]}
+{"job_id": "374560", "tag": "PyTorch", "sources": ["regex", "llm"]}
+{"job_id": "374560", "tag": "A/B테스트", "sources": ["regex", "llm"]}
+{"job_id": "374560", "tag": "AI Agent", "sources": ["regex"]}
+{"job_id": "374560", "tag": "파이프라인설계운영", "sources": ["regex", "llm"]}
+{"job_id": "374560", "tag": "Docker", "sources": ["regex", "llm"]}
+{"job_id": "374560", "tag": "NLP", "sources": ["llm"]}
+{"job_id": "374560", "tag": "대시보드", "sources": ["regex"]}
+{"job_id": "374560", "tag": "Git", "sources": ["regex", "llm"]}
+{"job_id": "374560", "tag": "파인튜닝", "sources": ["regex", "llm"]}
+{"job_id": "374560", "tag": "LLM API", "sources": ["regex", "llm"]}
+{"job_id": "374560", "tag": "SQL", "sources": ["regex", "llm"]}
+{"job_id": "374560", "tag": "scikit-learn", "sources": ["regex", "llm"]}
+{"job_id": "374560", "tag": "회귀", "sources": ["regex", "llm"]}
+{"job_id": "374560", "tag": "협업커뮤니케이션", "sources": ["regex", "llm"]}
+{"job_id": "374560", "tag": "RNN", "sources": ["regex", "llm"]}
+{"job_id": "374560", "tag": "분류", "sources": ["regex", "llm"]}
+{"job_id": "374560", "tag": "모델서빙배포", "sources": ["llm"]}
+{"job_id": "374560", "tag": "CNN", "sources": ["regex", "llm"]}
+{"job_id": "374560", "tag": "Linux", "sources": ["regex", "llm"]}
+{"job_id": "374560", "tag": "멀티모달", "sources": ["regex", "llm"]}
+{"job_id": "374560", "tag": "ComputerVision", "sources": ["regex", "llm"]}
+{"job_id": "375501", "tag": "Python", "sources": ["regex", "llm"]}
+{"job_id": "375501", "tag": "TensorFlow", "sources": ["regex", "llm"]}
+{"job_id": "375501", "tag": "NumPy", "sources": ["regex", "llm"]}
+{"job_id": "375501", "tag": "SQL", "sources": ["regex", "llm"]}
+{"job_id": "375501", "tag": "통계분석", "sources": ["regex", "llm"]}
+{"job_id": "375501", "tag": "scikit-learn", "sources": ["regex", "llm"]}
+{"job_id": "375501", "tag": "PyTorch", "sources": ["regex", "llm"]}
+{"job_id": "375501", "tag": "A/B테스트", "sources": ["regex"]}
+{"job_id": "375501", "tag": "협업커뮤니케이션", "sources": ["regex", "llm"]}
+{"job_id": "375501", "tag": "파이프라인설계운영", "sources": ["regex"]}
+{"job_id": "375501", "tag": "데이터품질관리", "sources": ["regex", "llm"]}
+{"job_id": "375501", "tag": "Pandas", "sources": ["regex", "llm"]}
+{"job_id": "375501", "tag": "MLOps", "sources": ["regex"]}
+{"job_id": "375501", "tag": "모델서빙배포", "sources": ["regex"]}
+{"job_id": "375501", "tag": "시계열분석", "sources": ["regex", "llm"]}
+{"job_id": "375560", "tag": "TensorFlow", "sources": ["regex", "llm"]}
+{"job_id": "375560", "tag": "EdgeAI", "sources": ["regex", "llm"]}
+{"job_id": "375560", "tag": "파인튜닝", "sources": ["llm"]}
+{"job_id": "375560", "tag": "모델서빙배포", "sources": ["regex", "llm"]}
+{"job_id": "375560", "tag": "PyTorch", "sources": ["regex", "llm"]}
+{"job_id": "375560", "tag": "ONNX", "sources": ["regex", "llm"]}
+{"job_id": "375560", "tag": "임베디드", "sources": ["regex", "llm"]}
+{"job_id": "375560", "tag": "IoT", "sources": ["regex", "llm"]}
+{"job_id": "376498", "tag": "AWS", "sources": ["regex", "llm"]}
+{"job_id": "376498", "tag": "데이터품질관리", "sources": ["regex", "llm"]}
+{"job_id": "376498", "tag": "Azure", "sources": ["regex", "llm"]}
+{"job_id": "376498", "tag": "협업커뮤니케이션", "sources": ["regex", "llm"]}
