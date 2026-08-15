@@ -1,0 +1,16 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "date": "2026-07-30",
+  "pricing_as_of": "2026-08-12",
+  "n_processed": 35,
+  "n_error": 0,
+  "n_parse_fail": 2,
+  "n_truncated": 0,
+  "n_hallucinated_tags": 12,
+  "avg_tags": 9.6,
+  "total_cost_usd": 0.112006,
+  "cost_per_doc_usd": 0.00320017,
+  "latency_ms_p50": 1312,
+  "latency_ms_p95": 2049,
+  "pred_path": "data/processed/2026-07-30/llm_extract_claude-haiku-4-5-20251001.jsonl"
+}

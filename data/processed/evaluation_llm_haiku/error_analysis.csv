@@ -1,0 +1,63 @@
+﻿유형,태그,건수
+FP_오탐,데이터모델링,8
+FP_오탐,SQL,6
+FP_오탐,Python,6
+FP_오탐,모델서빙배포,5
+FP_오탐,A/B테스트,4
+FP_오탐,분류,4
+FP_오탐,파이프라인설계운영,3
+FP_오탐,통계분석,3
+FP_오탐,회귀,3
+FP_오탐,Tableau,3
+FP_오탐,REST API,3
+FP_오탐,Docker,3
+FP_오탐,대시보드,3
+FP_오탐,NLP,2
+FP_오탐,Pandas,2
+FP_오탐,Node.js,2
+FP_오탐,대용량데이터처리,2
+FP_오탐,AI Agent,2
+FP_오탐,프롬프트엔지니어링,2
+FP_오탐,Grafana,2
+FP_오탐,데이터품질관리,2
+FP_오탐,임베디드,2
+FP_오탐,PySpark,1
+FP_오탐,SpringBoot,1
+FP_오탐,Prometheus,1
+FP_오탐,VectorDB,1
+FP_오탐,FastAPI,1
+FP_오탐,LLM API,1
+FP_오탐,NumPy,1
+FP_오탐,파인튜닝,1
+FP_오탐,MSA,1
+FP_오탐,MongoDB,1
+FP_오탐,ArgoCD,1
+FP_오탐,Tool Use,1
+FP_오탐,IoT,1
+FP_오탐,Linux,1
+FP_오탐,C++,1
+FP_오탐,Athena,1
+FP_오탐,R,1
+FN_누락,파이프라인설계운영,5
+FN_누락,JavaScript,3
+FN_누락,데이터품질관리,2
+FN_누락,CI/CD,2
+FN_누락,대용량데이터처리,2
+FN_누락,LLM,2
+FN_누락,AI Agent,2
+FN_누락,MLOps,2
+FN_누락,이상탐지,1
+FN_누락,Spark,1
+FN_누락,통계분석,1
+FN_누락,대시보드,1
+FN_누락,HuggingFace,1
+FN_누락,모델서빙배포,1
+FN_누락,모바일,1
+FN_누락,ElasticSearch,1
+FN_누락,Terraform,1
+FN_누락,ansys,1
+FN_누락,NLP,1
+FN_누락,label-free imaging(holotomography,1
+FN_누락,polarization,1
+FN_누락,quantitative phase,1
+FN_누락,LLM평가,1

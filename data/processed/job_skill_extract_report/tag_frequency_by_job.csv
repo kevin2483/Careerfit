@@ -23,7 +23,7 @@ Airflow,data_pipeline,1,28,81,27,7,143
 파인튜닝,llm_genai,2,30,27,83,1,141
 TensorFlow,ml_frameworks,1,35,14,85,3,137
 시계열분석,experience_narrative,2,43,28,63,2,136
-통계분석,experience_narrative,2,44,29,33,20,126
+통계분석,experience_narrative,2,45,29,34,20,128
 VLM,cv,2,13,17,82,0,112
 멀티모달,cv,2,17,25,68,1,111
 Spark,data_pipeline,1,25,56,23,4,108

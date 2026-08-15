@@ -16,7 +16,7 @@ CareerFit — LLM 기반 스킬 추출기 (regex baseline과 동일 인터페이
 
 스키마 맞추기 (레포에 붙일 때 여기만 확인)
 ------------------------------------------
-- RAW_ID_KEYS / RAW_TEXT_KEYS / RAW_ROLE_KEYS: 원본 JSONL 키 후보. 실제 키 추가.
+- RAW_ID_KEYS / RAW_TEXT_KEYS: CareerFit 실제 스키마(job_id / body_raw)로 고정돼 있음.
 - PRED_TAGS_KEY: evaluate_extraction.py가 예측 태그를 읽는 키 이름.
 - load_canonical_tags(): 사전 YAML 구조에 맞게 확인.
 
@@ -31,6 +31,9 @@ CareerFit — LLM 기반 스킬 추출기 (regex baseline과 동일 인터페이
 
     # 전체
     python -m src.extract.llm_skill_extract ... --model claude-sonnet-5
+
+정답셋 id 목록 만들기:
+    python -c "import json;print('\\n'.join(str(json.loads(l)['job_id']) for l in open('data/labeled/label_draft.jsonl',encoding='utf-8') if l.strip() and json.loads(l).get('reviewed')))" > data/labeled/gold_ids.txt
 """
 
 from __future__ import annotations
@@ -51,10 +54,11 @@ from anthropic import Anthropic
 
 # ---------------------------------------------------------------- 스키마 어댑터
 
-RAW_ID_KEYS = ("job_id", "id", "position_id", "wanted_id")
-RAW_TEXT_KEYS = ("full_text", "detail", "description", "requirements", "content")
-RAW_ROLE_KEYS = ("role", "job_role", "category")
-PRED_TAGS_KEY = "tags"
+# CareerFit 실제 스키마 기준 (job_skill_extract_report.py 와 동일)
+RAW_ID_KEYS = ("job_id",)
+RAW_TEXT_KEYS = ("body_raw",)          # regex 베이스라인도 body_raw 만 본다 = 동일 입력
+PRED_TAGS_KEY = "tags"                 # evaluate_extraction.py --tag-key 기본값
+JOBS = ("ds", "de", "mle", "da")       # 직무는 레코드가 아니라 raw 디렉토리명에서 얻는다
 
 MAX_CHARS = 12_000  # 원티드 공고 본문은 대부분 이 안에 들어옴. 초과분은 잘리고 플래그가 남음.
 
@@ -141,6 +145,13 @@ def _pick(rec: dict, keys: Iterable[str]) -> Any:
     return None
 
 
+def _role_from_path(path: Path) -> str | None:
+    for part in path.parts:
+        if part in JOBS:
+            return part
+    return None
+
+
 def iter_raw_records(raw_dir: str | Path, date: str | None) -> Iterable[dict]:
     """raw_dir 아래 *.jsonl 을 재귀로 읽는다. date가 주어지면 경로에 포함된 것만."""
     root = Path(raw_dir)
@@ -161,6 +172,7 @@ def iter_raw_records(raw_dir: str | Path, date: str | None) -> Iterable[dict]:
                     print(f"[warn] {path}:{lineno} JSON 파싱 실패 스킵: {e}", file=sys.stderr)
                     continue
                 rec.setdefault("_src_file", str(path))
+                rec.setdefault("_role", _role_from_path(path))
                 yield rec
 
 
@@ -214,7 +226,7 @@ def extract_one(
 
     result = {
         "job_id": job_id,
-        "role": _pick(rec, RAW_ROLE_KEYS),
+        "role": rec.get("_role"),
         PRED_TAGS_KEY: [],
         "_meta": {
             "model": model,
