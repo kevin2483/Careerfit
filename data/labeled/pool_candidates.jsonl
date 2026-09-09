@@ -1,8 +1,8 @@
 {"job_id": "357204", "tag": "Excel", "verdict": false}
 {"job_id": "368805", "tag": "협업커뮤니케이션", "verdict": true}
 {"job_id": "361662", "tag": "Docker", "verdict": false}
-{"job_id": "373015", "tag": "Linux", "verdict": null}
-{"job_id": "373719", "tag": "파이프라인설계운영", "verdict": null}
+{"job_id": "373015", "tag": "Linux", "verdict": true}
+{"job_id": "373719", "tag": "파이프라인설계운영", "verdict": true}
 {"job_id": "202695", "tag": "AWS", "verdict": true}
 {"job_id": "374560", "tag": "AI Agent", "verdict": null}
 {"job_id": "282256", "tag": "SQL", "verdict": true}
@@ -22,12 +22,12 @@
 {"job_id": "352642", "tag": "ElasticSearch", "verdict": false}
 {"job_id": "352814", "tag": "협업커뮤니케이션", "verdict": true}
 {"job_id": "361511", "tag": "PySpark", "verdict": true}
-{"job_id": "370786", "tag": "데이터모델링", "verdict": null}
+{"job_id": "370786", "tag": "데이터모델링", "verdict": false}
 {"job_id": "375560", "tag": "EdgeAI", "verdict": null}
 {"job_id": "361511", "tag": "데이터모델링", "verdict": true}
 {"job_id": "375501", "tag": "모델서빙배포", "verdict": null}
 {"job_id": "352814", "tag": "분류", "verdict": true}
-{"job_id": "373719", "tag": "분류", "verdict": null}
+{"job_id": "373719", "tag": "분류", "verdict": false}
 {"job_id": "360141", "tag": "Redshift", "verdict": true}
 {"job_id": "364754", "tag": "PyTorch", "verdict": true}
 {"job_id": "366274", "tag": "C++", "verdict": true}
@@ -40,7 +40,7 @@
 {"job_id": "368805", "tag": "AI Agent", "verdict": false}
 {"job_id": "367361", "tag": "대시보드", "verdict": true}
 {"job_id": "368805", "tag": "통계분석", "verdict": true}
-{"job_id": "373757", "tag": "RAG", "verdict": null}
+{"job_id": "373757", "tag": "RAG", "verdict": true}
 {"job_id": "374560", "tag": "TensorFlow", "verdict": null}
 {"job_id": "360141", "tag": "SQLP", "verdict": true}
 {"job_id": "361662", "tag": "데이터모델링", "verdict": true}
@@ -51,35 +51,35 @@
 {"job_id": "355021", "tag": "Snowflake", "verdict": true}
 {"job_id": "375501", "tag": "A/B테스트", "verdict": null}
 {"job_id": "321087", "tag": "SQL", "verdict": true}
-{"job_id": "370786", "tag": "SpringBoot", "verdict": null}
-{"job_id": "373719", "tag": "TensorFlow", "verdict": null}
+{"job_id": "370786", "tag": "SpringBoot", "verdict": true}
+{"job_id": "373719", "tag": "TensorFlow", "verdict": true}
 {"job_id": "367361", "tag": "Pandas", "verdict": true}
 {"job_id": "358727", "tag": "Kubernetes", "verdict": false}
-{"job_id": "373757", "tag": "협업커뮤니케이션", "verdict": null}
+{"job_id": "373757", "tag": "협업커뮤니케이션", "verdict": false}
 {"job_id": "303122", "tag": "A/B테스트", "verdict": true}
 {"job_id": "361662", "tag": "협업커뮤니케이션", "verdict": true}
-{"job_id": "370786", "tag": "Kafka", "verdict": null}
+{"job_id": "370786", "tag": "Kafka", "verdict": true}
 {"job_id": "370344", "tag": "SQL", "verdict": true}
-{"job_id": "373409", "tag": "AWS", "verdict": null}
+{"job_id": "373409", "tag": "AWS", "verdict": true}
 {"job_id": "322002", "tag": "A/B테스트", "verdict": true}
 {"job_id": "330731", "tag": "프롬프트엔지니어링", "verdict": false}
-{"job_id": "373015", "tag": "Java", "verdict": null}
+{"job_id": "373015", "tag": "Java", "verdict": true}
 {"job_id": "361662", "tag": "Grafana", "verdict": false}
 {"job_id": "303122", "tag": "SQL", "verdict": true}
 {"job_id": "361511", "tag": "Git", "verdict": true}
 {"job_id": "362485", "tag": "Docker", "verdict": false}
 {"job_id": "330731", "tag": "모델서빙배포", "verdict": false}
 {"job_id": "330731", "tag": "AWS", "verdict": true}
-{"job_id": "373719", "tag": "Docker", "verdict": null}
+{"job_id": "373719", "tag": "Docker", "verdict": true}
 {"job_id": "376498", "tag": "협업커뮤니케이션", "verdict": null}
 {"job_id": "303122", "tag": "Airflow", "verdict": false}
 {"job_id": "348118", "tag": "MLOps", "verdict": true}
-{"job_id": "370786", "tag": "대시보드", "verdict": null}
+{"job_id": "370786", "tag": "대시보드", "verdict": true}
 {"job_id": "355021", "tag": "협업커뮤니케이션", "verdict": false}
 {"job_id": "368805", "tag": "모델서빙배포", "verdict": true}
 {"job_id": "375560", "tag": "모델서빙배포", "verdict": null}
 {"job_id": "351569", "tag": "Python", "verdict": true}
-{"job_id": "373409", "tag": "협업커뮤니케이션", "verdict": null}
+{"job_id": "373409", "tag": "협업커뮤니케이션", "verdict": true}
 {"job_id": "356898", "tag": "모델서빙배포", "verdict": false}
 {"job_id": "282256", "tag": "데이터모델링", "verdict": false}
 {"job_id": "330731", "tag": "MLOps", "verdict": false}
@@ -91,8 +91,8 @@
 {"job_id": "352642", "tag": "데이터품질관리", "verdict": false}
 {"job_id": "202695", "tag": "REST API", "verdict": true}
 {"job_id": "352642", "tag": "데이터모델링", "verdict": true}
-{"job_id": "373757", "tag": "LLM", "verdict": null}
-{"job_id": "374399", "tag": "파인튜닝", "verdict": null}
+{"job_id": "373757", "tag": "LLM", "verdict": true}
+{"job_id": "374399", "tag": "파인튜닝", "verdict": false}
 {"job_id": "348118", "tag": "Python", "verdict": true}
 {"job_id": "352642", "tag": "Redis", "verdict": true}
 {"job_id": "348118", "tag": "A/B테스트", "verdict": false}
@@ -101,7 +101,7 @@
 {"job_id": "321087", "tag": "Tableau", "verdict": true}
 {"job_id": "360141", "tag": "데이터품질관리", "verdict": true}
 {"job_id": "368120", "tag": "RAG", "verdict": true}
-{"job_id": "370786", "tag": "Java", "verdict": null}
+{"job_id": "370786", "tag": "Java", "verdict": true}
 {"job_id": "368521", "tag": "PyTorch", "verdict": true}
 {"job_id": "361511", "tag": "데이터품질관리", "verdict": true}
 {"job_id": "362485", "tag": "Azure", "verdict": true}
@@ -109,7 +109,7 @@
 {"job_id": "352642", "tag": "Airflow", "verdict": true}
 {"job_id": "352642", "tag": "협업커뮤니케이션", "verdict": false}
 {"job_id": "361511", "tag": "통계분석", "verdict": true}
-{"job_id": "373719", "tag": "MLflow", "verdict": null}
+{"job_id": "373719", "tag": "MLflow", "verdict": true}
 {"job_id": "361511", "tag": "이상탐지", "verdict": false}
 {"job_id": "375560", "tag": "TensorFlow", "verdict": null}
 {"job_id": "352642", "tag": "IoT", "verdict": true}
@@ -120,7 +120,7 @@
 {"job_id": "366274", "tag": "NLP", "verdict": true}
 {"job_id": "202695", "tag": "협업커뮤니케이션", "verdict": true}
 {"job_id": "368521", "tag": "파인튜닝", "verdict": false}
-{"job_id": "370786", "tag": "SQL", "verdict": null}
+{"job_id": "370786", "tag": "SQL", "verdict": true}
 {"job_id": "360141", "tag": "데이터모델링", "verdict": true}
 {"job_id": "361511", "tag": "Oracle", "verdict": true}
 {"job_id": "367361", "tag": "Python", "verdict": true}
@@ -128,7 +128,7 @@
 {"job_id": "361662", "tag": "AWS", "verdict": true}
 {"job_id": "374560", "tag": "CNN", "verdict": null}
 {"job_id": "374560", "tag": "Docker", "verdict": null}
-{"job_id": "373757", "tag": "AI Agent", "verdict": null}
+{"job_id": "373757", "tag": "AI Agent", "verdict": true}
 {"job_id": "374560", "tag": "회귀", "verdict": null}
 {"job_id": "376498", "tag": "데이터품질관리", "verdict": null}
 {"job_id": "360141", "tag": "BigQuery", "verdict": true}
@@ -137,11 +137,11 @@
 {"job_id": "368120", "tag": "AI Agent", "verdict": true}
 {"job_id": "355021", "tag": "통계분석", "verdict": false}
 {"job_id": "361662", "tag": "SQL", "verdict": true}
-{"job_id": "370786", "tag": "PostgreSQL", "verdict": null}
+{"job_id": "370786", "tag": "PostgreSQL", "verdict": true}
 {"job_id": "362485", "tag": "파이프라인설계운영", "verdict": false}
-{"job_id": "373757", "tag": "파이프라인설계운영", "verdict": null}
+{"job_id": "373757", "tag": "파이프라인설계운영", "verdict": false}
 {"job_id": "375560", "tag": "ONNX", "verdict": null}
-{"job_id": "373409", "tag": "대시보드", "verdict": null}
+{"job_id": "373409", "tag": "대시보드", "verdict": true}
 {"job_id": "360141", "tag": "SQLD", "verdict": true}
 {"job_id": "374560", "tag": "멀티모달", "verdict": null}
 {"job_id": "362485", "tag": "AWS", "verdict": true}
@@ -151,25 +151,25 @@
 {"job_id": "361662", "tag": "Python", "verdict": true}
 {"job_id": "303122", "tag": "Tableau", "verdict": true}
 {"job_id": "375501", "tag": "SQL", "verdict": null}
-{"job_id": "373757", "tag": "Node.js", "verdict": null}
+{"job_id": "373757", "tag": "Node.js", "verdict": true}
 {"job_id": "352814", "tag": "회귀", "verdict": true}
 {"job_id": "362485", "tag": "AI Agent", "verdict": false}
 {"job_id": "352642", "tag": "ELK", "verdict": true}
 {"job_id": "374560", "tag": "NLP", "verdict": null}
 {"job_id": "360141", "tag": "Snowflake", "verdict": true}
-{"job_id": "374421", "tag": "Kubernetes", "verdict": null}
+{"job_id": "374421", "tag": "Kubernetes", "verdict": true}
 {"job_id": "322002", "tag": "BigQuery", "verdict": true}
 {"job_id": "352814", "tag": "AI Agent", "verdict": true}
 {"job_id": "361511", "tag": "대용량데이터처리", "verdict": true}
 {"job_id": "330731", "tag": "CI/CD", "verdict": false}
-{"job_id": "370786", "tag": "AWS", "verdict": null}
+{"job_id": "370786", "tag": "AWS", "verdict": true}
 {"job_id": "360141", "tag": "Python", "verdict": true}
 {"job_id": "358727", "tag": "REST API", "verdict": true}
-{"job_id": "373409", "tag": "QuickSight", "verdict": null}
+{"job_id": "373409", "tag": "QuickSight", "verdict": true}
 {"job_id": "366274", "tag": "협업커뮤니케이션", "verdict": false}
 {"job_id": "362485", "tag": "JavaScript", "verdict": true}
 {"job_id": "366274", "tag": "Python", "verdict": false}
-{"job_id": "374399", "tag": "LLM API", "verdict": null}
+{"job_id": "374399", "tag": "LLM API", "verdict": true}
 {"job_id": "330731", "tag": "파이프라인설계운영", "verdict": true}
 {"job_id": "356898", "tag": "파인튜닝", "verdict": false}
 {"job_id": "361662", "tag": "Rust", "verdict": false}
@@ -179,33 +179,33 @@
 {"job_id": "368120", "tag": "프롬프트엔지니어링", "verdict": true}
 {"job_id": "375501", "tag": "파이프라인설계운영", "verdict": null}
 {"job_id": "375501", "tag": "MLOps", "verdict": null}
-{"job_id": "373719", "tag": "협업커뮤니케이션", "verdict": null}
+{"job_id": "373719", "tag": "협업커뮤니케이션", "verdict": false}
 {"job_id": "292454", "tag": "SQL", "verdict": false}
 {"job_id": "368805", "tag": "LLM", "verdict": true}
-{"job_id": "370786", "tag": "파이프라인설계운영", "verdict": null}
+{"job_id": "370786", "tag": "파이프라인설계운영", "verdict": true}
 {"job_id": "361662", "tag": "Terraform", "verdict": false}
-{"job_id": "373719", "tag": "Git", "verdict": null}
+{"job_id": "373719", "tag": "Git", "verdict": true}
 {"job_id": "358727", "tag": "협업커뮤니케이션", "verdict": true}
 {"job_id": "368805", "tag": "프롬프트엔지니어링", "verdict": true}
 {"job_id": "370344", "tag": "MariaDB", "verdict": true}
 {"job_id": "352642", "tag": "Grafana", "verdict": true}
 {"job_id": "374560", "tag": "LLM", "verdict": null}
 {"job_id": "368805", "tag": "RAG", "verdict": true}
-{"job_id": "374421", "tag": "Docker", "verdict": null}
+{"job_id": "374421", "tag": "Docker", "verdict": false}
 {"job_id": "303122", "tag": "협업커뮤니케이션", "verdict": true}
 {"job_id": "355021", "tag": "대용량데이터처리", "verdict": true}
 {"job_id": "356898", "tag": "LLM", "verdict": false}
-{"job_id": "370786", "tag": "CI/CD", "verdict": null}
+{"job_id": "370786", "tag": "CI/CD", "verdict": false}
 {"job_id": "368521", "tag": "ComputerVision", "verdict": false}
-{"job_id": "373719", "tag": "AWS", "verdict": null}
+{"job_id": "373719", "tag": "AWS", "verdict": false}
 {"job_id": "361511", "tag": "협업커뮤니케이션", "verdict": true}
 {"job_id": "352814", "tag": "LLM", "verdict": true}
 {"job_id": "374560", "tag": "대시보드", "verdict": null}
 {"job_id": "361662", "tag": "vLLM", "verdict": false}
-{"job_id": "373757", "tag": "VectorDB", "verdict": null}
+{"job_id": "373757", "tag": "VectorDB", "verdict": false}
 {"job_id": "374560", "tag": "SQL", "verdict": null}
-{"job_id": "373719", "tag": "MLOps", "verdict": null}
-{"job_id": "374421", "tag": "AWS", "verdict": null}
+{"job_id": "373719", "tag": "MLOps", "verdict": true}
+{"job_id": "374421", "tag": "AWS", "verdict": false}
 {"job_id": "368120", "tag": "협업커뮤니케이션", "verdict": false}
 {"job_id": "375501", "tag": "scikit-learn", "verdict": null}
 {"job_id": "374560", "tag": "RNN", "verdict": null}
@@ -216,11 +216,11 @@
 {"job_id": "375560", "tag": "IoT", "verdict": null}
 {"job_id": "355021", "tag": "회귀", "verdict": false}
 {"job_id": "361511", "tag": "dbt", "verdict": true}
-{"job_id": "373409", "tag": "Athena", "verdict": null}
-{"job_id": "370786", "tag": "ArgoCD", "verdict": null}
+{"job_id": "373409", "tag": "Athena", "verdict": true}
+{"job_id": "370786", "tag": "ArgoCD", "verdict": true}
 {"job_id": "361662", "tag": "REST API", "verdict": false}
 {"job_id": "368805", "tag": "파이프라인설계운영", "verdict": true}
-{"job_id": "374399", "tag": "임베디드", "verdict": null}
+{"job_id": "374399", "tag": "임베디드", "verdict": false}
 {"job_id": "292454", "tag": "협업커뮤니케이션", "verdict": true}
 {"job_id": "362485", "tag": "LLM", "verdict": true}
 {"job_id": "355021", "tag": "데이터모델링", "verdict": true}
@@ -228,46 +228,46 @@
 {"job_id": "292454", "tag": "모델서빙배포", "verdict": true}
 {"job_id": "292454", "tag": "MLOps", "verdict": false}
 {"job_id": "358727", "tag": "Docker", "verdict": false}
-{"job_id": "374421", "tag": "Linux", "verdict": null}
+{"job_id": "374421", "tag": "Linux", "verdict": true}
 {"job_id": "367361", "tag": "NumPy", "verdict": true}
 {"job_id": "282256", "tag": "A/B테스트", "verdict": true}
 {"job_id": "330731", "tag": "Kubernetes", "verdict": true}
-{"job_id": "373409", "tag": "GCP", "verdict": null}
+{"job_id": "373409", "tag": "GCP", "verdict": true}
 {"job_id": "362485", "tag": "Python", "verdict": true}
 {"job_id": "362485", "tag": "VectorDB", "verdict": true}
 {"job_id": "364754", "tag": "파이프라인설계운영", "verdict": false}
 {"job_id": "352642", "tag": "Kafka", "verdict": true}
 {"job_id": "367361", "tag": "A/B테스트", "verdict": true}
-{"job_id": "373719", "tag": "대용량데이터처리", "verdict": null}
+{"job_id": "373719", "tag": "대용량데이터처리", "verdict": true}
 {"job_id": "202695", "tag": "Java", "verdict": true}
-{"job_id": "373719", "tag": "REST API", "verdict": null}
+{"job_id": "373719", "tag": "REST API", "verdict": false}
 {"job_id": "351569", "tag": "대시보드", "verdict": false}
 {"job_id": "360141", "tag": "DASP", "verdict": true}
 {"job_id": "202695", "tag": "Kubernetes", "verdict": true}
 {"job_id": "374560", "tag": "Python", "verdict": null}
-{"job_id": "373015", "tag": "C", "verdict": null}
-{"job_id": "373719", "tag": "Airflow", "verdict": null}
+{"job_id": "373015", "tag": "C", "verdict": true}
+{"job_id": "373719", "tag": "Airflow", "verdict": true}
 {"job_id": "361662", "tag": "GCP", "verdict": true}
 {"job_id": "368120", "tag": "Python", "verdict": true}
-{"job_id": "373719", "tag": "Kubernetes", "verdict": null}
+{"job_id": "373719", "tag": "Kubernetes", "verdict": true}
 {"job_id": "321087", "tag": "ETL/ELT", "verdict": true}
-{"job_id": "370786", "tag": "협업커뮤니케이션", "verdict": null}
+{"job_id": "370786", "tag": "협업커뮤니케이션", "verdict": false}
 {"job_id": "352642", "tag": "Docker", "verdict": true}
-{"job_id": "370786", "tag": "Flink", "verdict": null}
+{"job_id": "370786", "tag": "Flink", "verdict": true}
 {"job_id": "375501", "tag": "TensorFlow", "verdict": null}
 {"job_id": "360141", "tag": "SQL", "verdict": true}
 {"job_id": "330731", "tag": "GCP", "verdict": true}
 {"job_id": "352642", "tag": "PostgreSQL", "verdict": true}
 {"job_id": "368521", "tag": "데이터품질관리", "verdict": false}
-{"job_id": "370786", "tag": "MySQL", "verdict": null}
+{"job_id": "370786", "tag": "MySQL", "verdict": true}
 {"job_id": "202695", "tag": "SpringBoot", "verdict": true}
-{"job_id": "373719", "tag": "모델서빙배포", "verdict": null}
+{"job_id": "373719", "tag": "모델서빙배포", "verdict": true}
 {"job_id": "351569", "tag": "통계분석", "verdict": false}
 {"job_id": "364754", "tag": "협업커뮤니케이션", "verdict": false}
-{"job_id": "374399", "tag": "AI Agent", "verdict": null}
+{"job_id": "374399", "tag": "AI Agent", "verdict": false}
 {"job_id": "376498", "tag": "Azure", "verdict": null}
 {"job_id": "374560", "tag": "파인튜닝", "verdict": null}
-{"job_id": "373719", "tag": "scikit-learn", "verdict": null}
+{"job_id": "373719", "tag": "scikit-learn", "verdict": true}
 {"job_id": "330731", "tag": "A/B테스트", "verdict": false}
 {"job_id": "202695", "tag": "MSA", "verdict": true}
 {"job_id": "355021", "tag": "NLP", "verdict": false}
@@ -285,12 +285,12 @@
 {"job_id": "368521", "tag": "Python", "verdict": true}
 {"job_id": "368521", "tag": "파이프라인설계운영", "verdict": false}
 {"job_id": "348118", "tag": "파이프라인설계운영", "verdict": true}
-{"job_id": "373719", "tag": "PyTorch", "verdict": null}
-{"job_id": "374399", "tag": "LLM", "verdict": null}
+{"job_id": "373719", "tag": "PyTorch", "verdict": true}
+{"job_id": "374399", "tag": "LLM", "verdict": true}
 {"job_id": "361662", "tag": "MLOps", "verdict": false}
 {"job_id": "362485", "tag": "RAG", "verdict": true}
 {"job_id": "357236", "tag": "Excel", "verdict": false}
-{"job_id": "370786", "tag": "Python", "verdict": null}
+{"job_id": "370786", "tag": "Python", "verdict": true}
 {"job_id": "375501", "tag": "NumPy", "verdict": null}
 {"job_id": "355021", "tag": "Pandas", "verdict": true}
 {"job_id": "375560", "tag": "PyTorch", "verdict": null}
@@ -299,9 +299,9 @@
 {"job_id": "367361", "tag": "Tableau", "verdict": true}
 {"job_id": "361662", "tag": "CI/CD", "verdict": true}
 {"job_id": "368521", "tag": "통계분석", "verdict": false}
-{"job_id": "373409", "tag": "Azure", "verdict": null}
+{"job_id": "373409", "tag": "Azure", "verdict": true}
 {"job_id": "375501", "tag": "통계분석", "verdict": null}
-{"job_id": "370786", "tag": "dbt", "verdict": null}
+{"job_id": "370786", "tag": "dbt", "verdict": true}
 {"job_id": "352814", "tag": "MLOps", "verdict": false}
 {"job_id": "303122", "tag": "대시보드", "verdict": true}
 {"job_id": "358727", "tag": "대용량데이터처리", "verdict": false}
@@ -312,15 +312,15 @@
 {"job_id": "303122", "tag": "MySQL", "verdict": false}
 {"job_id": "361511", "tag": "Tableau", "verdict": true}
 {"job_id": "374560", "tag": "모델서빙배포", "verdict": null}
-{"job_id": "370786", "tag": "Airflow", "verdict": null}
+{"job_id": "370786", "tag": "Airflow", "verdict": true}
 {"job_id": "358727", "tag": "JavaScript", "verdict": false}
-{"job_id": "373757", "tag": "Python", "verdict": null}
+{"job_id": "373757", "tag": "Python", "verdict": true}
 {"job_id": "367361", "tag": "통계분석", "verdict": true}
-{"job_id": "373719", "tag": "Spark", "verdict": null}
+{"job_id": "373719", "tag": "Spark", "verdict": true}
 {"job_id": "375560", "tag": "임베디드", "verdict": null}
 {"job_id": "370344", "tag": "MySQL", "verdict": false}
 {"job_id": "352642", "tag": "대용량데이터처리", "verdict": false}
-{"job_id": "373719", "tag": "SpringBoot", "verdict": null}
+{"job_id": "373719", "tag": "SpringBoot", "verdict": true}
 {"job_id": "321087", "tag": "Excel", "verdict": true}
 {"job_id": "358727", "tag": "Node.js", "verdict": true}
 {"job_id": "352814", "tag": "파이프라인설계운영", "verdict": true}
@@ -328,25 +328,25 @@
 {"job_id": "361662", "tag": "PostgreSQL", "verdict": false}
 {"job_id": "351569", "tag": "A/B테스트", "verdict": false}
 {"job_id": "361662", "tag": "VectorDB", "verdict": true}
-{"job_id": "373719", "tag": "회귀", "verdict": null}
+{"job_id": "373719", "tag": "회귀", "verdict": false}
 {"job_id": "367361", "tag": "대용량데이터처리", "verdict": true}
 {"job_id": "375501", "tag": "Python", "verdict": null}
 {"job_id": "374560", "tag": "A/B테스트", "verdict": null}
 {"job_id": "330731", "tag": "Python", "verdict": false}
 {"job_id": "375501", "tag": "PyTorch", "verdict": null}
-{"job_id": "374421", "tag": "Terraform", "verdict": null}
+{"job_id": "374421", "tag": "Terraform", "verdict": true}
 {"job_id": "360141", "tag": "대용량데이터처리", "verdict": true}
 {"job_id": "355021", "tag": "LLM", "verdict": true}
-{"job_id": "373757", "tag": "REST API", "verdict": null}
+{"job_id": "373757", "tag": "REST API", "verdict": false}
 {"job_id": "303122", "tag": "Python", "verdict": true}
 {"job_id": "321087", "tag": "Python", "verdict": true}
 {"job_id": "352642", "tag": "Linux", "verdict": true}
-{"job_id": "370786", "tag": "데이터품질관리", "verdict": null}
+{"job_id": "370786", "tag": "데이터품질관리", "verdict": false}
 {"job_id": "361662", "tag": "파이프라인설계운영", "verdict": true}
-{"job_id": "373719", "tag": "Kafka", "verdict": null}
-{"job_id": "373719", "tag": "Grafana", "verdict": null}
+{"job_id": "373719", "tag": "Kafka", "verdict": true}
+{"job_id": "373719", "tag": "Grafana", "verdict": true}
 {"job_id": "360141", "tag": "LLM", "verdict": false}
-{"job_id": "370786", "tag": "Terraform", "verdict": null}
+{"job_id": "370786", "tag": "Terraform", "verdict": true}
 {"job_id": "321087", "tag": "대시보드", "verdict": false}
 {"job_id": "361662", "tag": "Databricks", "verdict": false}
 {"job_id": "330731", "tag": "데이터품질관리", "verdict": false}
@@ -354,7 +354,7 @@
 {"job_id": "367361", "tag": "SQL", "verdict": true}
 {"job_id": "292454", "tag": "파이프라인설계운영", "verdict": true}
 {"job_id": "358727", "tag": "Python", "verdict": true}
-{"job_id": "373719", "tag": "Python", "verdict": null}
+{"job_id": "373719", "tag": "Python", "verdict": true}
 {"job_id": "361511", "tag": "Snowflake", "verdict": true}
 {"job_id": "361662", "tag": "MongoDB", "verdict": false}
 {"job_id": "322002", "tag": "대시보드", "verdict": false}
@@ -371,18 +371,18 @@
 {"job_id": "351569", "tag": "데이터품질관리", "verdict": false}
 {"job_id": "202695", "tag": "CI/CD", "verdict": true}
 {"job_id": "358727", "tag": "MCP", "verdict": true}
-{"job_id": "373409", "tag": "SQL", "verdict": null}
+{"job_id": "373409", "tag": "SQL", "verdict": true}
 {"job_id": "366274", "tag": "임베디드", "verdict": true}
 {"job_id": "352814", "tag": "이상탐지", "verdict": false}
 {"job_id": "362485", "tag": "Airflow", "verdict": true}
 {"job_id": "375501", "tag": "시계열분석", "verdict": null}
 {"job_id": "374560", "tag": "PyTorch", "verdict": null}
-{"job_id": "373719", "tag": "시계열분석", "verdict": null}
+{"job_id": "373719", "tag": "시계열분석", "verdict": true}
 {"job_id": "374560", "tag": "Git", "verdict": null}
 {"job_id": "352814", "tag": "Python", "verdict": true}
-{"job_id": "370786", "tag": "Snowflake", "verdict": null}
+{"job_id": "370786", "tag": "Snowflake", "verdict": true}
 {"job_id": "282256", "tag": "대시보드", "verdict": false}
-{"job_id": "373719", "tag": "Prometheus", "verdict": null}
+{"job_id": "373719", "tag": "Prometheus", "verdict": true}
 {"job_id": "368521", "tag": "LLM평가", "verdict": false}
 {"job_id": "355021", "tag": "scikit-learn", "verdict": true}
 {"job_id": "352814", "tag": "시계열분석", "verdict": false}
@@ -390,11 +390,11 @@
 {"job_id": "292454", "tag": "Python", "verdict": false}
 {"job_id": "292454", "tag": "데이터모델링", "verdict": false}
 {"job_id": "362485", "tag": "데이터품질관리", "verdict": false}
-{"job_id": "373409", "tag": "통계분석", "verdict": null}
+{"job_id": "373409", "tag": "통계분석", "verdict": false}
 {"job_id": "322002", "tag": "Python", "verdict": true}
-{"job_id": "370786", "tag": "FastAPI", "verdict": null}
+{"job_id": "370786", "tag": "FastAPI", "verdict": true}
 {"job_id": "376498", "tag": "AWS", "verdict": null}
-{"job_id": "374399", "tag": "RAG", "verdict": null}
+{"job_id": "374399", "tag": "RAG", "verdict": true}
 {"job_id": "330731", "tag": "ArgoCD", "verdict": true}
 {"job_id": "374560", "tag": "Linux", "verdict": null}
 {"job_id": "348118", "tag": "통계분석", "verdict": false}
@@ -404,5 +404,6 @@
 {"job_id": "374560", "tag": "ComputerVision", "verdict": null}
 {"job_id": "282256", "tag": "BigQuery", "verdict": true}
 {"job_id": "330731", "tag": "LLM평가", "verdict": true}
-{"job_id": "373719", "tag": "CI/CD", "verdict": null}
+{"job_id": "373719", "tag": "CI/CD", "verdict": true}
 {"job_id": "292454", "tag": "코드품 품질관리", "verdict": true, "source": "manual"}
+{"job_id": "374399", "tag": "임베디드", "verdict": true, "source": "manual"}
