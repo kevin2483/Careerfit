@@ -60,6 +60,7 @@ RAW_TEXT_KEYS = ("body_raw",)          # regex 베이스라인도 body_raw 만 �
 PRED_TAGS_KEY = "tags"                 # evaluate_extraction.py --tag-key 기본값
 JOBS = ("ds", "de", "mle", "da")       # 직무는 레코드가 아니라 raw 디렉토리명에서 얻는다
 
+MIN_CANONICAL = 30   # 이보다 적게 읽히면 파싱 실패로 보고 중단한다
 MAX_CHARS = 12_000  # 원티드 공고 본문은 대부분 이 안에 들어옴. 초과분은 잘리고 플래그가 남음.
 
 # USD / 1M tokens. 2026-08-12 기준. Sonnet 5는 2026-09-01부터 3/15로 바뀜 —
@@ -102,38 +103,47 @@ USER_TEMPLATE = """다음 채용공고에서 요구 기술 태그를 추출하�
 def load_canonical_tags(dict_path: str | Path) -> list[str]:
     """사전 YAML에서 canonical 이름만 뽑는다.
 
-    다음 구조를 모두 허용:
-      A) {canonical: [alias, ...], ...}
-      B) {tags: [{canonical: "Python", aliases: [...]}, ...]}
-      C) [{name: "Python", aliases: [...]}, ...]
-    구조가 다르면 여기서 터지게 둔다. 조용히 빈 목록을 돌려주면
-    LLM이 아무 태그도 못 뽑고 그게 '성능'으로 기록된다.
+    CareerFit 사전 구조는 {카테고리: [{canonical, aliases, field}, ...]} 다.
+    job_skill_extract_report.load_dict() 와 같은 라벨 공간을 만들어야
+    regex 와 동일 조건 비교가 성립한다.
+
+    실패 시 조용히 빈 목록/짧은 목록을 돌려주면 LLM 이 엉뚱한 것을 뽑고
+    그게 '성능'으로 기록된다(실제로 겪음: 카테고리명 12개를 태그로 넘겼다).
+    그래서 개수 하한 검사를 둔다.
     """
     raw = yaml.safe_load(Path(dict_path).read_text(encoding="utf-8"))
-
-    if isinstance(raw, dict) and "tags" in raw:
-        raw = raw["tags"]
-
     names: list[str] = []
+
+    def _take(entry: Any) -> None:
+        if isinstance(entry, str):
+            names.append(entry)
+        elif isinstance(entry, dict):
+            for key in ("canonical", "name", "tag"):
+                if key in entry:
+                    names.append(str(entry[key]))
+                    return
+            raise ValueError(f"canonical 키를 못 찾음: {entry!r}")
+
     if isinstance(raw, dict):
-        names = [str(k) for k in raw.keys()]
+        for _category, entries in raw.items():
+            if isinstance(entries, list):
+                for e in entries:
+                    _take(e)
+        if not names:  # {canonical: [alias, ...]} 형태 대비
+            names = [str(k) for k in raw.keys()]
     elif isinstance(raw, list):
-        for item in raw:
-            if isinstance(item, str):
-                names.append(item)
-            elif isinstance(item, dict):
-                for key in ("canonical", "name", "tag"):
-                    if key in item:
-                        names.append(str(item[key]))
-                        break
-                else:
-                    raise ValueError(f"canonical 키를 못 찾음: {item!r}")
+        for e in raw:
+            _take(e)
     else:
         raise ValueError(f"지원하지 않는 사전 구조: {type(raw)}")
 
     names = sorted(set(names))
-    if not names:
-        raise ValueError(f"{dict_path} 에서 canonical 태그를 하나도 못 읽음")
+    if len(names) < MIN_CANONICAL:
+        raise ValueError(
+            f"{dict_path} 에서 canonical 을 {len(names)}개만 읽었다 "
+            f"(하한 {MIN_CANONICAL}). 사전 구조를 잘못 파싱했을 가능성이 크다. "
+            f"읽힌 값: {names}"
+        )
     return names
 
 
@@ -182,8 +192,12 @@ def iter_raw_records(raw_dir: str | Path, date: str | None) -> Iterable[dict]:
 _ARRAY_RE = re.compile(r"\[.*?\]", re.S)
 
 
-def parse_tags(text: str, canonical: set[str]) -> tuple[list[str], list[str]]:
-    """모델 출력 -> (허용목록 안 태그, 버려진 환각 태그)"""
+def parse_tags(text: str, canonical: set[str]) -> tuple[list[str], list[str], bool]:
+    """모델 출력 -> (허용목록 안 태그, 목록 밖 태그, 파싱 성공 여부)
+
+    빈 배열 [] 은 '파싱 실패'가 아니라 '태그 없음'이다. 둘을 섞으면
+    모델이 정상 판단한 것을 오류로 집계하게 된다(실제로 겪음).
+    """
     body = text.strip()
     if body.startswith("```"):
         body = re.sub(r"^```[a-zA-Z]*\s*|\s*```$", "", body).strip()
@@ -193,14 +207,14 @@ def parse_tags(text: str, canonical: set[str]) -> tuple[list[str], list[str]]:
     except json.JSONDecodeError:
         m = _ARRAY_RE.search(body)
         if not m:
-            return [], []
+            return [], [], False
         try:
             parsed = json.loads(m.group(0))
         except json.JSONDecodeError:
-            return [], []
+            return [], [], False
 
     if not isinstance(parsed, list):
-        return [], []
+        return [], [], False
 
     kept, dropped = [], []
     for item in parsed:
@@ -209,7 +223,7 @@ def parse_tags(text: str, canonical: set[str]) -> tuple[list[str], list[str]]:
             kept.append(s)
         else:
             dropped.append(s)
-    return sorted(set(kept)), sorted(set(dropped))
+    return sorted(set(kept)), sorted(set(dropped)), True
 
 
 def extract_one(
@@ -233,6 +247,7 @@ def extract_one(
             "truncated": truncated,
             "n_chars": len(text),
             "hallucinated_tags": [],
+            "parse_ok": None,
             "error": None,
         },
     }
@@ -241,20 +256,23 @@ def extract_one(
         return result
 
     delay = 1.0
+    use_temp = True   # 일부 모델(claude-sonnet-5 등)은 temperature 를 받지 않는다
     for attempt in range(max_retries):
         try:
+            kwargs = {
+                "model": model,
+                "max_tokens": 512,
+                "system": system_prompt,
+                "messages": [{"role": "user", "content": USER_TEMPLATE.format(text=text[:MAX_CHARS])}],
+            }
+            if use_temp:
+                kwargs["temperature"] = 0
             t0 = time.perf_counter()
-            resp = client.messages.create(
-                model=model,
-                max_tokens=512,
-                temperature=0,
-                system=system_prompt,
-                messages=[{"role": "user", "content": USER_TEMPLATE.format(text=text[:MAX_CHARS])}],
-            )
+            resp = client.messages.create(**kwargs)
             latency_ms = int((time.perf_counter() - t0) * 1000)
 
             out_text = "".join(b.text for b in resp.content if getattr(b, "type", "") == "text")
-            tags, dropped = parse_tags(out_text, canonical)
+            tags, dropped, parse_ok = parse_tags(out_text, canonical)
 
             in_tok = resp.usage.input_tokens
             out_tok = resp.usage.output_tokens
@@ -269,12 +287,18 @@ def extract_one(
                     "latency_ms": latency_ms,
                     "cost_usd": (in_tok * p_in + out_tok * p_out) / 1_000_000,
                     "stop_reason": resp.stop_reason,
-                    "raw_output": out_text if not tags else None,  # 파싱 실패만 원문 보존
+                    "parse_ok": parse_ok,
+                    # 파싱에 실패했을 때만 원문을 남긴다. 빈 배열은 실패가 아니다.
+                    "raw_output": None if parse_ok else out_text,
                 }
             )
             return result
 
         except Exception as e:  # noqa: BLE001 — 재시도 후 실패는 행 단위로 기록하고 진행
+            # temperature 미지원 모델이면 빼고 즉시 재시도한다 (대기 없음)
+            if use_temp and "temperature" in str(e).lower():
+                use_temp = False
+                continue
             if attempt == max_retries - 1:
                 result["_meta"]["error"] = f"{type(e).__name__}: {e}"
                 return result
@@ -322,16 +346,27 @@ def run(
                     continue
         print(f"[resume] 기존 {len(done)}건 스킵")
 
+    # job_id 는 교차직무 중복이 있다 (원티드가 한 공고를 여러 직군에 노출).
+    # 중복을 그대로 두면 같은 job_id 행이 여러 개 생겨 채점 시 어느 쪽이 남는지가
+    # 파일 읽기 순서에 좌우된다. 첫 등장만 쓴다.
     targets: list[dict] = []
+    seen: set[str] = set()
+    n_dup = 0
     for rec in iter_raw_records(raw_dir, date):
         jid = str(_pick(rec, RAW_ID_KEYS))
         if ids is not None and jid not in ids:
             continue
         if jid in done:
             continue
+        if jid in seen:
+            n_dup += 1
+            continue
+        seen.add(jid)
         targets.append(rec)
         if limit and len(targets) >= limit:
             break
+    if n_dup:
+        print(f"[dedup] 교차직무 중복 {n_dup}건 스킵 (첫 등장만 사용)")
 
     print(f"[run] model={model} 대상 {len(targets)}건 workers={workers}")
     if not targets:
@@ -359,7 +394,8 @@ def run(
     total_cost = sum(r["_meta"].get("cost_usd", 0.0) for r in ok)
     lat = sorted(r["_meta"].get("latency_ms", 0) for r in ok)
     halluc = sum(len(r["_meta"]["hallucinated_tags"]) for r in ok)
-    parse_fail = sum(1 for r in ok if r["_meta"].get("raw_output"))
+    parse_fail = sum(1 for r in ok if r["_meta"].get("parse_ok") is False)
+    n_empty = sum(1 for r in ok if r["_meta"].get("parse_ok") and not r[PRED_TAGS_KEY])
 
     summary = {
         "model": model,
@@ -368,6 +404,7 @@ def run(
         "n_processed": len(rows),
         "n_error": n_err,
         "n_parse_fail": parse_fail,
+        "n_empty": n_empty,   # 파싱은 됐으나 태그 0개 = 모델이 '요구 역량 없음'이라 판단
         "n_truncated": sum(1 for r in rows if r["_meta"]["truncated"]),
         "n_hallucinated_tags": halluc,
         "avg_tags": round(sum(len(r[PRED_TAGS_KEY]) for r in ok) / max(len(ok), 1), 3),

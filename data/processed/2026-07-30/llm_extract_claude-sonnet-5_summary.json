@@ -1,0 +1,17 @@
+{
+  "model": "claude-sonnet-5",
+  "date": "2026-07-30",
+  "pricing_as_of": "2026-08-12",
+  "n_processed": 38,
+  "n_error": 0,
+  "n_parse_fail": 1,
+  "n_empty": 2,
+  "n_truncated": 0,
+  "n_hallucinated_tags": 0,
+  "avg_tags": 7.947,
+  "total_cost_usd": 0.283906,
+  "cost_per_doc_usd": 0.00747121,
+  "latency_ms_p50": 2108,
+  "latency_ms_p95": 5385,
+  "pred_path": "data/processed/2026-07-30/llm_extract_claude-sonnet-5.jsonl"
+}
