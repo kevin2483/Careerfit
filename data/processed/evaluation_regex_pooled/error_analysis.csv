@@ -1,0 +1,46 @@
+﻿유형,태그,건수
+FP_오탐,데이터품질관리,6
+FP_오탐,파이프라인설계운영,6
+FP_오탐,A/B테스트,4
+FP_오탐,MLOps,4
+FP_오탐,AI Agent,4
+FP_오탐,대시보드,4
+FP_오탐,통계분석,3
+FP_오탐,AWS,3
+FP_오탐,이상탐지,2
+FP_오탐,데이터모델링,2
+FP_오탐,CI/CD,2
+FP_오탐,Excel,2
+FP_오탐,MySQL,2
+FP_오탐,파인튜닝,2
+FP_오탐,Kubernetes,1
+FP_오탐,Docker,1
+FP_오탐,JavaScript,1
+FP_오탐,VectorDB,1
+FP_오탐,HuggingFace,1
+FP_오탐,FastAPI,1
+FP_오탐,ElasticSearch,1
+FP_오탐,LLM,1
+FP_오탐,PostgreSQL,1
+FP_오탐,Rust,1
+FP_오탐,REST API,1
+FP_오탐,vLLM,1
+FP_오탐,Terraform,1
+FP_오탐,Grafana,1
+FP_오탐,Databricks,1
+FP_오탐,모델서빙배포,1
+FP_오탐,Go,1
+FP_오탐,시계열분석,1
+FP_오탐,임베디드,1
+FP_오탐,LLM평가,1
+FP_오탐,ComputerVision,1
+FP_오탐,Athena,1
+FP_오탐,Airflow,1
+FN_누락,데이터모델링,4
+FN_누락,파이프라인설계운영,3
+FN_누락,모델서빙배포,2
+FN_누락,프롬프트엔지니어링,1
+FN_누락,fastapi,1
+FN_누락,파인튜닝,1
+FN_누락,MSA,1
+FN_누락,코드품 품질관리,1
