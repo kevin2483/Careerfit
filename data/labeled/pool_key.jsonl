@@ -405,3 +405,33 @@
 {"job_id": "376498", "tag": "데이터품질관리", "sources": ["regex", "llm"]}
 {"job_id": "376498", "tag": "Azure", "sources": ["regex", "llm"]}
 {"job_id": "376498", "tag": "협업커뮤니케이션", "sources": ["regex", "llm"]}
+{"job_id": "292454", "tag": "EdgeAI", "sources": ["sonnet", "opus"]}
+{"job_id": "292454", "tag": "REST API", "sources": ["sonnet", "opus"]}
+{"job_id": "202695", "tag": "SQL", "sources": ["sonnet"]}
+{"job_id": "374560", "tag": "REST API", "sources": ["sonnet", "opus"]}
+{"job_id": "358727", "tag": "모델서빙배포", "sources": ["sonnet", "opus"]}
+{"job_id": "356898", "tag": "LLM평가", "sources": ["sonnet", "opus"]}
+{"job_id": "321087", "tag": "통계분석", "sources": ["opus"]}
+{"job_id": "282256", "tag": "통계분석", "sources": ["opus"]}
+{"job_id": "370786", "tag": "REST API", "sources": ["opus"]}
+{"job_id": "370786", "tag": "대용량데이터처리", "sources": ["opus"]}
+{"job_id": "361662", "tag": "대용량데이터처리", "sources": ["opus"]}
+{"job_id": "202695", "tag": "데이터모델링", "sources": ["opus"]}
+{"job_id": "355021", "tag": "대시보드", "sources": ["opus"]}
+{"job_id": "361511", "tag": "대시보드", "sources": ["opus"]}
+{"job_id": "361511", "tag": "파이프라인설계운영", "sources": ["opus"]}
+{"job_id": "362485", "tag": "대용량데이터처리", "sources": ["opus"]}
+{"job_id": "362485", "tag": "협업커뮤니케이션", "sources": ["opus"]}
+{"job_id": "357204", "tag": "데이터품질관리", "sources": ["opus"]}
+{"job_id": "357204", "tag": "협업커뮤니케이션", "sources": ["opus"]}
+{"job_id": "357236", "tag": "협업커뮤니케이션", "sources": ["opus"]}
+{"job_id": "375560", "tag": "협업커뮤니케이션", "sources": ["opus"]}
+{"job_id": "368120", "tag": "REST API", "sources": ["opus"]}
+{"job_id": "368120", "tag": "파이프라인설계운영", "sources": ["opus"]}
+{"job_id": "374560", "tag": "MongoDB", "sources": ["opus"]}
+{"job_id": "348118", "tag": "데이터모델링", "sources": ["opus"]}
+{"job_id": "348118", "tag": "모델서빙배포", "sources": ["opus"]}
+{"job_id": "356898", "tag": "협업커뮤니케이션", "sources": ["opus"]}
+{"job_id": "368805", "tag": "A/B테스트", "sources": ["opus"]}
+{"job_id": "330731", "tag": "임베딩", "sources": ["opus"]}
+{"job_id": "330731", "tag": "협업커뮤니케이션", "sources": ["opus"]}

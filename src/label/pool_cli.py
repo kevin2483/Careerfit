@@ -207,7 +207,7 @@ def apply(args: argparse.Namespace) -> None:
         removed += len(old - new)
         if old != new:
             n_doc += 1
-        r["gold_tags_prepool"] = sorted(old)   # 이전 라벨을 남긴다 — 되돌릴 수 있어야 한다
+        r.setdefault("gold_tags_prepool", sorted(old))   # 이전 라벨을 남긴다 — 되돌릴 수 있어야 한다
         r["gold_tags"] = sorted(new)
         r["pooled"] = True
     write_jsonl(path, rows)
