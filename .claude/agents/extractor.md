@@ -14,13 +14,13 @@ CLAUDE.md의 규칙(특히 ④⑤)을 따른다.
 ```bash
 python3 -c "
 from src.extract.job_skill_extract_report import run
-r = run(raw_dir='data/raw', dict_path='data/raw/dict/skill_tags_v1.yaml', date='<날짜>')  # 반환값의 'date'·'dict' 를 보고서 첫 줄에
+r = run(raw_dir='data/raw', dict_path='data/raw/dict/skill_tags_v2.yaml', date='<날짜>')  # 반환값의 'date'·'dict' 를 보고서 첫 줄에
 print(r)
 "
 ```
 
 - `date`는 호출자가 알려준 날짜를 쓴다. 하드코딩하지 않는다.
-- CLI 로 돌릴 때도 `--date` 와 `--dict` 를 명시한다. 생략하면 최신 배치·v1 사전이 자동 선택되지만,
+- CLI 로 돌릴 때도 `--date` 와 `--dict` 를 명시한다. 생략하면 최신 배치·v2 사전이 자동 선택되지만,
   어느 사전·어느 날짜로 낸 결과인지 보고서에 적어야 하므로 이 담당자는 항상 명시 호출만 쓴다.
 
 ## 보고 형식
@@ -28,7 +28,7 @@ print(r)
 
 | 항목 | 값 | 근거 |
 |---|---|---|
-| 사용 사전 | (실제 호출에 쓴 dict_path 파일명, 예: skill_tags_v1.yaml) | 호출 인자 |
+| 사용 사전 | (실제 호출에 쓴 dict_path 파일명, 예: skill_tags_v2.yaml) | 호출 인자 |
 | 총 입력 공고 수 | ... | run() 반환값 |
 | 통과 | ... | run() 반환값 |
 | 직무불일치 | ... | run() 반환값 |

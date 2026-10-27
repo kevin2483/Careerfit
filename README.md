@@ -6,29 +6,29 @@
 
 [![ci](https://github.com/kevin2483/Careerfit/actions/workflows/ci.yml/badge.svg)](.github/workflows/ci.yml) · `make reproduce` 한 줄로 공개 데이터만으로 모든 평가 표가 다시 만들어집니다.
 
-> **English summary.** CareerFit extracts required skills from 1,190 Korean job postings (data scientist / engineer / ML engineer / analyst), builds per-role market maps, and diagnoses an individual's skill gaps. The core contribution is the *measurement apparatus*, not the extractor: a regex baseline and three Claude models are scored against a human-labeled gold set built by **blind pooling** (candidates from all systems, source hidden, order shuffled). Three rounds of bias correction were needed. Final F1 on 38 postings: opus 0.859, regex 0.849, sonnet 0.841, haiku 0.824. Bootstrap 95% CIs overlap; the opus–regex gap of +0.010 has CI [−0.016, +0.037], so no ranking is statistically settled at this sample size. Explicit tool names are solved equally by all methods (F1 0.92–0.93); the difference is entirely in descriptive competencies. Length-based routing of 40% of postings to opus reaches opus-level F1 at 40% of the cost, but is only +1.1σ above random routing. Everything in `data/processed/` regenerates byte-identically from committed public files via `make reproduce`; CI verifies this on every push.
+> **English summary.** CareerFit extracts required skills from 1,190 Korean job postings (data scientist / engineer / ML engineer / analyst), builds per-role market maps, and diagnoses an individual's skill gaps. The core contribution is the *measurement apparatus*, not the extractor: a regex baseline and three Claude models are scored against a human-labeled gold set built by **blind pooling** (candidates from all systems, source hidden, order shuffled). Three rounds of bias correction were needed. Final F1 on 38 postings (dictionary v2, which closes tag sets under one human-confirmed implication rule, PySpark→Spark): opus 0.863, regex 0.853, sonnet 0.845, haiku 0.828. Bootstrap 95% CIs overlap; the opus–regex gap of +0.010 has CI [−0.016, +0.037], so no ranking is statistically settled at this sample size. Explicit tool names are solved equally by all methods (F1 0.92–0.94); the difference is entirely in descriptive competencies. Length-based routing of 40% of postings to opus reaches opus-level F1 at 40% of the cost, but is only +1.1σ above random routing. Everything in `data/processed/` regenerates byte-identically from committed public files via `make reproduce`; CI verifies this on every push.
 
 ---
 
 ## 핵심 결과
 
-정답셋 38건(블라인드 풀링 재검수 3회 교정 후). 신뢰구간은 공고 단위 부트스트랩 10,000회. 비용은 고유 공고 892건 전체 처리 시 환산.
+정답셋 38건(블라인드 풀링 재검수 3회 교정 후), 사전 v2(함의 규칙 PySpark→Spark로 정답·예측을 같이 닫음). 신뢰구간은 공고 단위 부트스트랩 10,000회. 비용은 고유 공고 892건 전체 처리 시 환산.
 
 | 방식 | F1 | 95% CI | Precision | Recall | ①명시 기술 | ②서술형 역량 | 전체 비용 |
 |---|---|---|---|---|---|---|---|
-| Claude opus-5 | **0.859** | [0.820, 0.892] | 0.785 | **0.949** | **0.932** | **0.766** | $15.70 |
-| 정규식 | 0.849 | [0.803, 0.889] | 0.801 | 0.904 | 0.931 | 0.736 | **$0** |
-| Claude sonnet-5 | 0.841 | [0.781, 0.885] | **0.842** | 0.840 | 0.930 | 0.716 | $6.66 |
-| Claude haiku-4.5 | 0.824 | [0.782, 0.860] | 0.769 | 0.887 | 0.916 | 0.692 | $2.89 |
-| 길이 기준 라우팅 (opus 40%) | 0.860 | — | 0.791 | 0.942 | — | — | $6.20 |
+| Claude opus-5 | **0.863** | [0.822, 0.896] | 0.787 | **0.956** | **0.937** | **0.766** | $15.70 |
+| 정규식 | 0.853 | [0.806, 0.892] | 0.802 | 0.911 | **0.937** | 0.736 | **$0** |
+| Claude sonnet-5 | 0.845 | [0.784, 0.889] | **0.844** | 0.846 | 0.936 | 0.716 | $6.66 |
+| Claude haiku-4.5 | 0.828 | [0.785, 0.865] | 0.771 | 0.894 | 0.922 | 0.692 | $2.89 |
+| 길이 기준 라우팅 (opus 40%) | 0.863 | — | 0.792 | 0.949 | — | — | $6.20 |
 
 | 짝지은 차이 | 점추정 | 95% CI | P(차이>0) |
 |---|---|---|---|
-| opus − regex | +0.010 | [−0.016, +0.037] | 0.78 |
+| opus − regex | +0.010 | [−0.016, +0.037] | 0.77 |
 | opus − haiku | +0.035 | [+0.013, +0.059] | 1.00 |
-| regex − sonnet | +0.008 | [−0.025, +0.043] | 0.68 |
+| regex − sonnet | +0.008 | [−0.026, +0.042] | 0.67 |
 
-- **명시적인 기술명은 정규식으로 충분합니다.** ①명시 기술에서 네 방식이 0.92~0.93으로 사실상 동률입니다.
+- **명시적인 기술명은 정규식으로 충분합니다.** ①명시 기술에서 네 방식이 0.92~0.94로 사실상 동률입니다.
 - **차이는 서술형 역량에서 납니다.** "대용량 데이터 처리 경험" 같은 서술형 요구에서 opus가 앞섭니다(0.766 vs 0.736).
 - **opus와 정규식의 차이는 이 표본 크기로 확정할 수 없습니다.** 차이의 신뢰구간이 0을 포함합니다. 확정되는 건 "haiku는 opus보다 낮다" 하나뿐입니다.
 - **파레토 최적은 정규식($0)과 opus($15.70) 둘입니다.** sonnet과 haiku는 더 싸고 더 정확한 정규식에 지배당합니다.
@@ -56,6 +56,8 @@
 
 고치고 재채점한 결과가 위 표입니다. 순위는 바뀌지 않았지만, 이때 부트스트랩 신뢰구간을 붙이면서 "opus가 앞선다"를 "확정할 수 없다"로 고쳤습니다. 사전의 충돌은 이제 `load_dict()`가 경고하고 테스트가 막습니다.
 
+alias 충돌을 없애자 반대 문제가 드러났습니다. 정답셋은 "PySpark" 언급을 Spark 요구로도 봤는데, 사전에는 하위 도구가 상위 도구를 함의한다는 규칙이 없어 Spark가 누락으로 바뀌었습니다. 사전 v2는 `implies` 필드로 이 규칙을 적고, 정답·정규식·LLM 예측을 **같은 규칙으로 닫은 뒤** 비교합니다. 규칙은 정답셋이 지지하는 쌍에만 넣었습니다. 후보 쌍 다섯 중 PySpark→Spark만 "하위만 태깅된 정답"이 0건이었고, MariaDB→MySQL·ELK→ElasticSearch·ArgoCD→CI/CD·모델서빙배포→MLOps는 사람이 하위만 정답으로 인정한 공고가 있어 제외했습니다. 효과는 네 방식 모두 +0.004로 같고 순위와 신뢰구간 결론은 바뀌지 않았습니다. 사전의 기존 `parent` 필드는 57건 중 54건이 canonical이 아닌 개념 그룹(RDBMS, ML/DL)이라 함의 규칙으로 쓸 수 없었습니다.
+
 ### 4. 정규식이 원리적으로 못 고치는 오탐이 있다
 
 ```
@@ -77,11 +79,11 @@ API 호출 없이 기존 예측을 섞어 라우팅 정책을 시뮬레이션했
 
 | 라우팅 기준 (opus 40%) | F1 | 비용 |
 |---|---|---|
-| 공고 길이 상위 40% | 0.860 | $6.20 |
-| 무작위 40% (1,000회 평균) | 0.853 ± 0.006 | $6.20 |
-| 정규식이 찾은 서술형 태그 수 상위 40% | 0.846 | $6.20 |
+| 공고 길이 상위 40% | 0.863 | $6.20 |
+| 무작위 40% (1,000회 평균) | 0.857 ± 0.006 | $6.20 |
+| 정규식이 찾은 서술형 태그 수 상위 40% | 0.850 | $6.20 |
 
-길이 기준은 opus 단독(0.859)과 같은 수준을 비용 40%로 얻습니다. 그런데 무작위 라우팅과의 차이는 +1.1σ입니다. 어떤 공고를 보내든 opus를 40% 섞으면 그만큼 오르고, "긴 공고를 고르는 것"이 보태는 몫은 38건에서 구분되지 않습니다. 서술형 태그 수 기준은 무작위보다 못합니다. 정규식이 서술형을 제대로 못 잡으니 그 개수로 어려운 공고를 고르는 것 자체가 부정확했습니다.
+길이 기준은 opus 단독(0.863)과 같은 수준을 비용 40%로 얻습니다. 그런데 무작위 라우팅과의 차이는 +1.1σ입니다. 어떤 공고를 보내든 opus를 40% 섞으면 그만큼 오르고, "긴 공고를 고르는 것"이 보태는 몫은 38건에서 구분되지 않습니다. 서술형 태그 수 기준은 무작위보다 못합니다. 정규식이 서술형을 제대로 못 잡으니 그 개수로 어려운 공고를 고르는 것 자체가 부정확했습니다.
 
 ---
 
@@ -105,7 +107,7 @@ flowchart LR
 |---|---|---|
 | 수집 | 원티드 내부 API. ds·de·mle·da 4개 직무. 원문 통째로 보존 | `src/crawl/` |
 | 정제 | 비데이터 공고 58건 제외(데이터 분석가가 경영 직군에 분류돼 절반이 무관). 교차 직무 중복 제거 시 고유 892건 | `src/extract/job_skill_extract_report.py` |
-| 추출 | 표준 태그 106개 사전(별칭 288개). 한국어 조사 경계 처리. LLM은 닫힌 라벨 공간, 사전 밖 출력은 환각으로 별도 집계 | `src/extract/` |
+| 추출 | 표준 태그 106개 사전(별칭 288개, 함의 규칙 1건). 한국어 조사 경계 처리. LLM은 닫힌 라벨 공간, 사전 밖 출력은 환각으로 별도 집계 | `src/extract/` |
 | 정답셋 | 블라인드 풀링 CLI. 판정은 사람만. LLM에게 묻지 않는다 | `src/label/pool_cli.py` |
 | 평가 | precision·recall·F1, 필드 난이도별 분리, 공고 단위 부트스트랩 CI, 랜덤 베이스라인 라우팅 시뮬레이션 | `src/eval/` |
 | 분석 | 직무별 출현율, 동시출현, 신입·경력 비교. 판단 기준은 코드 상수 | `src/analyze/market_stats.py` |
@@ -133,7 +135,7 @@ Claude Code 서브에이전트 3명(extractor · analyst · diagnoser)이 직렬
 - **풀링은 참여 시스템이 찾은 것만 후보로 올립니다.** 네 방식 모두 놓친 태그는 수기 입력 3건에 의존하며, recall 상한이 남습니다.
 - **서술형 역량은 최선도 0.766입니다.** 모델 규모로 해결되지 않는 구간이며, 태그 정의 쪽 문제로 보입니다.
 - **추가 풀링 30건은 블라인드가 약했습니다.** 이미 판정한 공고에 새 후보만 떠서 출처를 짐작할 수 있었습니다.
-- **사전은 하위 도구가 상위 도구를 함의하는지 모릅니다.** alias 충돌을 제거하자 정답셋 2건에서 "PySpark" 언급의 Spark가 누락으로 바뀌었습니다. v2에서 `parent` 기반 상향 매핑으로 다룰 문제입니다.
+- **함의 규칙은 정답셋을 보고 골랐습니다.** v2의 PySpark→Spark는 의미상으로도 타당하지만(PySpark는 Spark의 Python API), 어느 쌍을 넣을지는 38건 정답셋의 동시출현을 보고 정했습니다. 평가 데이터로 사전을 다듬은 것이므로 이 +0.004는 과적합일 수 있습니다. 정답셋이 커지면 다시 봐야 합니다.
 - **이력서가 외부 드라이브에 있어** 레포만으로는 갭 진단이 재현되지 않습니다. 로컬 텍스트 파일로는 같은 산식으로 돌릴 수 있습니다.
 
 실패한 실험과 버린 선택, 세 번의 교정 경위는 [`notes/lab_log.md`](notes/lab_log.md)에 날짜순으로 있습니다.
@@ -146,7 +148,7 @@ Claude Code 서브에이전트 3명(extractor · analyst · diagnoser)이 직렬
 
 ```bash
 pip install -r requirements.txt
-make test        # pytest 58건
+make test        # pytest 64건
 make reproduce   # data/processed/evaluation_* · bootstrap_ci.csv · method_comparison.csv · cascade_sim.csv 재생성
 make check       # 재생성 결과가 커밋본과 같은지 diff
 ```
@@ -160,7 +162,7 @@ make stats       # 시장 통계
 python -m src.analyze.gap_diagnosis --job de --resume-file resume.txt
 
 export ANTHROPIC_API_KEY=...
-python -m src.extract.llm_skill_extract --raw-dir data/raw --dict data/raw/dict/skill_tags_v1.yaml \
+python -m src.extract.llm_skill_extract --raw-dir data/raw --dict data/raw/dict/skill_tags_v2.yaml \
   --out-dir data/processed --date 2026-07-30 --model claude-opus-5 --ids-file data/labeled/gold_ids.txt
 ```
 
@@ -175,7 +177,7 @@ python -m src.extract.llm_skill_extract --raw-dir data/raw --dict data/raw/dict/
   agents/                   서브에이전트 정의 (extractor · analyst · diagnoser)
   skills/careerfit팀-돌리기/   팀 운영 절차
 data/
-  raw/dict/                 역량 태그 사전 v0 · v1
+  raw/dict/                 역량 태그 사전 v0 · v1 · v2 (v2 = v1 + 함의 규칙)
   labeled/                  정답셋 공개판 · 풀링 후보 · 판정 키
   processed/<date>/         예측 파일 4종 (regex · haiku · sonnet · opus) + LLM 비용·지연 요약
   processed/evaluation_*/   방식별 평가 (eval_summary · error_analysis)
@@ -190,7 +192,7 @@ src/
   label/                    정답셋 라벨링 · 블라인드 풀링
   eval/                     평가 · 부트스트랩 CI · 방식 비교 · 라우팅 시뮬레이션
   analyze/                  시장 통계 · 갭 진단
-tests/                      58건. 경계 규칙 · 불변식 · 산식 · 풀링 반영 · 결정성
+tests/                      64건. 경계 규칙 · 사전 함의 · 불변식 · 산식 · 풀링 반영 · 결정성
 CLAUDE.md                   에이전트 팀 운영 규칙
 ```
 

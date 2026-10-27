@@ -7,7 +7,8 @@
 
 ## ② 자주 쓰는 자료는 어디에 있나
 - 공고 원문: `data/raw/{ds,de,mle,da}/wanted_YYYY-MM-DD.jsonl` (레포 미포함, 최신 2026-07-30)
-- 역량 태그 사전: `data/raw/dict/skill_tags_v1.yaml` (106 canonical / 288 alias) ← v0 아님
+- 역량 태그 사전: `data/raw/dict/skill_tags_v2.yaml` (106 canonical / 288 alias / 함의 규칙 `implies` 1건: PySpark→Spark) ← v0·v1 아님
+  `parent` 필드는 개념 그룹 메타데이터일 뿐 함의 규칙이 아니다. 정답·정규식·LLM 예측은 평가 전에 `skill_dict.close_tags()` 로 같이 닫는다.
 - 정답셋: `data/labeled/label_draft.jsonl` (비공개본, 본문 포함, reviewed=true 38건만 유효)
   공개판 `label_draft.public.jsonl` 은 본문만 뺀 것. 비공개본을 고치면 `python -m scripts.make_public_labels` 로 맞춘다.
 - 예측 파일: `data/processed/<date>/{regex_extract,llm_extract_*}.jsonl` — 평가는 이 파일만 있으면 된다.
@@ -36,6 +37,8 @@
 - **사전(skill_tags)을 고쳐야 할 때** — canonical 이름이 바뀌면 정답셋 태그명도 같이 바꿔야 하므로,
   둘을 함께 처리할지 사람에게 확인받고 진행한다. (v1 개정 시 F1이 0.897→0.797로 하락한 사고)
   alias 만 추가·삭제하는 것도 점수를 바꾼다(2026-10-27 alias 충돌 4건 제거로 regex F1 0.843→0.849). 사람 확인 후 전 평가 재실행.
+  `implies` 를 추가할 때는 정답셋에 "하위만 태깅된 공고"가 0건인지 먼저 센다. 1건이라도 있으면 사람 판정과 충돌하므로 넣지 않는다
+  (2026-10-28: 후보 5쌍 중 PySpark→Spark 만 통과). `tests/test_skill_dict.py` 가 공개 정답셋이 규칙으로 닫혀 있는지 검사한다.
 - **검증 표의 산수가 안 맞을 때** — `입력공고수 = 통과 + 모든 스킵/분리 사유`가 깨지면 즉시 중단하고 보고한다.
 - **성능 지표가 비정상적으로 높을 때(F1 ≥ 0.98)** — 라벨링 편향이나 평가 누수를 의심하고,
   결과를 쓰기 전에 사람에게 원인 확인을 요청한다.
