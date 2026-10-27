@@ -2,32 +2,29 @@
 data/raw/*/wanted_*.jsonl
 data/raw/*/*.failed.txt
 
-# 파이썬 캐시
+# 정답셋 비공개본(본문 포함)·백업. 공개판과 풀링 파일만 커밋한다
+data/labeled/*.jsonl
+!data/labeled/label_draft.public.jsonl
+!data/labeled/pool_candidates.jsonl
+!data/labeled/pool_key.jsonl
+*.bak_*
+
+# 이력서·공고 본문 덤프 (레포에 넣지 않는다)
+resume*.txt
+notes/sample_read*.md
+
+# 파이썬
 __pycache__/
 *.pyc
+.pytest_cache/
 .ipynb_checkpoints/
-
-# 가상환경
 .venv/
+*.egg-info/
 
 # 환경/비밀
 .env
 *.key
+logs_*.txt
 
 # OS
 .DS_Store
-data/labeled/*.jsonl
-logs_*.txt
-
-*.bak_*
-__pycache__/
-.venv/
-
-*.bak_*
-__pycache__/
-.venv/
-data/labeled/label_draft.jsonl
-data/labeled/label_draft_backup.jsonl
-!data/labeled/label_draft.public.jsonl
-!data/labeled/pool_candidates.jsonl
-!data/labeled/pool_key.jsonl
