@@ -8,7 +8,6 @@
 {"job_id": "282256", "tag": "SQL", "verdict": true}
 {"job_id": "364754", "tag": "Python", "verdict": true}
 {"job_id": "322002", "tag": "대용량데이터처리", "verdict": true}
-{"job_id": "374560", "tag": "FastAPI", "verdict": false}
 {"job_id": "351569", "tag": "Tableau", "verdict": true}
 {"job_id": "321087", "tag": "협업커뮤니케이션", "verdict": false}
 {"job_id": "352642", "tag": "Prometheus", "verdict": true}
@@ -407,7 +406,7 @@
 {"job_id": "373719", "tag": "CI/CD", "verdict": true}
 {"job_id": "292454", "tag": "코드품 품질관리", "verdict": true, "source": "manual"}
 {"job_id": "374399", "tag": "임베디드", "verdict": true, "source": "manual"}
-{"job_id": "374560", "tag": "fastapi", "verdict": true, "source": "manual"}
+{"job_id": "374560", "tag": "FastAPI", "verdict": true, "source": "manual", "note": "2026-10-27 표기 정규화 (fastapi → FastAPI). 중복된 n 판정 행 제거"}
 {"job_id": "292454", "tag": "EdgeAI", "verdict": false}
 {"job_id": "292454", "tag": "REST API", "verdict": false}
 {"job_id": "202695", "tag": "SQL", "verdict": false}

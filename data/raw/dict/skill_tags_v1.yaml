@@ -112,7 +112,6 @@ data_pipeline:
   - canonical: Spark
     aliases:
       - spark
-      - pyspark
       - apache spark
     field: 1
     parent: 분산처리
@@ -175,7 +174,6 @@ datastores:
   - canonical: MySQL
     aliases:
       - mysql
-      - mariadb
     field: 1
     parent: RDBMS
   - canonical: Oracle
@@ -197,7 +195,6 @@ datastores:
     aliases:
       - elasticsearch
       - elastic search
-      - elk
     field: 1
   - canonical: BigQuery
     aliases:
@@ -282,7 +279,6 @@ infra:
       - ci/cd
       - cicd
       - jenkins
-      - argocd
       - gitops
       - github actions
       - gitlab ci
