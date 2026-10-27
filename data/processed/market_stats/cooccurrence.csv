@@ -8,27 +8,27 @@ AI Agent,LLM,51,ds
 LLM,Python,51,ds
 LLM,협업커뮤니케이션,48,ds
 AI Agent,Python,46,ds
-Python,통계분석,40,ds
 PyTorch,Python,40,ds
-Python,데이터품질관리,39,ds
+Python,통계분석,40,ds
 AI Agent,협업커뮤니케이션,39,ds
-Python,대시보드,38,ds
-MLOps,Python,38,ds
+Python,데이터품질관리,39,ds
 LLM,파이프라인설계운영,38,ds
-데이터품질관리,협업커뮤니케이션,37,ds
+MLOps,Python,38,ds
+Python,대시보드,38,ds
 MLOps,협업커뮤니케이션,37,ds
+데이터품질관리,협업커뮤니케이션,37,ds
 A/B테스트,Python,36,ds
 Python,시계열분석,36,ds
 SQL,데이터품질관리,35,ds
 A/B테스트,협업커뮤니케이션,34,ds
 AWS,Python,34,ds
+PyTorch,TensorFlow,34,ds
 Python,대용량데이터처리,34,ds
 SQL,대시보드,34,ds
 대용량데이터처리,협업커뮤니케이션,34,ds
-PyTorch,TensorFlow,34,ds
-SQL,파이프라인설계운영,33,ds
 LLM,RAG,33,ds
-통계분석,협업커뮤니케이션,31,ds
+SQL,파이프라인설계운영,33,ds
+AI Agent,RAG,31,ds
 Python,협업커뮤니케이션,123,de
 Python,파이프라인설계운영,103,de
 파이프라인설계운영,협업커뮤니케이션,103,de
@@ -43,21 +43,21 @@ AI Agent,LLM,74,de
 LLM,협업커뮤니케이션,72,de
 LLM,Python,70,de
 AWS,파이프라인설계운영,69,de
-SQL,데이터품질관리,67,de
 AI Agent,Python,67,de
+SQL,데이터품질관리,67,de
 AI Agent,협업커뮤니케이션,66,de
 SQL,파이프라인설계운영,66,de
 Airflow,Python,65,de
-Python,대용량데이터처리,64,de
 LLM,파이프라인설계운영,64,de
+Python,대용량데이터처리,64,de
 대용량데이터처리,파이프라인설계운영,61,de
 AI Agent,파이프라인설계운영,59,de
-대용량데이터처리,협업커뮤니케이션,58,de
 AWS,GCP,58,de
+대용량데이터처리,협업커뮤니케이션,58,de
 Airflow,파이프라인설계운영,57,de
 LLM,RAG,57,de
-대용량데이터처리,데이터품질관리,53,de
 Airflow,협업커뮤니케이션,53,de
+대용량데이터처리,데이터품질관리,53,de
 AWS,Airflow,52,de
 AI Agent,LLM,191,mle
 LLM,Python,156,mle
@@ -76,8 +76,8 @@ AI Agent,파이프라인설계운영,94,mle
 PyTorch,파이프라인설계운영,94,mle
 PyTorch,협업커뮤니케이션,93,mle
 LLM,PyTorch,91,mle
-PyTorch,모델서빙배포,88,mle
 ComputerVision,Python,88,mle
+PyTorch,모델서빙배포,88,mle
 Python,RAG,87,mle
 모델서빙배포,협업커뮤니케이션,84,mle
 LLM,모델서빙배포,83,mle
@@ -103,19 +103,19 @@ SQL,통계분석,18,da
 Tableau,대시보드,18,da
 Tableau,협업커뮤니케이션,18,da
 데이터품질관리,협업커뮤니케이션,17,da
+A/B테스트,통계분석,16,da
 SQL,대용량데이터처리,16,da
 SQL,데이터품질관리,16,da
-A/B테스트,통계분석,16,da
 대시보드,통계분석,14,da
 통계분석,협업커뮤니케이션,14,da
-Python,대용량데이터처리,13,da
 A/B테스트,협업커뮤니케이션,13,da
 Python,Tableau,13,da
-Tableau,통계분석,12,da
+Python,대용량데이터처리,13,da
 A/B테스트,Tableau,12,da
 Python,데이터품질관리,12,da
 Python,통계분석,12,da
+Tableau,통계분석,12,da
 AI Agent,SQL,11,da
 BigQuery,SQL,11,da
 BigQuery,대시보드,11,da
-AI Agent,협업커뮤니케이션,10,da
+A/B테스트,대용량데이터처리,10,da
