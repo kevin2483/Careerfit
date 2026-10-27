@@ -1,8 +1,10 @@
 """
 역량 태그 사전 로딩 + alias 정규식 컴파일 — 추출·평가·진단이 전부 이 한 곳을 쓴다.
 
-사전 구조: {카테고리: [{canonical, aliases, field, parent?}, ...]}
+사전 구조: {카테고리: [{canonical, aliases, field, parent?, implies?}, ...]}
   field 1 = 명시 기술 / 2 = 서술형 역량 / 3 = 암묵 조건(집계·평가 제외)
+  parent  = 개념 그룹 이름(RDBMS, ML/DL …). 집계용 메타데이터이며 추출에 쓰지 않는다.
+  implies = 이 태그가 함의하는 상위 canonical 목록(v2: PySpark→Spark). 추출·예측·정답을 평가 전에 같은 규칙으로 닫는다.
 
 같은 태그 정의를 두 번 다르게 구현하면 기준이 어긋나므로(가령 평가는 v0, 추출은 v1),
 여기 외의 곳에서 YAML 을 직접 읽지 않는다.
@@ -10,6 +12,7 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Iterable
 from pathlib import Path
 
 import yaml
@@ -53,7 +56,13 @@ def load_dict(path: str | Path) -> list[dict]:
                 "field": e.get("field"),
                 "category": category,
                 "parent": e.get("parent"),
+                "implies": [str(x) for x in (e.get("implies") or [])],
             })
+    # implies 대상이 canonical 이 아니면 닫기가 조용히 아무것도 안 한다 → 구조 오류로 중단
+    for t in tags:
+        for target in t["implies"]:
+            if target not in seen:
+                raise SystemExit(f"[전체중단] {t['canonical']} 의 implies 대상이 사전에 없음: {target}")
     return tags
 
 
@@ -92,4 +101,29 @@ def alias_index(path: str | Path) -> dict[str, str]:
 
 
 def extract_tags(text: str, patterns: list[Pattern]) -> set[str]:
+    """정규식 매칭만. 함의 닫기는 하지 않는다 — 호출자가 close_tags 를 적용한다."""
     return {c for c, _cat, _f, pat in patterns if pat.search(text)}
+
+
+def implies_from_tags(tags: list[dict]) -> dict[str, list[str]]:
+    return {t["canonical"]: list(t["implies"]) for t in tags if t.get("implies")}
+
+
+def implies_map(path: str | Path) -> dict[str, list[str]]:
+    """canonical -> 함의하는 상위 canonical 목록. 규칙이 없는 사전(v1)이면 빈 dict."""
+    return implies_from_tags(load_dict(path))
+
+
+def close_tags(tags: Iterable[str], implies: dict[str, list[str]] | None) -> set[str]:
+    """함의 규칙으로 태그 집합을 닫는다(추이적). PySpark 가 있으면 Spark 를 더한다.
+    정답셋·정규식·LLM 예측에 전부 같은 규칙을 적용해야 비교가 공정하다. 규칙이 없으면 입력 그대로."""
+    out = set(tags)
+    if not implies:
+        return out
+    stack = list(out)
+    while stack:
+        for parent in implies.get(stack.pop(), ()):
+            if parent not in out:
+                out.add(parent)
+                stack.append(parent)
+    return out

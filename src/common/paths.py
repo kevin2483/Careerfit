@@ -14,7 +14,7 @@ JOBS = ["ds", "de", "mle", "da"]
 
 DATA_DIR = Path("data")
 RAW_DIR = DATA_DIR / "raw"
-DICT_PATH = RAW_DIR / "dict" / "skill_tags_v1.yaml"
+DICT_PATH = RAW_DIR / "dict" / "skill_tags_v2.yaml"   # v1 + implies(PySpark→Spark). canonical·alias 는 v1 과 동일
 LABELED_DIR = DATA_DIR / "labeled"
 LABELS_PRIVATE = LABELED_DIR / "label_draft.jsonl"          # body_raw 포함. 레포 미포함
 LABELS_PUBLIC = LABELED_DIR / "label_draft.public.jsonl"    # body_raw 제거. 레포 포함
