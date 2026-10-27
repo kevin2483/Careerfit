@@ -26,8 +26,8 @@ CareerFit — LLM 기반 스킬 추출기 (regex baseline과 동일 인터페이
     # 정답셋 38건만 (평가 루프용, 싸다)
     python -m src.extract.llm_skill_extract \
         --raw-dir data/raw --dict data/raw/dict/skill_tags_v1.yaml \
-        --out-dir data/processed --date 2026-08-12 \
-        --model claude-haiku-4-5-20251001 --ids-file data/gold/gold_ids.txt
+        --out-dir data/processed --date 2026-07-30 \
+        --model claude-haiku-4-5-20251001 --ids-file data/labeled/gold_ids.txt
 
     # 전체
     python -m src.extract.llm_skill_extract ... --model claude-sonnet-5
@@ -389,24 +389,36 @@ def run(
                 if i % 25 == 0 or i == len(targets):
                     print(f"  {i}/{len(targets)}")
 
-    ok = [r for r in rows if not r["_meta"]["error"]]
-    n_err = len(rows) - len(ok)
+    summary = summarize(pred_path, model, date)
+    summary_path.write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(json.dumps(summary, ensure_ascii=False, indent=2))
+    return summary
+
+
+def summarize(pred_path: Path, model: str, date: str) -> dict:
+    """예측 파일 '전체'에서 요약을 다시 센다.
+
+    이번 실행분만 세면 --resume 로 이어 돌린 뒤의 요약이 파일과 어긋난다
+    (실제로 haiku 요약이 35건·환각 12로 남아 있었고 파일은 38건·환각 16이었다, 2026-10-27).
+    """
+    rows: list[dict] = []
+    with pred_path.open(encoding="utf-8") as f:
+        for line in f:
+            if line.strip():
+                rows.append(json.loads(line))
+    ok = [r for r in rows if not r["_meta"].get("error")]
     total_cost = sum(r["_meta"].get("cost_usd", 0.0) for r in ok)
     lat = sorted(r["_meta"].get("latency_ms", 0) for r in ok)
-    halluc = sum(len(r["_meta"]["hallucinated_tags"]) for r in ok)
-    parse_fail = sum(1 for r in ok if r["_meta"].get("parse_ok") is False)
-    n_empty = sum(1 for r in ok if r["_meta"].get("parse_ok") and not r[PRED_TAGS_KEY])
-
-    summary = {
+    return {
         "model": model,
         "date": date,
         "pricing_as_of": PRICING_AS_OF,
         "n_processed": len(rows),
-        "n_error": n_err,
-        "n_parse_fail": parse_fail,
-        "n_empty": n_empty,   # 파싱은 됐으나 태그 0개 = 모델이 '요구 역량 없음'이라 판단
-        "n_truncated": sum(1 for r in rows if r["_meta"]["truncated"]),
-        "n_hallucinated_tags": halluc,
+        "n_error": len(rows) - len(ok),
+        "n_parse_fail": sum(1 for r in ok if r["_meta"].get("parse_ok") is False),
+        "n_empty": sum(1 for r in ok if r["_meta"].get("parse_ok") and not r[PRED_TAGS_KEY]),  # 파싱됐으나 태그 0개
+        "n_truncated": sum(1 for r in rows if r["_meta"].get("truncated")),
+        "n_hallucinated_tags": sum(len(r["_meta"].get("hallucinated_tags") or []) for r in ok),
         "avg_tags": round(sum(len(r[PRED_TAGS_KEY]) for r in ok) / max(len(ok), 1), 3),
         "total_cost_usd": round(total_cost, 6),
         "cost_per_doc_usd": round(total_cost / max(len(ok), 1), 8),
@@ -414,9 +426,6 @@ def run(
         "latency_ms_p95": lat[int(len(lat) * 0.95)] if lat else None,
         "pred_path": str(pred_path),
     }
-    summary_path.write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(json.dumps(summary, ensure_ascii=False, indent=2))
-    return summary
 
 
 def main() -> None:
@@ -430,7 +439,20 @@ def main() -> None:
     ap.add_argument("--ids-file", default=None, help="한 줄에 job_id 하나. 정답셋만 돌릴 때.")
     ap.add_argument("--workers", type=int, default=4)
     ap.add_argument("--no-resume", action="store_true")
+    ap.add_argument("--resummarize", action="store_true",
+                    help="API 호출 없이 기존 예측 파일 전체에서 _summary.json 만 다시 만든다")
     a = ap.parse_args()
+
+    if a.resummarize:
+        out_root = Path(a.out_dir) / a.date
+        pred_path = out_root / f"llm_extract_{_slug(a.model)}.jsonl"
+        if not pred_path.exists():
+            raise SystemExit(f"[중단] 예측 파일 없음: {pred_path}")
+        summary = summarize(pred_path, a.model, a.date)
+        (out_root / f"llm_extract_{_slug(a.model)}_summary.json").write_text(
+            json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(json.dumps(summary, ensure_ascii=False, indent=2))
+        return
 
     ids = None
     if a.ids_file:
