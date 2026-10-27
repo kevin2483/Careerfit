@@ -26,10 +26,10 @@ TensorFlow,ml_frameworks,1,35,14,85,3,137
 통계분석,experience_narrative,2,45,29,34,20,128
 VLM,cv,2,13,17,82,0,112
 멀티모달,cv,2,17,25,68,1,111
+Spark,data_pipeline,1,25,56,23,4,108
 데이터모델링,experience_narrative,2,20,58,21,5,104
 C++,languages,1,9,12,82,0,103
 VectorDB,datastores,1,14,40,46,0,100
-Spark,data_pipeline,1,22,52,21,4,99
 CI/CD,infra,1,10,42,46,0,98
 ETL/ELT,data_pipeline,2,19,59,16,3,97
 Linux,infra,1,10,34,49,0,93

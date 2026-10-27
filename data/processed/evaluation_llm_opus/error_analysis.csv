@@ -34,7 +34,6 @@ FP_오탐,VectorDB,1
 FP_오탐,vLLM,1
 FP_오탐,시계열분석,1
 FP_오탐,프롬프트엔지니어링,1
-FN_누락,Spark,2
 FN_누락,데이터모델링,2
 FN_누락,AI Agent,1
 FN_누락,MLOps,1
