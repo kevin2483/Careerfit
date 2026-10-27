@@ -1,0 +1,21 @@
+[project]
+name = "careerfit"
+version = "1.0.0"
+description = "채용공고 역량 추출 파이프라인과 그 추출을 채점하는 평가 장치 (regex vs Claude haiku/sonnet/opus)"
+requires-python = ">=3.11"
+dependencies = [
+    "PyYAML>=6.0",
+    "requests>=2.31",
+    "anthropic>=0.40",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.4", "pyflakes>=3.0"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-q"
+
+[tool.setuptools]
+packages = ["src", "src.common", "src.extract", "src.eval", "src.label", "src.analyze", "src.crawl", "scripts"]
