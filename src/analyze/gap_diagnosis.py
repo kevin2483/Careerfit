@@ -14,7 +14,7 @@ diagnoser 담당자가 이 모듈의 run()만 호출한다. 사람이 직접 돌
   추가되면 CAREER_WEIGHT에 "부분보유": 0.5를 더하고 classify_possession()만 바꾸면
   3단계로 복원된다.
 
-  이력서 매칭은 job_skill_extract_report.py와 같은 regex+사전(v1) 방식을 재사용한다
+  이력서 매칭은 job_skill_extract_report.py와 같은 regex+사전 방식을 재사용한다
   (같은 태그 정의를 두 번 다르게 구현하면 기준이 어긋난다).
 """
 from __future__ import annotations
@@ -25,7 +25,7 @@ import json
 from pathlib import Path
 
 from src.common.paths import DICT_PATH, JOBS, MARKET_STATS_DIR
-from src.common.skill_dict import extract_tags, load_dict, load_patterns
+from src.common.skill_dict import close_tags, extract_tags, implies_map, load_dict, load_patterns
 TOP_N = 5  # 판단 기준: 상위 5개만 이번 분기, 6위 이하는 다음 분기 (CLAUDE.md/판단 기준)
 
 # 미보유 가중치. 지금은 이진. 이력서에 숙련도 표기가 생기면 "부분보유": 0.5 를 추가하고
@@ -79,8 +79,8 @@ def classify_possession(canonical: str, resume_tags: set[str]) -> str:
 
 
 def extract_resume_tags(resume_text: str, dict_path: Path = DICT_PATH) -> set[str]:
-    """이력서 텍스트에서 사전(v1) 기준으로 보유 태그를 뽑는다. extractor와 같은 regex 방식."""
-    return extract_tags(resume_text, load_patterns(dict_path))
+    """이력서 텍스트에서 사전 기준으로 보유 태그를 뽑는다. extractor와 같은 regex + 함의 닫기."""
+    return close_tags(extract_tags(resume_text, load_patterns(dict_path)), implies_map(dict_path))
 
 
 FIELD3_EXCLUSION_NOTE = (

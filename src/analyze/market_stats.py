@@ -24,7 +24,8 @@ from itertools import combinations
 from pathlib import Path
 
 from src.common.jsonl import iter_jsonl, read_jsonl
-from src.common.paths import EXTRACT_REPORT_DIR, JOBS, MARKET_STATS_DIR, RAW_DIR, resolve_date
+from src.common.paths import DICT_PATH, EXTRACT_REPORT_DIR, JOBS, MARKET_STATS_DIR, RAW_DIR, resolve_date
+from src.common.skill_dict import implies_map
 
 LOWFREQ_THRESHOLD = 3  # 판단 기준 ①
 
@@ -131,12 +132,21 @@ def compute_rank_by_job(tag_freq_rows: list[dict], population: dict[str, dict[st
     return out
 
 
-def compute_cooccurrence(extracted_rows: list[dict], excluded_keys: set[tuple[str, str]], top_n: int = 30) -> list[dict]:
+def implied_pairs(implies: dict[str, list[str]] | None) -> set[frozenset[str]]:
+    """함의 규칙으로 묶인 쌍(PySpark-Spark). 하위가 있으면 상위가 항상 있어 동시출현이 자명하므로 표에서 뺀다."""
+    return {frozenset((c, p)) for c, ps in (implies or {}).items() for p in ps}
+
+
+def compute_cooccurrence(extracted_rows: list[dict], excluded_keys: set[tuple[str, str]], top_n: int = 30,
+                         skip_pairs: set[frozenset[str]] | None = None) -> list[dict]:
     pair_counts: dict[str, Counter] = defaultdict(Counter)
+    skip = skip_pairs or set()
     for rec in extracted_rows:
         job = rec["직무"]
         tags = sorted({t for t in rec.get("tags", []) if (t, job) not in excluded_keys})
         for a, b in combinations(tags, 2):
+            if frozenset((a, b)) in skip:
+                continue
             pair_counts[job][(a, b)] += 1
     out: list[dict] = []
     for job in JOBS:
@@ -204,6 +214,7 @@ def run(
     validation_summary_path: str | Path = VALIDATION_SUMMARY_PATH,
     out_dir: str | Path = OUT_DIR,
     date: str | None = None,
+    dict_path: str | Path = DICT_PATH,
 ) -> dict:
     """analyst가 호출하는 진입점. 입력 경로를 인자로 받아 하드코딩을 피한다 (CLAUDE.md ④).
     date 를 생략하면 raw_dir 의 최신 배치. 반환: 처리 요약 dict."""
@@ -223,7 +234,7 @@ def run(
 
     excluded_keys, excluded_rows = compute_excluded(tag_freq_rows)
     rank_rows = compute_rank_by_job(tag_freq_rows, population, excluded_keys, da_note)
-    cooc_rows = compute_cooccurrence(extracted_rows, excluded_keys)
+    cooc_rows = compute_cooccurrence(extracted_rows, excluded_keys, skip_pairs=implied_pairs(implies_map(dict_path)))
     career_rows = compute_junior_vs_senior(extracted_rows, annual_from_map, excluded_keys)
 
     _write_csv(out_dir / "rank_by_job.csv", rank_rows, ["canonical", "직무", "출현수", "모집단수", "출현율%", "비고", "순위"])
@@ -252,11 +263,13 @@ def main(argv: list[str] | None = None) -> None:
     ap.add_argument("--extract-dir", default=str(EXTRACT_REPORT_DIR), help="extractor 산출물 폴더")
     ap.add_argument("--out-dir", default=str(OUT_DIR))
     ap.add_argument("--date", default=None, help="extractor 에 쓴 것과 같은 날짜. 생략 시 raw-dir 최신 배치")
+    ap.add_argument("--dict", dest="dict_path", default=str(DICT_PATH), help="함의 쌍을 동시출현표에서 빼기 위해 읽는다")
     a = ap.parse_args(argv)
     ed = Path(a.extract_dir)
     r = run(raw_dir=a.raw_dir, tag_freq_path=ed / "tag_frequency_by_job.csv",
             extracted_tags_path=ed / "extracted_tags.jsonl",
-            validation_summary_path=ed / "validation_summary.csv", out_dir=a.out_dir, date=a.date)
+            validation_summary_path=ed / "validation_summary.csv", out_dir=a.out_dir, date=a.date,
+            dict_path=a.dict_path)
     print(json.dumps(r, ensure_ascii=False, indent=2))
 
 

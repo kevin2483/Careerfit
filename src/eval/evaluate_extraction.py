@@ -32,7 +32,7 @@ from pathlib import Path
 
 from src.common.jsonl import read_jsonl
 from src.common.paths import DICT_PATH, JOBS, labels_path
-from src.common.skill_dict import extract_tags, field_map, load_patterns
+from src.common.skill_dict import close_tags, extract_tags, field_map, implies_map, load_patterns
 
 FIELD_LABEL = {1: "①명시 기술", 2: "②서술형 역량", "사전밖": "사전에 없던 역량"}
 
@@ -75,10 +75,12 @@ def prf(tp: int, fp: int, fn: int) -> tuple[float, float, float]:
     return round(p, 3), round(r, 3), round(f, 3)
 
 
-def evaluate(rows: list[dict], fmap: dict[str, int | None], exclude_field: int = 3):
+def evaluate(rows: list[dict], fmap: dict[str, int | None], exclude_field: int = 3,
+             implies: dict[str, list[str]] | None = None):
     """
     반환: (전체, 필드별, 직무별, 오류사례)
     TP: 정답에도 있고 예측도 함 / FP: 예측했지만 정답 아님(오탐) / FN: 정답인데 놓침(누락)
+    implies 가 있으면 정답과 예측을 같은 함의 규칙으로 닫은 뒤 비교한다 (v2: PySpark→Spark).
     """
     def keep(tag: str) -> bool:
         return fmap.get(tag) != exclude_field
@@ -89,8 +91,8 @@ def evaluate(rows: list[dict], fmap: dict[str, int | None], exclude_field: int =
     errors = {"fp": defaultdict(int), "fn": defaultdict(int)}
 
     for r in rows:
-        gold = {t for t in r.get("gold_tags", []) if keep(t)}
-        pred = {t for t in r.get("_pred", r.get("regex_prefilled", [])) if keep(t)}
+        gold = {t for t in close_tags(r.get("gold_tags", []), implies) if keep(t)}
+        pred = {t for t in close_tags(r.get("_pred", r.get("regex_prefilled", [])), implies) if keep(t)}
         job = r.get("직무", "?")
         for name, s in (("tp", gold & pred), ("fp", pred - gold), ("fn", gold - pred)):
             total[name] += len(s)
@@ -153,7 +155,7 @@ def main(argv: list[str] | None = None) -> None:
         label = args.label or f"regex({Path(args.dict_path).name})"
         print(f"[정보] 사전 {Path(args.dict_path).name} 로 regex 재실행 후 평가")
 
-    total, by_field, by_job, errors = evaluate(rows, fmap)
+    total, by_field, by_job, errors = evaluate(rows, fmap, implies=implies_map(args.dict_path))
     out_dir = Path(args.out_dir)
     write_outputs(out_dir, total, by_field, by_job, errors)
 

@@ -1,7 +1,7 @@
 """
 채용 역량 추출 리포트 (job-skill-extract-report) — 정규식 베이스라인
 
-입력: data/raw/{ds,de,mle,da}/wanted_{date}.jsonl + data/raw/dict/skill_tags_v1.yaml
+입력: data/raw/{ds,de,mle,da}/wanted_{date}.jsonl + 사전(기본 src/common/paths.DICT_PATH)
 출력: {out_dir}/
   validation_summary.csv       직무별 입력·통과·스킵 사유 (불변식: 입력 = 통과 + 모든 스킵 사유)
   extracted_tags.jsonl         공고별 태그 (직무순 → job_id 오름차순)
@@ -23,7 +23,7 @@ from pathlib import Path
 
 from src.common.jsonl import iter_jsonl
 from src.common.paths import DICT_PATH, EXTRACT_REPORT_DIR, JOBS, RAW_DIR, resolve_date
-from src.common.skill_dict import compile_patterns, load_dict  # noqa: F401 — 하위 호환 re-export
+from src.common.skill_dict import close_tags, compile_patterns, implies_from_tags, load_dict  # noqa: F401 — 하위 호환 re-export
 
 OUT_DIR = EXTRACT_REPORT_DIR
 SECTION_KEYS = ["main_tasks", "requirements", "preferred_points"]
@@ -59,6 +59,7 @@ def run(raw_dir: str | Path = RAW_DIR, dict_path: str | Path = DICT_PATH,
     tags = load_dict(dict_path)
     patterns = compile_patterns(tags)
     tag_meta = {c: (cat, f) for c, cat, f, _ in patterns}
+    implies = implies_from_tags(tags)
     excluded = sorted(t["canonical"] for t in tags if t["field"] == 3)
     if excluded:
         print(f"[로그] ④ 집계 제외 태그(field=3, 암묵조건) {len(excluded)}개: {excluded}")
@@ -119,6 +120,7 @@ def run(raw_dir: str | Path = RAW_DIR, dict_path: str | Path = DICT_PATH,
                     for sk in SECTION_KEYS:
                         if pat.search(sections.get(sk) or ""):
                             matched_fields.add(sk)
+            matched_canonicals = close_tags(matched_canonicals, implies)  # v2: PySpark → Spark
 
             for c in matched_canonicals:
                 freq[c][job] += 1

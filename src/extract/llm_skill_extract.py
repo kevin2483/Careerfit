@@ -5,7 +5,7 @@ CareerFit — LLM 기반 스킬 추출기 (regex baseline과 동일 인터페이
 
 설계 원칙
 ---------
-1. 닫힌 라벨 공간(closed set). 사전 v1의 canonical 106개만 출력하게 강제한다.
+1. 닫힌 라벨 공간(closed set). 사전의 canonical 106개만 출력하게 강제한다 (v1·v2 동일 집합).
    regex와 같은 라벨 공간이어야 evaluate_extraction.py로 직접 비교가 된다.
    자유 생성을 허용하면 "LLM이 더 많이 찾았다"가 성능인지 라벨 불일치인지 구분 불가.
 2. 가설을 프롬프트에 명시. regex는 문자열이 있으면 무조건 잡는다.
@@ -25,7 +25,7 @@ CareerFit — LLM 기반 스킬 추출기 (regex baseline과 동일 인터페이
     export ANTHROPIC_API_KEY=...
     # 정답셋 38건만 (평가 루프용, 싸다)
     python -m src.extract.llm_skill_extract \
-        --raw-dir data/raw --dict data/raw/dict/skill_tags_v1.yaml \
+        --raw-dir data/raw --dict data/raw/dict/skill_tags_v2.yaml \
         --out-dir data/processed --date 2026-07-30 \
         --model claude-haiku-4-5-20251001 --ids-file data/labeled/gold_ids.txt
 

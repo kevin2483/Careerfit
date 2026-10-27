@@ -34,7 +34,7 @@ from pathlib import Path
 
 from src.common.jsonl import read_jsonl
 from src.common.paths import DICT_PATH, PROCESSED_DIR, labels_path, resolve_date
-from src.common.skill_dict import field_map
+from src.common.skill_dict import close_tags, field_map, implies_map
 
 
 def score(pairs: list[tuple[set, set]], fm: dict) -> dict:
@@ -52,10 +52,11 @@ def score(pairs: list[tuple[set, set]], fm: dict) -> dict:
     return {"P": P, "R": R, "F1": F, "TP": tp, "FP": fp, "FN": fn}
 
 
-def build_docs(labels: str | Path, regex_pred: str | Path, opus_pred: str | Path, fm: dict) -> list[dict]:
+def build_docs(labels: str | Path, regex_pred: str | Path, opus_pred: str | Path, fm: dict,
+               implies: dict[str, list[str]] | None = None) -> list[dict]:
     rows = [r for r in read_jsonl(labels) if r.get("reviewed")]
     regex = {str(r["job_id"]): r for r in read_jsonl(regex_pred)}
-    opus = {str(r["job_id"]): set(r.get("tags") or []) for r in read_jsonl(opus_pred)}
+    opus = {str(r["job_id"]): close_tags(r.get("tags") or [], implies) for r in read_jsonl(opus_pred)}
     for name, m in (("regex", regex), ("opus", opus)):
         missing = [str(r["job_id"]) for r in rows if str(r["job_id"]) not in m]
         if missing:
@@ -63,12 +64,12 @@ def build_docs(labels: str | Path, regex_pred: str | Path, opus_pred: str | Path
     docs = []
     for r in rows:
         jid = str(r["job_id"])
-        rx = set(regex[jid].get("tags") or [])
+        rx = close_tags(regex[jid].get("tags") or [], implies)
         op = opus[jid]
         length = regex[jid].get("_meta", {}).get("n_chars") or len(r.get("body_raw") or "")
         docs.append({
             "jid": jid,
-            "gold": set(r.get("gold_tags") or []),
+            "gold": close_tags(r.get("gold_tags") or [], implies),
             "regex": rx, "opus": op,
             "combo": {t for t in rx if fm.get(t) == 1} | {t for t in op if fm.get(t) != 1},
             "length": length,
@@ -140,7 +141,7 @@ def main(argv: list[str] | None = None) -> None:
     out = Path(a.out) if a.out else pdir / "cascade_sim.csv"
 
     fm = field_map(a.dict_path)
-    docs = build_docs(labels_path(a.labels), regex_pred, opus_pred, fm)
+    docs = build_docs(labels_path(a.labels), regex_pred, opus_pred, fm, implies=implies_map(a.dict_path))
     opus_cpd = json.loads(Path(opus_sum).read_text(encoding="utf-8"))["cost_per_doc_usd"]
     results = simulate(docs, fm, opus_cpd, a.n_docs, a.random_trials, a.seed)
     n = len(docs)

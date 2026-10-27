@@ -21,11 +21,12 @@ from pathlib import Path
 
 from src.common.jsonl import read_jsonl, write_jsonl
 from src.common.paths import DICT_PATH, PROCESSED_DIR, labels_path, resolve_date
-from src.common.skill_dict import extract_tags, load_patterns
+from src.common.skill_dict import close_tags, extract_tags, implies_map, load_patterns
 
 
 def predict(rows: list[dict], dict_path: str | Path) -> list[dict]:
     patterns = load_patterns(dict_path)
+    implies = implies_map(dict_path)
     out = []
     for r in rows:
         body = r.get("body_raw")
@@ -36,7 +37,7 @@ def predict(rows: list[dict], dict_path: str | Path) -> list[dict]:
         out.append({
             "job_id": str(r["job_id"]),
             "role": r.get("직무"),
-            "tags": sorted(extract_tags(body, patterns)),
+            "tags": sorted(close_tags(extract_tags(body, patterns), implies)),
             "_meta": {"model": "regex", "dict": Path(dict_path).name, "n_chars": len(body)},
         })
     return out

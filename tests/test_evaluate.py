@@ -38,3 +38,10 @@ def test_cascade_score_matches_evaluate():
 def test_rerun_regex_refuses_rows_without_body():
     with pytest.raises(SystemExit, match="body_raw 없는 정답"):
         rerun_regex([{"job_id": "1", "gold_tags": []}], "data/raw/dict/skill_tags_v1.yaml")
+
+
+def test_evaluate_closes_gold_and_pred_with_implies():
+    fm = {"PySpark": 1, "Spark": 1}
+    rows = [{"직무": "de", "gold_tags": ["PySpark", "Spark"], "_pred": ["PySpark"]}]
+    assert evaluate(rows, fm)[0] == {"tp": 1, "fp": 0, "fn": 1}                               # 규칙 없음: Spark 누락
+    assert evaluate(rows, fm, implies={"PySpark": ["Spark"]})[0] == {"tp": 2, "fp": 0, "fn": 0}  # v2: 함의로 복구

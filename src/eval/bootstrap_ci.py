@@ -20,7 +20,7 @@ from pathlib import Path
 
 from src.common.jsonl import read_jsonl
 from src.common.paths import DICT_PATH, PROCESSED_DIR, labels_path, resolve_date
-from src.common.skill_dict import field_map
+from src.common.skill_dict import close_tags, field_map, implies_map
 
 PRED_FILES = {
     "regex": "regex_extract.jsonl",
@@ -50,10 +50,11 @@ def percentile(xs: list[float], q: float) -> float:
     return s[lo] + (s[hi] - s[lo]) * (k - lo)
 
 
-def run(labels: Path, pred_dir: Path, fm: dict, b: int, seed: int, methods: dict[str, str]):
+def run(labels: Path, pred_dir: Path, fm: dict, b: int, seed: int, methods: dict[str, str],
+        implies: dict[str, list[str]] | None = None):
     rows = [r for r in read_jsonl(labels) if r.get("reviewed")]
     ids = [str(r["job_id"]) for r in rows]
-    gold = {str(r["job_id"]): set(r.get("gold_tags") or []) for r in rows}
+    gold = {str(r["job_id"]): close_tags(r.get("gold_tags") or [], implies) for r in rows}
 
     counts: dict[str, list[tuple[int, int, int]]] = {}
     for name, fname in methods.items():
@@ -61,7 +62,7 @@ def run(labels: Path, pred_dir: Path, fm: dict, b: int, seed: int, methods: dict
         if not p.exists():
             print(f"[건너뜀] {name}: {p} 없음")
             continue
-        pred = {str(r["job_id"]): set(r.get("tags") or []) for r in read_jsonl(p)}
+        pred = {str(r["job_id"]): close_tags(r.get("tags") or [], implies) for r in read_jsonl(p)}
         missing = [j for j in ids if j not in pred]
         if missing:
             raise SystemExit(f"[중단] {name} 예측 없는 정답 {len(missing)}건: {missing[:5]}")
@@ -101,7 +102,8 @@ def main(argv: list[str] | None = None) -> None:
     pdir = Path(a.processed_dir)
     date = resolve_date(a.date, processed_dir=pdir)
     out = Path(a.out) if a.out else pdir / "bootstrap_ci.csv"
-    n, rows = run(labels_path(a.labels), pdir / date, field_map(a.dict_path), a.b, a.seed, PRED_FILES)
+    n, rows = run(labels_path(a.labels), pdir / date, field_map(a.dict_path), a.b, a.seed, PRED_FILES,
+                  implies=implies_map(a.dict_path))
 
     print("=" * 70)
     print(f"부트스트랩 95% CI — 정답셋 {n}건 · 공고 단위 복원추출 B={a.b} · seed={a.seed}")

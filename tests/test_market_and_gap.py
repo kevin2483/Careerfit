@@ -2,7 +2,8 @@
 import csv
 
 from src.analyze import gap_diagnosis as gd
-from src.analyze.market_stats import compute_excluded, compute_junior_vs_senior, compute_rank_by_job
+from src.analyze.market_stats import (compute_cooccurrence, compute_excluded, compute_junior_vs_senior,
+                                      compute_rank_by_job, implied_pairs)
 
 
 def test_lowfreq_excluded_and_pct_uses_pass_count():
@@ -17,6 +18,13 @@ def test_lowfreq_excluded_and_pct_uses_pass_count():
     assert ("Python", "de") not in by and ("R", "ds") not in by
     assert by[("Python", "ds")]["출현율%"] == 50.0
     assert by[("Python", "da")]["출현율%"] == 50.0 and by[("Python", "da")]["비고"] == "da 비고"  # 분모 6, 12 아님
+
+
+def test_cooccurrence_skips_implied_pairs():
+    ext = [{"job_id": "1", "직무": "de", "tags": ["PySpark", "Spark", "Python"]}]
+    rows = compute_cooccurrence(ext, set(), skip_pairs=implied_pairs({"PySpark": ["Spark"]}))
+    assert {(r["tag_a"], r["tag_b"]) for r in rows} == {("PySpark", "Python"), ("Python", "Spark")}
+    assert len(compute_cooccurrence(ext, set())) == 3
 
 
 def test_junior_vs_senior_buckets():
