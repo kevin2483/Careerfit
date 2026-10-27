@@ -1,82 +1,42 @@
 """
-채용 역량 추출 리포트 (job-skill-extract-report)
-data/raw/{ds,de,mle,da}/*.jsonl + data/raw/dict/skill_tags_v1.yaml
--> data/processed/job_skill_extract_report/{validation_summary.csv, extracted_tags.jsonl,
-   tag_frequency_by_job.csv, field_difficulty_summary.csv}
-regex 베이스라인만 사용 (결정적: 같은 입력 = 같은 출력). LLM 추출·정확도 비교는 4회차로 이관.
+채용 역량 추출 리포트 (job-skill-extract-report) — 정규식 베이스라인
+
+입력: data/raw/{ds,de,mle,da}/wanted_{date}.jsonl + data/raw/dict/skill_tags_v1.yaml
+출력: {out_dir}/
+  validation_summary.csv       직무별 입력·통과·스킵 사유 (불변식: 입력 = 통과 + 모든 스킵 사유)
+  extracted_tags.jsonl         공고별 태그 (직무순 → job_id 오름차순)
+  tag_frequency_by_job.csv     canonical × 직무 출현수. "전체" 열은 직무 합산이라 교차직무 중복 공고가 여러 번 세어진다
+  field_difficulty_summary.csv field 1(명시)/2(서술)만. field 3(암묵조건)은 집계 제외
+결정적: 같은 입력 = 같은 출력. LLM 추출은 llm_skill_extract.py.
+
 사용:
-  python -m src.extract.job_skill_extract_report
+  python -m src.extract.job_skill_extract_report --date 2026-07-30
+  python -m src.extract.job_skill_extract_report              # --date 생략 시 data/raw 의 최신 배치
 """
 from __future__ import annotations
+
+import argparse
 import csv
 import json
-import re
 from collections import Counter, defaultdict
 from pathlib import Path
-import yaml
-from src.extract.boundary import build_alias_pattern
 
-JOBS = ["ds", "de", "mle", "da"]
-RAW_DIR = Path("data/raw")
-DICT_PATH = RAW_DIR / "dict" / "skill_tags_v1.yaml"
-OUT_DIR = Path("data/processed/job_skill_extract_report")
+from src.common.jsonl import iter_jsonl
+from src.common.paths import DICT_PATH, EXTRACT_REPORT_DIR, JOBS, RAW_DIR, resolve_date
+from src.common.skill_dict import compile_patterns, load_dict  # noqa: F401 — 하위 호환 re-export
+
+OUT_DIR = EXTRACT_REPORT_DIR
 SECTION_KEYS = ["main_tasks", "requirements", "preferred_points"]
-# STEP 0-5: da(경영·비즈니스 직군) 유입 공고를 제목 키워드로 데이터 직무 여부 판정.
-# category_tags가 실데이터에서 전부 null이라(2026-07-25 확인) 제목 키워드로 대체.
+# da(경영·비즈니스 직군) 유입 공고를 제목 키워드로 데이터 직무 여부 판정.
+# category_tags 가 실데이터에서 전부 null 이라(2026-07-25 확인) 제목 키워드로 대체.
 DATA_TITLE_KEYWORDS = ["데이터", "data", "분석가", "analyst", "analytics"]
 
-
-def load_dict(path: Path) -> list[dict]:
-    # STEP 0-4: 사전 없음/파싱 실패는 공용 자원 문제 -> 개별 스킵이 아니라 전체 중단.
-    if not path.exists():
-        raise SystemExit(f"[전체중단] 태그 사전 없음: {path}")
-    try:
-        raw = yaml.safe_load(path.read_text(encoding="utf-8"))
-    except yaml.YAMLError as e:
-        raise SystemExit(f"[전체중단] 태그 사전 파싱 실패: {e}")
-    tags: list[dict] = []
-    seen: set[str] = set()
-    for category, entries in raw.items():
-        if not isinstance(entries, list):
-            continue
-        for e in entries:
-            canonical = e["canonical"]
-            if canonical in seen:
-                print(f"[경고] canonical 중복 정의: {canonical}")
-            seen.add(canonical)
-            tags.append({
-                "canonical": canonical,
-                "aliases": e.get("aliases") or [],
-                "field": e.get("field"),
-                "category": category,
-            })
-    excluded = sorted(t["canonical"] for t in tags if t["field"] == 3)
-    if excluded:
-        print(f"[로그] ④ 집계 제외 태그(field=3, 암묵조건) {len(excluded)}개: {excluded}")
-    return tags
-
-def compile_patterns(tags: list[dict]):
-    patterns = []
-    for t in tags:
-        alts = sorted({a for a in [*t["aliases"], t["canonical"]] if a}, key=len, reverse=True)
-        if not alts:
-            continue
-        pat = re.compile("|".join(build_alias_pattern(a) for a in alts), re.IGNORECASE)
-        patterns.append((t["canonical"], t["category"], t["field"], pat))
-    return patterns
+VALIDATION_COLUMNS = ["입력공고수", "통과", "스킵_파싱실패", "스킵_필드누락", "스킵_본문결측", "직무불일치"]
 
 
 def load_jsonl(path: Path):
-    # STEP 0-1: 파일 객체 직접 순회 (splitlines()는 유니코드 줄바꿈에서 레코드 절단 위험)
-    with open(path, encoding="utf-8") as fh:
-        for lineno, line in enumerate(fh, 1):
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                yield lineno, json.loads(line)
-            except json.JSONDecodeError:
-                yield lineno, None
+    """(줄번호, 레코드|None). 파싱 실패 줄은 None — 호출자가 스킵 사유로 집계한다."""
+    yield from iter_jsonl(path, strict=False)
 
 
 def is_data_job(title: str) -> bool:
@@ -84,20 +44,24 @@ def is_data_job(title: str) -> bool:
     return any(kw.lower() in t for kw in DATA_TITLE_KEYWORDS)
 
 
-def run(raw_dir: Path = RAW_DIR, dict_path: Path = DICT_PATH,
-        out_dir: Path = OUT_DIR, date: str = "2026-07-30") -> dict:
+def run(raw_dir: str | Path = RAW_DIR, dict_path: str | Path = DICT_PATH,
+        out_dir: str | Path = OUT_DIR, date: str | None = None) -> dict:
     """
     regex 베이스라인으로 채용공고에서 역량 태그를 추출하고 4개 표를 저장한다.
-    입력 경로를 인자로 받아 MCP 도구가 감쌀 수 있게 했다(기본값은 프로젝트 표준 경로).
-    반환: 처리 요약 dict (호출한 쪽=Claude가 대화에서 바로 쓸 수 있도록).
+    date 를 생략하면 raw_dir 의 최신 배치를 쓴다 (어느 날짜를 썼는지 화면과 반환값에 남긴다).
+    반환: 처리 요약 dict (호출한 쪽이 대화에서 바로 쓸 수 있도록).
     """
     raw_dir = Path(raw_dir)
     dict_path = Path(dict_path)
     out_dir = Path(out_dir)
+    date = resolve_date(date, raw_dir=raw_dir)
 
     tags = load_dict(dict_path)
     patterns = compile_patterns(tags)
     tag_meta = {c: (cat, f) for c, cat, f, _ in patterns}
+    excluded = sorted(t["canonical"] for t in tags if t["field"] == 3)
+    if excluded:
+        print(f"[로그] ④ 집계 제외 태그(field=3, 암묵조건) {len(excluded)}개: {excluded}")
 
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -111,7 +75,10 @@ def run(raw_dir: Path = RAW_DIR, dict_path: Path = DICT_PATH,
         path = raw_dir / job / f"wanted_{date}.jsonl"
         counts = Counter()
         if not path.exists():
-            validation_rows[job] = [0, 0, 0, 0, 0]
+            # 열 수를 다른 행과 똑같이 맞춘다. 짧은 행을 넣으면 합계 zip 이 조용히 잘리고
+            # market_stats 가 int(None) 으로 죽는다 (2026-10-27 발견).
+            validation_rows[job] = [0] * len(VALIDATION_COLUMNS)
+            fail_log.append({"file": str(path), "reason": "raw_file_missing"})
             continue
 
         for lineno, rec in load_jsonl(path):
@@ -179,10 +146,11 @@ def run(raw_dir: Path = RAW_DIR, dict_path: Path = DICT_PATH,
     # ① validation_summary.csv
     with open(out_dir / "validation_summary.csv", "w", newline="", encoding="utf-8-sig") as f:
         w = csv.writer(f)
-        w.writerow(["직무", "입력공고수", "통과", "스킵_파싱실패", "스킵_필드누락", "스킵_본문결측", "직무불일치"])
-        totals = [0, 0, 0, 0, 0, 0]
+        w.writerow(["직무", *VALIDATION_COLUMNS])
+        totals = [0] * len(VALIDATION_COLUMNS)
         for job in JOBS:
             row = validation_rows[job]
+            assert len(row) == len(VALIDATION_COLUMNS), (job, row)
             w.writerow([job, *row])
             totals = [a + b for a, b in zip(totals, row)]
         w.writerow(["전체합계", *totals])
@@ -198,12 +166,11 @@ def run(raw_dir: Path = RAW_DIR, dict_path: Path = DICT_PATH,
     for canonical, per_job in freq.items():
         category, field = tag_meta[canonical]
         total = sum(per_job.values())
-        freq_rows.append([canonical, category, field, per_job.get("ds", 0), per_job.get("de", 0),
-                           per_job.get("mle", 0), per_job.get("da", 0), total])
+        freq_rows.append([canonical, category, field, *[per_job.get(j, 0) for j in JOBS], total])
     freq_rows.sort(key=lambda r: (-r[-1], r[0]))
     with open(out_dir / "tag_frequency_by_job.csv", "w", newline="", encoding="utf-8-sig") as f:
         w = csv.writer(f)
-        w.writerow(["canonical", "category", "field", "ds", "de", "mle", "da", "전체"])
+        w.writerow(["canonical", "category", "field", *JOBS, "전체"])
         w.writerows(freq_rows)
 
     # ④ field_difficulty_summary.csv : field 1(명시)/2(서술)만. field 3(암묵조건)은 집계 제외.
@@ -223,7 +190,7 @@ def run(raw_dir: Path = RAW_DIR, dict_path: Path = DICT_PATH,
             avg = round(st["total"] / n_postings, 2) if n_postings else 0.0
             w.writerow([label, len(st["types"]), st["total"], avg])
 
-    # 공식 4개 출력 외 진단용 로그 (재현 검증·6번 분석 재료)
+    # 공식 4개 출력 외 진단용 로그
     with open(out_dir / "_fail_log.jsonl", "w", encoding="utf-8") as f:
         for r in fail_log:
             f.write(json.dumps(r, ensure_ascii=False) + "\n")
@@ -232,25 +199,23 @@ def run(raw_dir: Path = RAW_DIR, dict_path: Path = DICT_PATH,
             f.write("\n".join(ids))
 
     total_mismatch = sum(len(v) for v in mismatch_by_job.values())
-    print(f"완료 -> {out_dir}")
+    print(f"완료 -> {out_dir}  (date={date}, dict={dict_path.name})")
     print(f"직무불일치(별도분리, 통과 미포함): {total_mismatch}건")
     print(f"진단 로그: {len(fail_log)}건 -> _fail_log.jsonl")
 
-    # --- MCP/호출자용 요약 반환 ---
-    # 파일 저장은 그대로 하되, 호출한 쪽이 대화에서 바로 쓸 수 있게 핵심 수치를 돌려준다.
     total_input = sum(validation_rows[j][0] for j in JOBS)
-    total_pass = len(extracted_rows)
     # field 3(암묵조건)은 변별력이 없어 집계에서 제외한다(CSV ④와 동일 기준).
-    # 이 필터가 없으면 '협업커뮤니케이션'이 거의 모든 공고에 나와 상위를 차지해 오해를 부른다.
     top_tags = [
         {"canonical": c, "전체": sum(pj.values())}
-        for c, pj in sorted(freq.items(), key=lambda kv: -sum(kv[1].values()))
+        for c, pj in sorted(freq.items(), key=lambda kv: (-sum(kv[1].values()), kv[0]))
         if tag_meta[c][1] != 3
     ][:10]
     return {
         "output_dir": str(out_dir),
+        "date": date,
+        "dict": str(dict_path),
         "총입력": total_input,
-        "통과": total_pass,
+        "통과": len(extracted_rows),
         "직무불일치": total_mismatch,
         "진단로그건수": len(fail_log),
         "직무별통과": {j: validation_rows[j][1] for j in JOBS},
@@ -264,5 +229,16 @@ def run(raw_dir: Path = RAW_DIR, dict_path: Path = DICT_PATH,
     }
 
 
+def main(argv: list[str] | None = None) -> None:
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--raw-dir", default=str(RAW_DIR))
+    ap.add_argument("--dict", dest="dict_path", default=str(DICT_PATH))
+    ap.add_argument("--out-dir", default=str(OUT_DIR))
+    ap.add_argument("--date", default=None, help="wanted_{date}.jsonl 의 date. 생략 시 raw-dir 의 최신 배치")
+    a = ap.parse_args(argv)
+    r = run(raw_dir=a.raw_dir, dict_path=a.dict_path, out_dir=a.out_dir, date=a.date)
+    print(json.dumps({k: v for k, v in r.items() if k != "출력파일"}, ensure_ascii=False, indent=2))
+
+
 if __name__ == "__main__":
-    run()
+    main()

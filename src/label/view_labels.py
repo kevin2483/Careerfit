@@ -10,9 +10,9 @@ JSONL 을 눈으로 보는 고통을 없애기 위한 도구. 판단만 하도�
 """
 from __future__ import annotations
 import argparse
-import json
 import re
-from pathlib import Path
+
+from src.common.jsonl import read_jsonl
 
 SECTION_LABELS = {
     "회사소개": "🏢 회사소개",
@@ -82,7 +82,7 @@ def main() -> None:
     p.add_argument("--no-body", action="store_true", help="본문 빼고 태그만")
     args = p.parse_args()
 
-    rows = [json.loads(l) for l in Path(args.infile).read_text(encoding="utf-8").splitlines() if l.strip()]
+    rows = read_jsonl(args.infile)
     total = len(rows)
 
     if args.n:

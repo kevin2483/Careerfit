@@ -3,7 +3,8 @@
 data/processed/market_stats/{rank_by_job.csv, junior_vs_senior.csv} + 이력서 텍스트(인자로 받음)
 -> 화면에만 출력 (파일에 쓰지 않는다 — diagnoser는 읽기 전용 담당자다. 최종 기록은 리더가 노션에 한다)
 
-diagnoser 담당자가 이 모듈의 run()만 호출한다.
+diagnoser 담당자가 이 모듈의 run()만 호출한다. 사람이 직접 돌릴 때:
+    python -m src.analyze.gap_diagnosis --job de --resume-file path/to/resume.txt
 
   산식: 우선순위 = 출현율(%) × 미보유가중치 × 신입접근성(0~1)
 
@@ -18,12 +19,13 @@ diagnoser 담당자가 이 모듈의 run()만 호출한다.
 """
 from __future__ import annotations
 
+import argparse
 import csv
+import json
 from pathlib import Path
 
-from src.extract.job_skill_extract_report import DICT_PATH, compile_patterns, load_dict
-
-JOBS = ["ds", "de", "mle", "da"]
+from src.common.paths import DICT_PATH, JOBS, MARKET_STATS_DIR
+from src.common.skill_dict import extract_tags, load_dict, load_patterns
 TOP_N = 5  # 판단 기준: 상위 5개만 이번 분기, 6위 이하는 다음 분기 (CLAUDE.md/판단 기준)
 
 # 미보유 가중치. 지금은 이진. 이력서에 숙련도 표기가 생기면 "부분보유": 0.5 를 추가하고
@@ -42,8 +44,8 @@ RESUME_STALENESS_NOTE = (
     "입력 문서의 최신성이 진단 정확도를 좌우한다 — 이 진단 결과를 이력서 갱신 없이 그대로 신뢰하지 말 것."
 )
 
-RANK_BY_JOB_PATH = Path("data/processed/market_stats/rank_by_job.csv")
-JUNIOR_SENIOR_PATH = Path("data/processed/market_stats/junior_vs_senior.csv")
+RANK_BY_JOB_PATH = MARKET_STATS_DIR / "rank_by_job.csv"
+JUNIOR_SENIOR_PATH = MARKET_STATS_DIR / "junior_vs_senior.csv"
 
 # analyst(market_stats.py)가 이 파일들을 읽어 rank_by_job.csv 등을 만든다.
 # 이 파일들이 rank_by_job.csv보다 최신이면 analyst가 재실행되기 전 것이라는 뜻이다.
@@ -78,13 +80,7 @@ def classify_possession(canonical: str, resume_tags: set[str]) -> str:
 
 def extract_resume_tags(resume_text: str, dict_path: Path = DICT_PATH) -> set[str]:
     """이력서 텍스트에서 사전(v1) 기준으로 보유 태그를 뽑는다. extractor와 같은 regex 방식."""
-    tags = load_dict(Path(dict_path))
-    patterns = compile_patterns(tags)
-    found: set[str] = set()
-    for canonical, _category, _field, pattern in patterns:
-        if pattern.search(resume_text):
-            found.add(canonical)
-    return found
+    return extract_tags(resume_text, load_patterns(dict_path))
 
 
 FIELD3_EXCLUSION_NOTE = (
@@ -181,3 +177,22 @@ def run(
         "미보유가중치_방식": POSSESSION_TIER_NOTE,
         "이력서_최신성_한계": RESUME_STALENESS_NOTE,
     }
+
+
+def main(argv: list[str] | None = None) -> None:
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--job", required=True, choices=JOBS)
+    ap.add_argument("--resume-file", required=True, help="이력서 텍스트 파일 (레포에 넣지 않는다)")
+    ap.add_argument("--dict", dest="dict_path", default=str(DICT_PATH))
+    ap.add_argument("--stats-dir", default=str(MARKET_STATS_DIR))
+    ap.add_argument("--top-n", type=int, default=TOP_N)
+    a = ap.parse_args(argv)
+    sd = Path(a.stats_dir)
+    r = run(resume_text=Path(a.resume_file).read_text(encoding="utf-8"), target_job=a.job,
+            dict_path=Path(a.dict_path), rank_by_job_path=sd / "rank_by_job.csv",
+            junior_senior_path=sd / "junior_vs_senior.csv", top_n=a.top_n)
+    print(json.dumps(r, ensure_ascii=False, indent=2))
+
+
+if __name__ == "__main__":
+    main()

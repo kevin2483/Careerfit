@@ -15,8 +15,9 @@
 """
 from __future__ import annotations
 import argparse
-import json
 from pathlib import Path
+
+from src.common.jsonl import read_jsonl, write_jsonl
 
 from src.label.view_labels import split_sections, bulletify
 
@@ -63,9 +64,9 @@ def review_one(idx: int, total: int, row: dict) -> str:
             return "quit"
         if a == "n":
             keep.remove(tag)
-            print(f"     → 제외됨")
+            print("     → 제외됨")
         else:
-            print(f"     → 유지")
+            print("     → 유지")
 
     # 2) regex 가 놓친 태그 추가
     print("\n  regex가 놓친 역량이 본문에 있나요?")
@@ -102,7 +103,7 @@ def main() -> None:
     args = p.parse_args()
 
     path = Path(args.infile)
-    rows = [json.loads(l) for l in path.read_text(encoding="utf-8").splitlines() if l.strip()]
+    rows = read_jsonl(path)
     total = len(rows)
 
     if args.n:
@@ -123,14 +124,9 @@ def main() -> None:
         if res == "quit":
             break
         done += 1
-        # 매 건마다 저장 (중간에 끊겨도 안전)
-        with path.open("w", encoding="utf-8") as f:
-            for r in rows:
-                f.write(json.dumps(r, ensure_ascii=False) + "\n")
+        write_jsonl(path, rows)  # 매 건마다 저장 (중간에 끊겨도 안전)
 
-    with path.open("w", encoding="utf-8") as f:
-        for r in rows:
-            f.write(json.dumps(r, ensure_ascii=False) + "\n")
+    write_jsonl(path, rows)
 
     reviewed = sum(1 for r in rows if r.get("reviewed"))
     print(f"\n{'='*70}")

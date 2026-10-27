@@ -16,14 +16,14 @@
   사람이 넣은 태그를 삭제하거나 새로 추가하지 않는다.
 
 사용:
-  python normalize_gold.py data/labeled/label_draft.jsonl data/raw/dict/skill_tags_v1.yaml
+  python -m scripts.normalize_gold data/labeled/label_draft.jsonl data/raw/dict/skill_tags_v1.yaml
 """
 from __future__ import annotations
-import json
 import sys
 from pathlib import Path
 
-import yaml
+from src.common.jsonl import read_jsonl, write_jsonl
+from src.common.skill_dict import alias_index
 
 # 사전 v1 개정 시 이름이 바뀐 것 (수동 매핑)
 RENAMES = {
@@ -31,27 +31,12 @@ RENAMES = {
 }
 
 
-def build_alias_index(dict_path: Path) -> dict[str, str]:
-    """소문자 표기 -> canonical. alias 와 canonical 자신을 모두 포함."""
-    raw = yaml.safe_load(dict_path.read_text(encoding="utf-8"))
-    idx: dict[str, str] = {}
-    for _cat, entries in raw.items():
-        if not isinstance(entries, list):
-            continue
-        for e in entries:
-            canon = e["canonical"]
-            idx[canon.lower()] = canon
-            for a in (e.get("aliases") or []):
-                idx[str(a).lower()] = canon
-    return idx
-
-
 def main() -> None:
     label_path = Path(sys.argv[1])
     dict_path = Path(sys.argv[2])
-    idx = build_alias_index(dict_path)
+    idx = alias_index(dict_path)
 
-    rows = [json.loads(l) for l in label_path.read_text(encoding="utf-8").splitlines() if l.strip()]
+    rows = read_jsonl(label_path)
 
     changed = 0
     detail: dict[str, str] = {}
@@ -68,9 +53,7 @@ def main() -> None:
             new_tags.append(t3)
         r["gold_tags"] = sorted(set(new_tags))
 
-    with label_path.open("w", encoding="utf-8") as f:
-        for r in rows:
-            f.write(json.dumps(r, ensure_ascii=False) + "\n")
+    write_jsonl(label_path, rows)
 
     print(f"정규화 완료: {changed}건 변경 -> {label_path}")
     if detail:

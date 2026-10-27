@@ -19,13 +19,14 @@ reviewed=true 로 바꾸는 것으로 완료된다. (순환논리 회피: 기준
 """
 from __future__ import annotations
 import argparse
-import json
 from pathlib import Path
+
+from src.common.jsonl import read_jsonl, write_jsonl
 
 # 판단 3(약한 추측)로 자주 오탐되는 태그 -> 이 태그가 붙으면 "근거 확인 요망" flag.
 # regex 가 단일·범용 단어로 잡기 쉬워 문맥 확인이 필요한 태그들.
 WEAK_MATCH_TAGS = {
-    "ABテスト",        # "실험" 한 단어로 오탐되기 쉬움
+    "A/B테스트",       # "실험" 한 단어로 오탐되기 쉬움 (v0 표기 ABテスト)
     "통계분석",         # "분석" 범용어
     "대시보드",         # "리포트" 범용어
     "협업커뮤니케이션",  # field 3, 어차피 평가 제외지만 표시
@@ -56,14 +57,12 @@ def main() -> None:
     p.add_argument("--out", default="data/labeled/label_draft.jsonl")
     args = p.parse_args()
 
-    rows = [json.loads(l) for l in Path(args.infile).read_text(encoding="utf-8").splitlines() if l.strip()]
+    rows = read_jsonl(args.infile)
     for r in rows:
         prelabel_row(r)
 
     out = Path(args.out)
-    with out.open("w", encoding="utf-8") as f:
-        for r in rows:
-            f.write(json.dumps(r, ensure_ascii=False) + "\n")
+    write_jsonl(out, rows)
 
     n_flagged = sum(1 for r in rows if r["review_flags"])
     n_zero = sum(1 for r in rows if not r["regex_prefilled"])

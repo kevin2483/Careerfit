@@ -24,15 +24,14 @@
 from __future__ import annotations
 
 import argparse
-import json
 import random
 from pathlib import Path
 
 # 추출 코드의 함수를 재활용 (중복 구현 금지)
-from src.extract.job_skill_extract_report import (
-    load_dict, compile_patterns, load_jsonl, is_data_job,
-    SECTION_KEYS, RAW_DIR, DICT_PATH, JOBS,
-)
+from src.common.jsonl import write_jsonl
+from src.common.paths import DICT_PATH, JOBS, RAW_DIR, resolve_date
+from src.common.skill_dict import compile_patterns, load_dict
+from src.extract.job_skill_extract_report import SECTION_KEYS, is_data_job, load_jsonl
 
 
 def collect_candidates(raw_dir: Path, date: str, job: str) -> list[dict]:
@@ -88,7 +87,7 @@ def build_unique_pool(raw_dir: Path, date: str) -> dict[str, dict]:
 
 def main() -> None:
     p = argparse.ArgumentParser()
-    p.add_argument("--date", default="2026-07-30")
+    p.add_argument("--date", default=None, help="생략 시 raw-dir 최신 배치")
     p.add_argument("--per-job", type=int, default=15)
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--raw-dir", default=str(RAW_DIR))
@@ -97,6 +96,7 @@ def main() -> None:
     args = p.parse_args()
 
     raw_dir = Path(args.raw_dir)
+    args.date = resolve_date(args.date, raw_dir=raw_dir)
     patterns = compile_patterns(load_dict(Path(args.dict_path)))
     rng = random.Random(args.seed)
 
@@ -135,10 +135,7 @@ def main() -> None:
     template_rows.sort(key=lambda r: (JOBS.index(r["직무"]), str(r["job_id"])))
 
     out_path = Path(args.out)
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    with out_path.open("w", encoding="utf-8") as f:
-        for r in template_rows:
-            f.write(json.dumps(r, ensure_ascii=False) + "\n")
+    write_jsonl(out_path, template_rows)
 
     n_multi = sum(1 for r in template_rows if len(r["all_jobs"]) > 1)
     print(f"라벨링 템플릿 생성: {len(template_rows)}건 -> {out_path}")

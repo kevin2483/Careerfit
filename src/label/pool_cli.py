@@ -39,41 +39,33 @@ pool_key.jsonl(어느 시스템이 냈는지)은 --apply 전까지 열지 말 �
 from __future__ import annotations
 
 import argparse
-import json
 import random
 import shutil
 from collections import defaultdict
 from pathlib import Path
 
+from src.common.jsonl import read_jsonl, write_jsonl
+from src.common.paths import DICT_PATH, LABELED_DIR, LABELS_PRIVATE
+from src.common.skill_dict import alias_index
 from src.label.view_labels import bulletify, split_sections
 
-POOL = "data/labeled/pool_candidates.jsonl"
-LABELS = "data/labeled/label_draft.jsonl"
+POOL = str(LABELED_DIR / "pool_candidates.jsonl")
+LABELS = str(LABELS_PRIVATE)
 SEED = 42
+VERDICT_KEYS = {"y", "n", "s", "q"}
 
 
-def read_jsonl(path: str | Path) -> list[dict]:
-    # splitlines() 쓰지 말 것 — 본문의 \u2028 등에서 레코드가 절단된다 (lab_log 기록됨)
-    out = []
-    with Path(path).open(encoding="utf-8") as fh:
-        for line in fh:
-            if line.strip():
-                out.append(json.loads(line))
-    return out
-
-
-def write_jsonl(path: str | Path, rows: list[dict]) -> None:
-    with Path(path).open("w", encoding="utf-8") as fh:
-        for r in rows:
-            fh.write(json.dumps(r, ensure_ascii=False) + "\n")
-
-
-def ask(prompt: str, default: str = "y") -> str:
-    try:
-        a = input(prompt).strip().lower()
-    except (EOFError, KeyboardInterrupt):
-        return "q"
-    return a or default
+def ask(prompt: str, default: str = "y", allowed: set[str] | None = None) -> str:
+    """allowed 가 있으면 그 안의 값만 받는다. 오타('yes', 'x')를 '예'로 세는 사고를 막는다."""
+    while True:
+        try:
+            a = input(prompt).strip().lower()
+        except (EOFError, KeyboardInterrupt):
+            return "q"
+        a = a or default
+        if allowed is None or a in allowed:
+            return a
+        print(f"     ! {a!r} 는 허용되지 않음. {'/'.join(sorted(allowed))} 중 하나")
 
 
 def show_doc(row: dict, n_cand: int) -> None:
@@ -134,7 +126,7 @@ def review(args: argparse.Namespace) -> None:
         show_doc(row, len(group))
 
         for i, c in enumerate(group, 1):
-            a = ask(f"  [{i}/{len(group)}] {c['tag']}  요구 역량? [Y/n/s=공고건너뜀/q]: ")
+            a = ask(f"  [{i}/{len(group)}] {c['tag']}  요구 역량? [Y/n/s=공고건너뜀/q]: ", allowed=VERDICT_KEYS)
             if a == "q":
                 quit_now = True
                 break
@@ -188,10 +180,21 @@ def apply(args: argparse.Namespace) -> None:
             f"전부 끝낸 뒤 실행하거나 --force 를 쓸 것."
         )
 
-    new_gold: dict[str, set[str]] = defaultdict(set)
+    # 판정 대상 공고는 y 가 하나도 없어도 정답을 '빈 집합'으로 갱신해야 한다.
+    # y 있는 공고만 모으면 전원 n 공고가 건너뛰어져 옛 정답이 남는다 (2026-09-21 사고, 356898).
+    judged_docs = {str(c["job_id"]) for c in cands if c["verdict"] is not None}
+    new_gold: dict[str, set[str]] = {jid: set() for jid in judged_docs}
+    # 수기 입력 태그는 사전 alias 로 canonical 에 맞춘다 ('fastapi' → 'FastAPI').
+    # 안 맞추면 같은 역량이 FP+FN 으로 이중 계산된다 (2026-10-27 발견, 374560).
+    idx = alias_index(args.dict_path)
     for c in cands:
         if c["verdict"]:
-            new_gold[str(c["job_id"])].add(c["tag"])
+            tag = idx.get(c["tag"].lower(), c["tag"])
+            if tag != c["tag"]:
+                print(f"  정규화: {c['tag']!r} -> {tag!r} (job_id={c['job_id']})")
+            elif c["tag"].lower() not in idx:
+                print(f"  [주의] 사전 밖 태그 유지: {c['tag']!r} (job_id={c['job_id']}) — 사전밖(FN)으로 채점됨")
+            new_gold[str(c["job_id"])].add(tag)
 
     path = Path(args.labels)
     shutil.copy(path, path.with_name(path.name + ".bak_prepool"))
@@ -221,6 +224,7 @@ def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--pool", default=POOL)
     p.add_argument("--labels", default=LABELS)
+    p.add_argument("--dict", dest="dict_path", default=str(DICT_PATH), help="--apply 시 수기 태그 정규화용")
     p.add_argument("--doc", help="특정 job_id 만")
     p.add_argument("--redo", action="store_true")
     p.add_argument("--stats", action="store_true")

@@ -1,7 +1,7 @@
 """
 CareerFit — 두 추출 산출물 비교 / 블라인드 풀링 후보 생성
 
-위치: scripts/diff_extractions.py
+위치: src/eval/diff_extractions.py
 
 용도 두 가지 (같은 도구를 2단계와 4단계에서 재사용):
   2단계  조사 패치 전/후 regex 출력을 비교 → 전체 1,190건에서 무엇이 몇 개 늘었나
@@ -10,15 +10,15 @@ CareerFit — 두 추출 산출물 비교 / 블라인드 풀링 후보 생성
 사용
 ----
     # 조사 패치 전후 비교
-    python scripts/diff_extractions.py \
-        --a data/processed/2026-08-12/regex_before.jsonl \
-        --b data/processed/2026-08-12/regex_after.jsonl \
+    python -m src.eval.diff_extractions \
+        --a data/processed/<date>/regex_before.jsonl \
+        --b data/processed/<date>/regex_after.jsonl \
         --label-a regex_b --label-b regex_patched
 
     # 풀링 후보 생성 (정답셋 38건만)
-    python scripts/diff_extractions.py \
-        --a data/processed/2026-08-12/regex_after.jsonl \
-        --b data/processed/2026-08-12/llm_extract_claude-haiku-4-5-20251001.jsonl \
+    python -m src.eval.diff_extractions \
+        --a data/processed/<date>/regex_after.jsonl \
+        --b data/processed/<date>/llm_extract_claude-haiku-4-5-20251001.jsonl \
         --label-a regex --label-b llm \
         --ids-file data/labeled/gold_ids.txt \
         --pool-out data/labeled/pool_candidates.jsonl \
