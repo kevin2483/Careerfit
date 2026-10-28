@@ -37,17 +37,13 @@ import random
 from collections import Counter
 from pathlib import Path
 
+from src.common.jsonl import read_jsonl
+
 
 def load(path: str, id_key: str, tags_key: str) -> dict[str, set[str]]:
     out: dict[str, set[str]] = {}
-    with Path(path).open(encoding="utf-8") as f:
-        for line in f:  # splitlines() 쓰지 말 것 (lab_log 기록됨)
-            line = line.strip()
-            if not line:
-                continue
-            rec = json.loads(line)
-            jid = str(rec[id_key])
-            out[jid] = set(rec.get(tags_key) or [])
+    for rec in read_jsonl(path):
+        out[str(rec[id_key])] = set(rec.get(tags_key) or [])
     return out
 
 
@@ -112,7 +108,7 @@ def main() -> None:
         rng = random.Random(a.seed)
         cands, keys = [], []
         for i in ids:
-            for tag in (A[i] | B[i]):
+            for tag in sorted(A[i] | B[i]):  # set 순회는 PYTHONHASHSEED 에 따라 달라 seed 가 무의미해진다 (2026-10-28 리뷰)
                 src = []
                 if tag in A[i]:
                     src.append(a.label_a)

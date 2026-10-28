@@ -3,6 +3,7 @@ import csv
 import json
 
 from src.analyze.market_stats import load_population
+from src.common.jsonl import read_jsonl
 from src.common.paths import DICT_PATH
 from src.extract.job_skill_extract_report import VALIDATION_COLUMNS, run
 
@@ -51,7 +52,7 @@ def test_invariant_with_synthetic_bad_inputs(tmp_path):
     pop = load_population(out / "validation_summary.csv")
     assert pop["de"]["통과"] == 0 and pop["ds"]["통과"] == 1
 
-    tags = [json.loads(l) for l in (out / "extracted_tags.jsonl").read_text(encoding="utf-8").splitlines() if l]
+    tags = read_jsonl(out / "extracted_tags.jsonl")
     assert {t["job_id"] for t in tags} == {"1", "10"}
     assert "Python" in tags[0]["tags"] and "SQL" in tags[0]["tags"]
     assert "requirements" in tags[0]["matched_fields"]

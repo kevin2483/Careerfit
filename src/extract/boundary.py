@@ -2,7 +2,7 @@ r"""
 CareerFit — alias 매칭 경계 패턴 v2 (한글 조사 대응)
 
 위치: src/extract/boundary.py
-교체 지점: job_skill_extract_report.py 의 compile_patterns()
+교체 지점: src/common/skill_dict.py 의 compile_patterns()
 
     # before
     pat = re.compile(r"\b(?:" + "|".join(alts) + r")\b", re.IGNORECASE)

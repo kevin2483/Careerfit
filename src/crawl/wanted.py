@@ -22,6 +22,8 @@ from typing import Any, Iterable
 
 import requests
 
+from src.common.jsonl import iter_jsonl
+
 KST = timezone(timedelta(hours=9))
 
 LIST_URL = "https://www.wanted.co.kr/api/chaos/navigation/v1/results"
@@ -194,12 +196,9 @@ def load_today_seen(out_path: Path) -> set[str]:
     seen: set[str] = set()
     if not out_path.exists():
         return seen
-    with out_path.open(encoding="utf-8") as f:
-        for line in f:
-            try:
-                seen.add(json.loads(line)["job_id"])
-            except Exception:
-                continue
+    for _ln, rec in iter_jsonl(out_path, strict=False):  # 깨진 줄은 건너뛰고 재수집 대상으로 남긴다
+        if rec and "job_id" in rec:
+            seen.add(rec["job_id"])
     return seen
 
 

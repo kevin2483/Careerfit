@@ -23,7 +23,7 @@ from pathlib import Path
 
 from src.common.jsonl import iter_jsonl
 from src.common.paths import DICT_PATH, EXTRACT_REPORT_DIR, JOBS, RAW_DIR, resolve_date
-from src.common.skill_dict import close_tags, compile_patterns, implies_from_tags, load_dict  # noqa: F401 — 하위 호환 re-export
+from src.common.skill_dict import close_tags, compile_patterns, implies_from_tags, load_dict
 
 OUT_DIR = EXTRACT_REPORT_DIR
 SECTION_KEYS = ["main_tasks", "requirements", "preferred_points"]

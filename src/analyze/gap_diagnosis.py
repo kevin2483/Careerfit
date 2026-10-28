@@ -24,7 +24,7 @@ import csv
 import json
 from pathlib import Path
 
-from src.common.paths import DICT_PATH, JOBS, MARKET_STATS_DIR
+from src.common.paths import DICT_PATH, EXTRACT_REPORT_DIR, JOBS, MARKET_STATS_DIR
 from src.common.skill_dict import close_tags, extract_tags, implies_map, load_dict, load_patterns
 TOP_N = 5  # 판단 기준: 상위 5개만 이번 분기, 6위 이하는 다음 분기 (CLAUDE.md/판단 기준)
 
@@ -47,15 +47,13 @@ RESUME_STALENESS_NOTE = (
 RANK_BY_JOB_PATH = MARKET_STATS_DIR / "rank_by_job.csv"
 JUNIOR_SENIOR_PATH = MARKET_STATS_DIR / "junior_vs_senior.csv"
 
-# analyst(market_stats.py)가 이 파일들을 읽어 rank_by_job.csv 등을 만든다.
-# 이 파일들이 rank_by_job.csv보다 최신이면 analyst가 재실행되기 전 것이라는 뜻이다.
-_MARKET_STATS_SOURCE_PATHS = [
-    Path("data/processed/job_skill_extract_report/tag_frequency_by_job.csv"),
-    Path("data/processed/job_skill_extract_report/extracted_tags.jsonl"),
-]
+# analyst(market_stats.py)가 extractor 산출물을 읽어 rank_by_job.csv 등을 만든다.
+# extractor 산출물이 rank_by_job.csv보다 최신이면 analyst가 재실행되기 전 것이라는 뜻이다.
+MARKET_STATS_SOURCE_FILES = ("tag_frequency_by_job.csv", "extracted_tags.jsonl")
 
 
-def check_inputs_fresh(rank_by_job_path: Path, junior_senior_path: Path) -> None:
+def check_inputs_fresh(rank_by_job_path: Path, junior_senior_path: Path,
+                       extract_dir: Path = EXTRACT_REPORT_DIR) -> None:
     """analyst 산출물이 있는지, extractor 산출물보다 최신인지 확인한다.
     순서 의존성(extractor → analyst → diagnoser)이 깨지면 조용히 틀린 결과를 내는
     대신 여기서 멈춘다."""
@@ -66,7 +64,7 @@ def check_inputs_fresh(rank_by_job_path: Path, junior_senior_path: Path) -> None
         )
 
     rank_mtime = rank_by_job_path.stat().st_mtime
-    for src in _MARKET_STATS_SOURCE_PATHS:
+    for src in (Path(extract_dir) / f for f in MARKET_STATS_SOURCE_FILES):
         if src.exists() and src.stat().st_mtime > rank_mtime:
             raise SystemExit(
                 f"[중단] analyst 산출물이 extractor 산출물보다 오래됨 ({src} 이 더 최신). "
@@ -123,12 +121,13 @@ def run(
     rank_by_job_path: Path = RANK_BY_JOB_PATH,
     junior_senior_path: Path = JUNIOR_SENIOR_PATH,
     top_n: int = TOP_N,
+    extract_dir: Path = EXTRACT_REPORT_DIR,
 ) -> dict:
     if target_job not in JOBS:
         raise SystemExit(f"[중단] target_job은 {JOBS} 중 하나여야 함: {target_job!r}")
     if not resume_text or not resume_text.strip():
         raise SystemExit("[중단] 이력서 텍스트가 비어 있음. 리더가 텍스트를 전달했는지 확인 필요.")
-    check_inputs_fresh(Path(rank_by_job_path), Path(junior_senior_path))
+    check_inputs_fresh(Path(rank_by_job_path), Path(junior_senior_path), Path(extract_dir))
 
     resume_tags = extract_resume_tags(resume_text, dict_path)
     field3_tags = load_field3_tags(dict_path)
@@ -185,12 +184,13 @@ def main(argv: list[str] | None = None) -> None:
     ap.add_argument("--resume-file", required=True, help="이력서 텍스트 파일 (레포에 넣지 않는다)")
     ap.add_argument("--dict", dest="dict_path", default=str(DICT_PATH))
     ap.add_argument("--stats-dir", default=str(MARKET_STATS_DIR))
+    ap.add_argument("--extract-dir", default=str(EXTRACT_REPORT_DIR), help="신선도 검사용 extractor 산출물 폴더")
     ap.add_argument("--top-n", type=int, default=TOP_N)
     a = ap.parse_args(argv)
     sd = Path(a.stats_dir)
     r = run(resume_text=Path(a.resume_file).read_text(encoding="utf-8"), target_job=a.job,
             dict_path=Path(a.dict_path), rank_by_job_path=sd / "rank_by_job.csv",
-            junior_senior_path=sd / "junior_vs_senior.csv", top_n=a.top_n)
+            junior_senior_path=sd / "junior_vs_senior.csv", top_n=a.top_n, extract_dir=Path(a.extract_dir))
     print(json.dumps(r, ensure_ascii=False, indent=2))
 
 

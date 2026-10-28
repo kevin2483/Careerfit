@@ -9,10 +9,11 @@
 from __future__ import annotations
 
 import argparse
-import json
 import random
 from collections import Counter
 from pathlib import Path
+
+from src.common.jsonl import read_jsonl
 
 SECTION_LABELS = {
     "intro": "회사소개",
@@ -28,11 +29,7 @@ def load(paths: list[str]) -> list[dict]:
     for p in paths:
         # 파일 객체를 직접 순회한다. splitlines()는 \u2028 등 유니코드 줄바꿈까지
         # 잘라내서 한 줄짜리 JSON 레코드를 두 동강 내므로 쓰면 안 된다.
-        with open(p, encoding="utf-8") as fh:
-            for line in fh:
-                line = line.strip()
-                if line:
-                    recs.append(json.loads(line))
+        recs.extend(read_jsonl(p))
     # 같은 job_id 스냅샷이 여러 개면 최신 1건만
     latest: dict[str, dict] = {}
     for r in recs:
