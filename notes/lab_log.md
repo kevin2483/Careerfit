@@ -827,7 +827,12 @@ README 에 "정규식이 원리적으로 못 고치는 오탐(excel)" 을 써 �
 ### 리뷰에서 "문제 없음"으로 확인된 것
 P/R/F1·percentile·쌍대 차이·라우팅 비용 산식, job_id str 조인, field 3 제외의 세 채점기 일관성, 정답셋 닫힘·사전 밖 태그 없음, README 수치 전부 CSV 와 일치.
 
+### 후속 (같은 날)
+- 단가: 공식 페이지(2026-10-28)에서 haiku 1/5 · sonnet 2/10 · opus 5/25 확인. Sonnet 5 의 9-01 인상은 취소됐다는 각주가 있다.
+  코드 주석이 틀렸던 것. PRICING_AS_OF 를 2026-10-28 로 갱신, 비용 값은 그대로.
+- CLI 인자명: 정답셋은 `--labels`, 사전은 `--dict` 로 통일. 옛 이름(`--infile`, `--dict-path`)은 alias 로 남겨 기존 명령이 깨지지 않는다.
+- 892 하드코딩 3곳 제거: `paths.corpus_size()` 가 extracted_tags.jsonl 의 고유 job_id 를 센다. `--n-docs` 는 덮어쓰기용으로만 남김.
+- prelabel·label_cli·make_label_template 에 [레거시] 표시. 삭제하지 않은 이유: 초기 정답셋 구축 과정의 재현 경로.
+
 ### 남은 것
-- 361662 sonnet 재호출(API 키 필요, 약 $0.02). 그 뒤 본표 재생성.
-- 단가 재확인 후 비용 열 재계산.
-- CLI 인자명 통일(`--infile` vs `--labels`, `--dict-path` vs `--dict`), prelabel/label_cli 레거시 정리, 892 하드코딩 3곳.
+- 361662 sonnet 재호출(API 키 필요, 약 $0.02). 그 뒤 본표 재생성. 환경에 키가 없어 이번엔 못 했다.
