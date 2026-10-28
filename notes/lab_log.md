@@ -794,3 +794,40 @@ README 에 "정규식이 원리적으로 못 고치는 오탐(excel)" 을 써 �
 ### 남은 것
 - 사전 밖 역량(Amplitude·Metabase·강화학습·코드품질관리) 수록 여부 — canonical 추가라 정답셋 재판정이 따라온다.
 - 정답셋 확대. 함의 규칙 선택을 포함해 38건에 맞춘 결정이 늘고 있다.
+
+---
+
+## 2026-10-28 (2) — 독립 코드 리뷰 반영: 네 번째 평가 결함
+
+### 1. sonnet 의 순위는 max_tokens=512 한 건이 만들고 있었다 (리뷰 지적, 재계산으로 확인)
+- `llm_extract_claude-sonnet-5.jsonl` 361662: stop_reason=max_tokens, output_tokens=512, 출력 빈 문자열, parse_ok=false, tags=[].
+  정답 14개(field 3 제외)가 전부 FN → sonnet 전체 FN 45 의 31%. haiku·opus 는 같은 공고에 24개씩 냈다.
+- 그 공고를 네 방식 모두에서 뺀 37건: opus 0.874 / regex 0.866 / sonnet 0.866 / haiku 0.836. "sonnet 은 regex 에 지배당한다"가 동률로 바뀐다.
+- `_summary.json` 에 n_parse_fail=1 이 적혀 있었는데 README·lab_log 어디에도 없었다. 세 번의 교정이 전부 정답셋 쪽을 봤고 예측 파일 쪽은 안 봤다.
+- 조치 (API 키가 없어 재호출은 못 함):
+  - 추출기: MAX_OUTPUT_TOKENS 512→1024, stop_reason=max_tokens 면 예산을 두 배로 즉시 재시도(상한 4096).
+  - 채점기 셋(evaluate·bootstrap·cascade): `pred_meta.report_failed_rows` 로 실패 행을 반드시 경고. 정답셋 수를 지키기 위해 빼지는 않는다.
+  - `src/eval/failed_rows.py` → `failed_rows_sensitivity.csv`: 실패 문서를 네 방식 모두에서 뺀 수치. `make reproduce`/`check` 에 포함.
+  - README 발견 7 + 한계에 공개. 본표 수치는 유지. 361662 sonnet 재호출은 남은 일.
+
+### 2. 그 밖의 리뷰 지적과 조치
+- bootstrap_ci: 예측 파일 없으면 `[건너뜀]` 후 헤더만 있는 CSV 를 정상 종료로 남김 → SystemExit. `resolve_date(prefer="processed")` 를 평가 4종에 적용
+  (새 크롤이 생기면 raw 날짜를 골라 예측 없는 날짜로 평가하던 경로 차단).
+- llm_skill_extract: `--no-resume` 인데 append 모드 → 같은 job_id 두 벌, 요약 두 배. resume 아닐 땐 "w".
+- haiku 예측 파일은 2026-08-15 옛 파서로 만들어 parse_ok 키가 없다. 2건(357204·357236)이 펜스 친 `[]` 인데 빈출력 0 으로 집계됐다.
+  `summarize()` 가 옛 행을 지금 파서로 다시 판정 → haiku n_empty 0→2. 파일 자체는 안 건드림.
+- 비용 단가 2026-08-12 기준이 README 에 없었다 → `method_comparison.csv` 에 단가기준일 열, README 에 명시. 현재 단가는 확인하지 않았다(코드 주석의 9-01 변경 메모만 인용).
+- `diff_extractions` 풀링이 set 순회라 seed 가 있어도 PYTHONHASHSEED 에 따라 순서가 달랐다 → sorted().
+- CLAUDE.md ② 위반: llm_skill_extract 가 YAML 을 따로 파싱(라벨 공간을 두 번 구현) → `skill_dict.canonical_names`.
+  JSONL 직접 순회 5곳(llm_skill_extract 3, diff_extractions, crawl 2) → `iter_jsonl/read_jsonl`. 테스트에도 splitlines 가 하나 있었다.
+- gap_diagnosis 신선도 검사가 레포 상대 경로를 하드코딩 → `--extract-dir` 인자. mtime 한계는 README 한계에 추가.
+- README 과장: "data/processed 전부 재현" → 평가 표만. `evaluation_v0/v1/...` 는 역사 기록임을 명시.
+- 테스트 64→72 (parse_tags, summarize 옛 행, 라벨 공간=사전, pred_failure, 민감도, resolve_date prefer, bootstrap 중단).
+
+### 리뷰에서 "문제 없음"으로 확인된 것
+P/R/F1·percentile·쌍대 차이·라우팅 비용 산식, job_id str 조인, field 3 제외의 세 채점기 일관성, 정답셋 닫힘·사전 밖 태그 없음, README 수치 전부 CSV 와 일치.
+
+### 남은 것
+- 361662 sonnet 재호출(API 키 필요, 약 $0.02). 그 뒤 본표 재생성.
+- 단가 재확인 후 비용 열 재계산.
+- CLI 인자명 통일(`--infile` vs `--labels`, `--dict-path` vs `--dict`), prelabel/label_cli 레거시 정리, 892 하드코딩 3곳.

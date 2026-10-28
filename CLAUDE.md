@@ -20,7 +20,7 @@
 ## ③ 결과는 어디에 어떤 형식으로 남기나
 - 추출 산출물: `data/processed/job_skill_extract_report/` (CSV 4종, 컬럼·행 순서 고정)
 - 평가 산출물: `data/processed/evaluation_{regex_pooled,llm_haiku,llm_sonnet,llm_opus}/eval_summary.csv`
-  비교·CI·라우팅: `data/processed/{method_comparison,bootstrap_ci,cascade_sim}.csv`
+  비교·CI·라우팅·실패민감도: `data/processed/{method_comparison,bootstrap_ci,cascade_sim,failed_rows_sensitivity}.csv`
 - `make reproduce` 가 공개 데이터만으로 위 전부를 다시 만들고, `make check` 가 커밋본과 diff 한다. CI 가 매번 돈다.
 - 모든 표는 **항목 · 값 · 근거** 세 칸을 갖춘다. 근거 없는 수치는 내지 않는다.
 
@@ -43,6 +43,8 @@
 - **성능 지표가 비정상적으로 높을 때(F1 ≥ 0.98)** — 라벨링 편향이나 평가 누수를 의심하고,
   결과를 쓰기 전에 사람에게 원인 확인을 요청한다.
 - **정답셋에 사전 밖 태그가 새로 생겼을 때** — 오타인지 새 역량인지 사람이 가린다. `pool_cli --apply` 가 "[주의] 사전 밖 태그" 로 알린다.
+- **채점기가 "[경고] 예측 실패 행" 을 찍을 때** — 잘린 응답·파싱 실패는 모델 성능이 아니라 호출 설정이다. 그 수치를 결론에 쓰기 전에
+  `failed_rows_sensitivity.csv` 의 제외 수치와 함께 보고하고, 재호출 여부를 사람이 정한다. (2026-10-28: sonnet 361662 가 max_tokens=512 에서 잘림)
 
 ## 판단 기준 (analyst·diagnoser가 쓰는 숫자 기준)
 - 어떤 역량의 (canonical, 직무) 출현 건수가 3건 미만이면 → 그 직무의 순위·비교·동시출현·

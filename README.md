@@ -2,11 +2,11 @@
 
 채용공고 1,190건에서 요구 역량을 추출해 직무별 시장 지형도를 만들고, 개인 이력과 대조해 학습 우선순위를 진단하는 파이프라인입니다.
 
-이 프로젝트의 중심은 추출기가 아니라 **추출 결과가 맞는지 재는 장치**입니다. 정규식 베이스라인과 Claude 3종(haiku · sonnet · opus)을 같은 정답셋으로 비교했고, 그 과정에서 평가 장치 자체의 결함을 세 번 찾아 고쳤습니다. 두 번째 교정에서는 결론이 뒤집혔고, 세 번째에서는 "차이가 있다"는 주장을 "확정할 수 없다"로 바꿨습니다.
+이 프로젝트의 중심은 추출기가 아니라 **추출 결과가 맞는지 재는 장치**입니다. 정규식 베이스라인과 Claude 3종(haiku · sonnet · opus)을 같은 정답셋으로 비교했고, 그 과정에서 평가 장치 자체의 결함을 네 번 찾아 고쳤습니다. 두 번째 교정에서는 결론이 뒤집혔고, 세 번째에서는 "차이가 있다"는 주장을 "확정할 수 없다"로 바꿨으며, 네 번째(독립 코드 리뷰)에서는 sonnet의 순위가 API 호출 설정 한 건의 산물이었음이 드러났습니다.
 
 [![ci](https://github.com/kevin2483/Careerfit/actions/workflows/ci.yml/badge.svg)](.github/workflows/ci.yml) · `make reproduce` 한 줄로 공개 데이터만으로 모든 평가 표가 다시 만들어집니다.
 
-> **English summary.** CareerFit extracts required skills from 1,190 Korean job postings (data scientist / engineer / ML engineer / analyst), builds per-role market maps, and diagnoses an individual's skill gaps. The core contribution is the *measurement apparatus*, not the extractor: a regex baseline and three Claude models are scored against a human-labeled gold set built by **blind pooling** (candidates from all systems, source hidden, order shuffled). Three rounds of bias correction were needed. Final F1 on 38 postings (dictionary v2, which closes tag sets under one human-confirmed implication rule, PySpark→Spark): opus 0.863, regex 0.853, sonnet 0.845, haiku 0.828. Bootstrap 95% CIs overlap; the opus–regex gap of +0.010 has CI [−0.016, +0.037], so no ranking is statistically settled at this sample size. Explicit tool names are solved equally by all methods (F1 0.92–0.94); the difference is entirely in descriptive competencies. Length-based routing of 40% of postings to opus reaches opus-level F1 at 40% of the cost, but is only +1.1σ above random routing. Everything in `data/processed/` regenerates byte-identically from committed public files via `make reproduce`; CI verifies this on every push.
+> **English summary.** CareerFit extracts required skills from 1,190 Korean job postings (data scientist / engineer / ML engineer / analyst), builds per-role market maps, and diagnoses an individual's skill gaps. The core contribution is the *measurement apparatus*, not the extractor: a regex baseline and three Claude models are scored against a human-labeled gold set built by **blind pooling** (candidates from all systems, source hidden, order shuffled). Four rounds of correction were needed; the last one, from an independent code review, found that sonnet's rank rested on a single response truncated at max_tokens=512 and scored as an empty prediction (without that posting sonnet ties regex at 0.866; see `failed_rows_sensitivity.csv`). Final F1 on 38 postings (dictionary v2, which closes tag sets under one human-confirmed implication rule, PySpark→Spark): opus 0.863, regex 0.853, sonnet 0.845, haiku 0.828. Bootstrap 95% CIs overlap; the opus–regex gap of +0.010 has CI [−0.016, +0.037], so no ranking is statistically settled at this sample size. Explicit tool names are solved equally by all methods (F1 0.92–0.94); the difference is entirely in descriptive competencies. Length-based routing of 40% of postings to opus reaches opus-level F1 at 40% of the cost, but is only +1.1σ above random routing. Every evaluation table (`evaluation_{regex_pooled,llm_*}`, bootstrap CIs, method comparison, routing simulation, failure sensitivity) regenerates byte-identically from committed public files via `make reproduce`; CI verifies this on every push.
 
 ---
 
@@ -31,7 +31,8 @@
 - **명시적인 기술명은 정규식으로 충분합니다.** ①명시 기술에서 네 방식이 0.92~0.94로 사실상 동률입니다.
 - **차이는 서술형 역량에서 납니다.** "대용량 데이터 처리 경험" 같은 서술형 요구에서 opus가 앞섭니다(0.766 vs 0.736).
 - **opus와 정규식의 차이는 이 표본 크기로 확정할 수 없습니다.** 차이의 신뢰구간이 0을 포함합니다. 확정되는 건 "haiku는 opus보다 낮다" 하나뿐입니다.
-- **파레토 최적은 정규식($0)과 opus($15.70) 둘입니다.** sonnet과 haiku는 더 싸고 더 정확한 정규식에 지배당합니다.
+- **파레토 최적은 정규식($0)과 opus($15.70) 둘입니다.** sonnet과 haiku는 더 싸고 더 정확한 정규식에 지배당합니다. 단, sonnet의 수치에는 잘린 응답 1건이 빈 예측으로 들어 있습니다(발견 7). 그 공고를 빼면 sonnet은 정규식과 동률(0.866)입니다.
+- **비용은 2026-08-12 단가 기준입니다.** `method_comparison.csv`의 단가기준일 열에 적혀 있습니다. 코드 주석에 sonnet 단가가 2026-09-01 이후 바뀌었다는 메모가 있으므로, 인용 시점의 단가로 다시 계산해야 합니다.
 
 ---
 
@@ -85,6 +86,19 @@ API 호출 없이 기존 예측을 섞어 라우팅 정책을 시뮬레이션했
 
 길이 기준은 opus 단독(0.863)과 같은 수준을 비용 40%로 얻습니다. 그런데 무작위 라우팅과의 차이는 +1.1σ입니다. 어떤 공고를 보내든 opus를 40% 섞으면 그만큼 오르고, "긴 공고를 고르는 것"이 보태는 몫은 38건에서 구분되지 않습니다. 서술형 태그 수 기준은 무작위보다 못합니다. 정규식이 서술형을 제대로 못 잡으니 그 개수로 어려운 공고를 고르는 것 자체가 부정확했습니다.
 
+### 7. 잘린 응답 한 건이 sonnet의 순위를 만들고 있었다
+
+제가 쓴 코드에 묶이지 않은 독립 리뷰를 돌렸더니, 위 세 번의 교정이 못 본 네 번째 결함이 나왔습니다. sonnet 예측 파일의 공고 한 건(361662)이 `max_tokens=512`에서 잘려 JSON이 닫히지 않았고, 채점기는 이를 "아무 태그도 못 찾음"으로 처리하고 있었습니다. 그 공고의 정답 14개가 전부 누락이 됐고, 이는 sonnet 전체 누락 45건의 31%입니다.
+
+| 방식 | 38건 전체 | 그 공고 제외(37건) |
+|---|---|---|
+| opus | 0.863 | 0.874 |
+| 정규식 | 0.853 | 0.866 |
+| sonnet | 0.845 | **0.866** |
+| haiku | 0.828 | 0.836 |
+
+"sonnet은 정규식에 지배당한다"는 말은 모델이 아니라 호출 설정을 재고 있었습니다. 재호출 없이 고칠 수 있는 것만 고쳤습니다. 추출기는 잘린 응답을 예산을 늘려 재시도하고, 세 채점기는 실패 행을 빈 예측으로 두되 반드시 경고를 찍으며, `failed_rows_sensitivity.csv`가 실패 문서를 뺀 수치를 매번 같이 냅니다. 정답셋 38건을 유지하기 위해 본표의 수치는 바꾸지 않았고, 그 공고의 sonnet 재호출은 남은 일로 적어 두었습니다. → [`src/eval/failed_rows.py`](src/eval/failed_rows.py)
+
 ---
 
 ## 파이프라인
@@ -109,7 +123,7 @@ flowchart LR
 | 정제 | 비데이터 공고 58건 제외(데이터 분석가가 경영 직군에 분류돼 절반이 무관). 교차 직무 중복 제거 시 고유 892건 | `src/extract/job_skill_extract_report.py` |
 | 추출 | 표준 태그 106개 사전(별칭 288개, 함의 규칙 1건). 한국어 조사 경계 처리. LLM은 닫힌 라벨 공간, 사전 밖 출력은 환각으로 별도 집계 | `src/extract/` |
 | 정답셋 | 블라인드 풀링 CLI. 판정은 사람만. LLM에게 묻지 않는다 | `src/label/pool_cli.py` |
-| 평가 | precision·recall·F1, 필드 난이도별 분리, 공고 단위 부트스트랩 CI, 랜덤 베이스라인 라우팅 시뮬레이션 | `src/eval/` |
+| 평가 | precision·recall·F1, 필드 난이도별 분리, 공고 단위 부트스트랩 CI, 랜덤 베이스라인 라우팅 시뮬레이션, 예측 실패 행 민감도 | `src/eval/` |
 | 분석 | 직무별 출현율, 동시출현, 신입·경력 비교. 판단 기준은 코드 상수 | `src/analyze/market_stats.py` |
 | 진단 | 우선순위 = 출현율 × 미보유 × 신입 접근성. 상위 5개만 이번 분기 | `src/analyze/gap_diagnosis.py` |
 
@@ -137,8 +151,10 @@ Claude Code 서브에이전트 3명(extractor · analyst · diagnoser)이 직렬
 - **추가 풀링 30건은 블라인드가 약했습니다.** 이미 판정한 공고에 새 후보만 떠서 출처를 짐작할 수 있었습니다.
 - **함의 규칙은 정답셋을 보고 골랐습니다.** v2의 PySpark→Spark는 의미상으로도 타당하지만(PySpark는 Spark의 Python API), 어느 쌍을 넣을지는 38건 정답셋의 동시출현을 보고 정했습니다. 평가 데이터로 사전을 다듬은 것이므로 이 +0.004는 과적합일 수 있습니다. 정답셋이 커지면 다시 봐야 합니다.
 - **이력서가 외부 드라이브에 있어** 레포만으로는 갭 진단이 재현되지 않습니다. 로컬 텍스트 파일로는 같은 산식으로 돌릴 수 있습니다.
+- **sonnet의 잘린 응답 1건은 아직 재호출하지 않았습니다.** 위 표는 그 공고를 빈 예측으로 둔 값이고, 제외한 값은 `failed_rows_sensitivity.csv`에 있습니다.
+- **단계 순서 보장은 파일 수정 시각에 의존합니다.** 앞 단계 산출물이 더 새로우면 코드가 멈추지만, git clone 직후에는 수정 시각이 체크아웃 시각이라 이 검사가 약합니다.
 
-실패한 실험과 버린 선택, 세 번의 교정 경위는 [`notes/lab_log.md`](notes/lab_log.md)에 날짜순으로 있습니다.
+실패한 실험과 버린 선택, 네 번의 교정 경위는 [`notes/lab_log.md`](notes/lab_log.md)에 날짜순으로 있습니다.
 
 ---
 
@@ -148,8 +164,8 @@ Claude Code 서브에이전트 3명(extractor · analyst · diagnoser)이 직렬
 
 ```bash
 pip install -r requirements.txt
-make test        # pytest 64건
-make reproduce   # data/processed/evaluation_* · bootstrap_ci.csv · method_comparison.csv · cascade_sim.csv 재생성
+make test        # pytest 72건
+make reproduce   # evaluation_{regex_pooled,llm_*} · bootstrap_ci · method_comparison · cascade_sim · failed_rows_sensitivity 재생성
 make check       # 재생성 결과가 커밋본과 같은지 diff
 ```
 
@@ -166,7 +182,7 @@ python -m src.extract.llm_skill_extract --raw-dir data/raw --dict data/raw/dict/
   --out-dir data/processed --date 2026-07-30 --model claude-opus-5 --ids-file data/labeled/gold_ids.txt
 ```
 
-모든 스크립트는 `--date`를 받고, 생략하면 `data/raw`의 최신 배치를 씁니다. 날짜와 파일명은 코드에 박혀 있지 않습니다.
+모든 스크립트는 `--date`를 받습니다. 생략하면 추출 단계는 `data/raw`의 최신 배치를, 평가 단계는 예측 파일이 있는 `data/processed`의 최신 배치를 고릅니다. 날짜와 파일명은 코드에 박혀 있지 않습니다. `data/processed/evaluation_v0`·`v1`·`v1_patched`·`v1_typofix`는 이전 사전·정답셋으로 만든 역사 기록이며 재생성 대상이 아닙니다.
 
 ---
 
@@ -181,7 +197,7 @@ data/
   labeled/                  정답셋 공개판 · 풀링 후보 · 판정 키
   processed/<date>/         예측 파일 4종 (regex · haiku · sonnet · opus) + LLM 비용·지연 요약
   processed/evaluation_*/   방식별 평가 (eval_summary · error_analysis)
-  processed/                bootstrap_ci · method_comparison · cascade_sim · 시장 통계
+  processed/                bootstrap_ci · method_comparison · cascade_sim · failed_rows_sensitivity · 시장 통계
 docs/agent_team.md          에이전트 팀 설계와 재현성 검증 기록
 notes/                      실험 로그 · 라벨링 기준
 scripts/                    일회성 마이그레이션 (사전 v1 생성, 정답셋 정규화·교정, 공개판 생성)
@@ -192,10 +208,14 @@ src/
   label/                    정답셋 라벨링 · 블라인드 풀링
   eval/                     평가 · 부트스트랩 CI · 방식 비교 · 라우팅 시뮬레이션
   analyze/                  시장 통계 · 갭 진단
-tests/                      64건. 경계 규칙 · 사전 함의 · 불변식 · 산식 · 풀링 반영 · 결정성
+tests/                      72건. 경계 규칙 · 사전 함의 · 불변식 · 산식 · 풀링 반영 · 결정성 · LLM 출력 파싱 · 실패 행 판정
 CLAUDE.md                   에이전트 팀 운영 규칙
 ```
 
 ## 기술
 
 Python 3.12 · 정규식 · Anthropic API (Claude haiku-4.5 · sonnet-5 · opus-5) · Claude Code 서브에이전트 · MCP (Notion, Google Drive) · pytest · GitHub Actions
+
+## 라이선스
+
+MIT. 공고 원문과 정답셋 본문은 레포에 포함하지 않으며, 라이선스는 코드·사전·공개 정답셋(태그만)에 적용됩니다.
