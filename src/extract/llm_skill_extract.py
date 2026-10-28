@@ -49,8 +49,10 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any, Iterable
 
-import yaml
 from anthropic import Anthropic
+
+from src.common.jsonl import iter_jsonl, read_jsonl
+from src.common.skill_dict import canonical_names
 
 # ---------------------------------------------------------------- 스키마 어댑터
 
@@ -61,6 +63,8 @@ PRED_TAGS_KEY = "tags"                 # evaluate_extraction.py --tag-key 기본
 JOBS = ("ds", "de", "mle", "da")       # 직무는 레코드가 아니라 raw 디렉토리명에서 얻는다
 
 MIN_CANONICAL = 30   # 이보다 적게 읽히면 파싱 실패로 보고 중단한다
+MAX_OUTPUT_TOKENS = 1024   # 태그 목록 출력용. 2026-10-28 리뷰: 512 에서 sonnet 1건이 잘려 빈 예측으로 채점됐다
+MAX_OUTPUT_TOKENS_CAP = 4096
 MAX_CHARS = 12_000  # 원티드 공고 본문은 대부분 이 안에 들어옴. 초과분은 잘리고 플래그가 남음.
 
 # USD / 1M tokens. 2026-08-12 기준. Sonnet 5는 2026-09-01부터 3/15로 바뀜 —
@@ -101,49 +105,13 @@ USER_TEMPLATE = """다음 채용공고에서 요구 기술 태그를 추출하�
 
 
 def load_canonical_tags(dict_path: str | Path) -> list[str]:
-    """사전 YAML에서 canonical 이름만 뽑는다.
+    """LLM 에 주는 라벨 공간 = 사전 canonical 전부. regex 와 같은 로더(src/common/skill_dict)를 써야 같은 조건 비교가 성립한다.
 
-    CareerFit 사전 구조는 {카테고리: [{canonical, aliases, field}, ...]} 다.
-    job_skill_extract_report.load_dict() 와 같은 라벨 공간을 만들어야
-    regex 와 동일 조건 비교가 성립한다.
-
-    실패 시 조용히 빈 목록/짧은 목록을 돌려주면 LLM 이 엉뚱한 것을 뽑고
-    그게 '성능'으로 기록된다(실제로 겪음: 카테고리명 12개를 태그로 넘겼다).
-    그래서 개수 하한 검사를 둔다.
+    예전엔 여기서 YAML 을 따로 파싱했다(카테고리명 12개를 태그로 넘긴 사고). 개수 하한 검사는 그대로 둔다.
     """
-    raw = yaml.safe_load(Path(dict_path).read_text(encoding="utf-8"))
-    names: list[str] = []
-
-    def _take(entry: Any) -> None:
-        if isinstance(entry, str):
-            names.append(entry)
-        elif isinstance(entry, dict):
-            for key in ("canonical", "name", "tag"):
-                if key in entry:
-                    names.append(str(entry[key]))
-                    return
-            raise ValueError(f"canonical 키를 못 찾음: {entry!r}")
-
-    if isinstance(raw, dict):
-        for _category, entries in raw.items():
-            if isinstance(entries, list):
-                for e in entries:
-                    _take(e)
-        if not names:  # {canonical: [alias, ...]} 형태 대비
-            names = [str(k) for k in raw.keys()]
-    elif isinstance(raw, list):
-        for e in raw:
-            _take(e)
-    else:
-        raise ValueError(f"지원하지 않는 사전 구조: {type(raw)}")
-
-    names = sorted(set(names))
+    names = canonical_names(dict_path)
     if len(names) < MIN_CANONICAL:
-        raise ValueError(
-            f"{dict_path} 에서 canonical 을 {len(names)}개만 읽었다 "
-            f"(하한 {MIN_CANONICAL}). 사전 구조를 잘못 파싱했을 가능성이 크다. "
-            f"읽힌 값: {names}"
-        )
+        raise SystemExit(f"[중단] 사전에서 canonical {len(names)}개만 읽힘 (하한 {MIN_CANONICAL}): {dict_path}")
     return names
 
 
@@ -170,20 +138,13 @@ def iter_raw_records(raw_dir: str | Path, date: str | None) -> Iterable[dict]:
         raise FileNotFoundError(f"{root} (date={date}) 에서 jsonl을 못 찾음")
 
     for path in paths:
-        # splitlines() 쓰지 말 것 — 본문 안 \u2028 등에서 줄이 깨진다. (lab_log 기록됨)
-        with path.open(encoding="utf-8") as f:
-            for lineno, line in enumerate(f, 1):
-                line = line.strip()
-                if not line:
-                    continue
-                try:
-                    rec = json.loads(line)
-                except json.JSONDecodeError as e:
-                    print(f"[warn] {path}:{lineno} JSON 파싱 실패 스킵: {e}", file=sys.stderr)
-                    continue
-                rec.setdefault("_src_file", str(path))
-                rec.setdefault("_role", _role_from_path(path))
-                yield rec
+        for lineno, rec in iter_jsonl(path, strict=False):  # 깨진 줄은 경고 후 스킵 (공용 리더가 \u2028 안전)
+            if rec is None:
+                print(f"[warn] {path}:{lineno} JSON 파싱 실패 스킵", file=sys.stderr)
+                continue
+            rec.setdefault("_src_file", str(path))
+            rec.setdefault("_role", _role_from_path(path))
+            yield rec
 
 
 # ---------------------------------------------------------------- 추출
@@ -257,11 +218,12 @@ def extract_one(
 
     delay = 1.0
     use_temp = True   # 일부 모델(claude-sonnet-5 등)은 temperature 를 받지 않는다
+    max_tokens = MAX_OUTPUT_TOKENS
     for attempt in range(max_retries):
         try:
             kwargs = {
                 "model": model,
-                "max_tokens": 512,
+                "max_tokens": max_tokens,
                 "system": system_prompt,
                 "messages": [{"role": "user", "content": USER_TEMPLATE.format(text=text[:MAX_CHARS])}],
             }
@@ -271,6 +233,11 @@ def extract_one(
             resp = client.messages.create(**kwargs)
             latency_ms = int((time.perf_counter() - t0) * 1000)
 
+            if resp.stop_reason == "max_tokens" and max_tokens < MAX_OUTPUT_TOKENS_CAP:
+                # 잘린 출력은 JSON 이 안 닫혀 파싱 실패 → 빈 예측으로 채점된다. 예산을 늘려 즉시 재시도.
+                print(f"  [재시도] {job_id}: max_tokens={max_tokens} 에서 잘림 → {max_tokens * 2}")
+                max_tokens *= 2
+                continue
             out_text = "".join(b.text for b in resp.content if getattr(b, "type", "") == "text")
             tags, dropped, parse_ok = parse_tags(out_text, canonical)
 
@@ -338,12 +305,7 @@ def run(
 
     done: set[str] = set()
     if resume and pred_path.exists():
-        with pred_path.open(encoding="utf-8") as f:
-            for line in f:
-                try:
-                    done.add(str(json.loads(line)["job_id"]))
-                except Exception:  # noqa: BLE001
-                    continue
+        done = {str(rec["job_id"]) for _ln, rec in iter_jsonl(pred_path, strict=False) if rec}
         print(f"[resume] 기존 {len(done)}건 스킵")
 
     # job_id 는 교차직무 중복이 있다 (원티드가 한 공고를 여러 직군에 노출).
@@ -375,7 +337,8 @@ def run(
     client = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
     rows: list[dict] = []
 
-    with pred_path.open("a", encoding="utf-8") as fout:
+    # --no-resume 인데 append 하면 같은 job_id 행이 두 벌 생겨 요약이 두 배로 센다 (2026-10-28 리뷰)
+    with pred_path.open("a" if resume else "w", encoding="utf-8") as fout:
         with ThreadPoolExecutor(max_workers=workers) as ex:
             futures = {
                 ex.submit(extract_one, client, model, system_prompt, canonical, rec): rec
@@ -401,11 +364,14 @@ def summarize(pred_path: Path, model: str, date: str) -> dict:
     이번 실행분만 세면 --resume 로 이어 돌린 뒤의 요약이 파일과 어긋난다
     (실제로 haiku 요약이 35건·환각 12로 남아 있었고 파일은 38건·환각 16이었다, 2026-10-27).
     """
-    rows: list[dict] = []
-    with pred_path.open(encoding="utf-8") as f:
-        for line in f:
-            if line.strip():
-                rows.append(json.loads(line))
+    rows = read_jsonl(pred_path)
+    for r in rows:
+        # 옛 파서(2026-08-15 이전)로 만든 행은 parse_ok 키가 없고, 실패했을 때만 raw_output 에 원문이 있다.
+        # 지금 파서로 다시 판정해 n_parse_fail / n_empty 가 파일과 맞게 한다 (haiku 2건이 빈출력 0 으로 집계되던 문제).
+        m = r["_meta"]
+        if "parse_ok" not in m and not m.get("error"):
+            raw = m.get("raw_output")
+            m["parse_ok"] = True if raw in (None, "None") else parse_tags(str(raw), set())[2]
     ok = [r for r in rows if not r["_meta"].get("error")]
     total_cost = sum(r["_meta"].get("cost_usd", 0.0) for r in ok)
     lat = sorted(r["_meta"].get("latency_ms", 0) for r in ok)

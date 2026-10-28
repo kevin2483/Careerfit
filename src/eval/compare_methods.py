@@ -67,7 +67,7 @@ def main(argv: list[str] | None = None) -> None:
     a = ap.parse_args(argv)
 
     pdir = Path(a.processed_dir)
-    date = resolve_date(a.date, processed_dir=pdir)
+    date = resolve_date(a.date, processed_dir=pdir, prefer="processed")
     out = Path(a.out) if a.out else pdir / "method_comparison.csv"
     ci = read_ci(pdir / "bootstrap_ci.csv")
 
@@ -126,7 +126,7 @@ def main(argv: list[str] | None = None) -> None:
     with out.open("w", newline="", encoding="utf-8-sig") as fh:
         w = csv.writer(fh)
         w.writerow(["방식", "구분", "precision", "recall", "F1", "F1_CI95_하한", "F1_CI95_상한", "TP", "FP", "FN",
-                    "비용_건당USD", "지연_p50ms", f"전체{a.n_docs}건_예상비용USD"])
+                    "비용_건당USD", "지연_p50ms", f"전체{a.n_docs}건_예상비용USD", "단가기준일"])
         for r in rows:
             c = r["cost"]
             for key, e in r["ev"].items():
@@ -139,6 +139,7 @@ def main(argv: list[str] | None = None) -> None:
                     round(c["cost_per_doc_usd"], 6) if is_total else "",
                     c["latency_ms_p50"] if is_total else "",
                     round(c["cost_per_doc_usd"] * a.n_docs, 2) if is_total else "",
+                    c.get("pricing_as_of", "") if is_total else "",
                 ])
     print(f"\n저장 -> {out}")
 
