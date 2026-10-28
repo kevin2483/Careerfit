@@ -33,6 +33,7 @@ from pathlib import Path
 from src.common.jsonl import read_jsonl
 from src.common.paths import DICT_PATH, JOBS, labels_path
 from src.common.skill_dict import close_tags, extract_tags, field_map, implies_map, load_patterns
+from src.eval.pred_meta import report_failed_rows
 
 FIELD_LABEL = {1: "①명시 기술", 2: "②서술형 역량", "사전밖": "사전에 없던 역량"}
 
@@ -59,7 +60,9 @@ def rerun_regex(rows: list[dict], dict_path: str | Path) -> None:
 
 
 def attach_pred_file(rows: list[dict], pred_file: str | Path, tag_key: str = "tags") -> None:
-    pred_map = {str(rec["job_id"]): list(rec.get(tag_key) or []) for rec in read_jsonl(pred_file)}
+    recs = read_jsonl(pred_file)
+    report_failed_rows(Path(pred_file).name, recs, [str(r["job_id"]) for r in rows])
+    pred_map = {str(rec["job_id"]): list(rec.get(tag_key) or []) for rec in recs}
     missing = [r["job_id"] for r in rows if str(r["job_id"]) not in pred_map]
     if missing:
         raise SystemExit(f"[중단] 예측 없는 정답 {len(missing)}건: {missing[:5]}")

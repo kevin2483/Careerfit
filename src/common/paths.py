@@ -52,11 +52,15 @@ def processed_dates(processed_dir: str | Path = PROCESSED_DIR) -> list[str]:
 
 
 def resolve_date(explicit: str | None, *, raw_dir: str | Path = RAW_DIR,
-                 processed_dir: str | Path = PROCESSED_DIR) -> str:
-    """--date 가 주어지면 그대로, 아니면 raw → processed 순으로 최신 배치를 고른다."""
+                 processed_dir: str | Path = PROCESSED_DIR, prefer: str = "raw") -> str:
+    """--date 가 주어지면 그대로. 아니면 prefer="raw" 는 raw → processed, prefer="processed" 는 그 반대 순으로 최신 배치.
+    추출은 raw 를, 평가(예측 파일만 읽음)는 processed 를 우선해야 새 크롤 직후에 예측 없는 날짜를 고르지 않는다."""
     if explicit:
         return explicit
-    for cands in (raw_dates(raw_dir), processed_dates(processed_dir)):
+    order = (raw_dates(raw_dir), processed_dates(processed_dir))
+    if prefer == "processed":
+        order = order[::-1]
+    for cands in order:
         if cands:
             print(f"[날짜] --date 미지정 → 최신 배치 {cands[-1]} 사용")
             return cands[-1]

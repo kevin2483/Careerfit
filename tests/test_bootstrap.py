@@ -32,3 +32,15 @@ def test_run_is_seeded(tmp_path):
     assert out1 == out2
     n, rows = out1
     assert n == 10 and rows[0]["CI_하한"] <= rows[0]["점추정"] <= rows[0]["CI_상한"]
+
+
+def test_run_refuses_missing_prediction_file(tmp_path):
+    """예측 파일이 없으면 헤더만 있는 CSV 를 정상 종료로 남기지 않고 중단한다 (2026-10-28 리뷰)."""
+    import json
+    import pytest
+    from pathlib import Path
+    from src.eval.bootstrap_ci import run
+    labels = tmp_path / "labels.jsonl"
+    labels.write_text(json.dumps({"job_id": "1", "reviewed": True, "gold_tags": ["Python"]}) + "\n", encoding="utf-8")
+    with pytest.raises(SystemExit, match="예측 파일 없음"):
+        run(labels, Path(tmp_path), {}, b=10, seed=1, methods={"a": "missing.jsonl"})

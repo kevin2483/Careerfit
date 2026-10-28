@@ -29,3 +29,15 @@ def test_strict_vs_lenient(tmp_path):
     with pytest.raises(json.JSONDecodeError):
         read_jsonl(p)
     assert [r for _, r in iter_jsonl(p, strict=False)] == [{"ok": 1}, None]
+
+
+def test_resolve_date_prefers_processed_for_eval(tmp_path, capsys):
+    """새 크롤(raw 2099-02-01)이 생겨도 평가 스크립트는 예측 파일이 있는 processed 날짜를 고른다."""
+    from src.common.paths import resolve_date
+    raw, proc = tmp_path / "raw", tmp_path / "processed"
+    (raw / "ds").mkdir(parents=True)
+    (raw / "ds" / "wanted_2099-02-01.jsonl").write_text("", encoding="utf-8")
+    (proc / "2099-01-01").mkdir(parents=True)
+    assert resolve_date(None, raw_dir=raw, processed_dir=proc) == "2099-02-01"
+    assert resolve_date(None, raw_dir=raw, processed_dir=proc, prefer="processed") == "2099-01-01"
+    assert resolve_date("2000-01-01", raw_dir=raw, processed_dir=proc) == "2000-01-01"

@@ -35,6 +35,7 @@ from pathlib import Path
 from src.common.jsonl import read_jsonl
 from src.common.paths import DICT_PATH, PROCESSED_DIR, labels_path, resolve_date
 from src.common.skill_dict import close_tags, field_map, implies_map
+from src.eval.pred_meta import report_failed_rows
 
 
 def score(pairs: list[tuple[set, set]], fm: dict) -> dict:
@@ -55,8 +56,12 @@ def score(pairs: list[tuple[set, set]], fm: dict) -> dict:
 def build_docs(labels: str | Path, regex_pred: str | Path, opus_pred: str | Path, fm: dict,
                implies: dict[str, list[str]] | None = None) -> list[dict]:
     rows = [r for r in read_jsonl(labels) if r.get("reviewed")]
-    regex = {str(r["job_id"]): r for r in read_jsonl(regex_pred)}
-    opus = {str(r["job_id"]): close_tags(r.get("tags") or [], implies) for r in read_jsonl(opus_pred)}
+    ids = [str(r["job_id"]) for r in rows]
+    regex_recs, opus_recs = read_jsonl(regex_pred), read_jsonl(opus_pred)
+    report_failed_rows("regex", regex_recs, ids)
+    report_failed_rows("opus", opus_recs, ids)
+    regex = {str(r["job_id"]): r for r in regex_recs}
+    opus = {str(r["job_id"]): close_tags(r.get("tags") or [], implies) for r in opus_recs}
     for name, m in (("regex", regex), ("opus", opus)):
         missing = [str(r["job_id"]) for r in rows if str(r["job_id"]) not in m]
         if missing:
@@ -133,7 +138,7 @@ def main(argv: list[str] | None = None) -> None:
     ap.add_argument("--out", default=None, help="기본: <processed>/cascade_sim.csv")
     a = ap.parse_args(argv)
 
-    date = resolve_date(a.date, processed_dir=a.processed_dir)
+    date = resolve_date(a.date, processed_dir=a.processed_dir, prefer="processed")
     pdir = Path(a.processed_dir)
     regex_pred = a.regex_pred or pdir / date / "regex_extract.jsonl"
     opus_pred = a.opus_pred or pdir / date / "llm_extract_claude-opus-5.jsonl"

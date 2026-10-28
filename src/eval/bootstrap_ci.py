@@ -21,6 +21,7 @@ from pathlib import Path
 from src.common.jsonl import read_jsonl
 from src.common.paths import DICT_PATH, PROCESSED_DIR, labels_path, resolve_date
 from src.common.skill_dict import close_tags, field_map, implies_map
+from src.eval.pred_meta import report_failed_rows
 
 PRED_FILES = {
     "regex": "regex_extract.jsonl",
@@ -60,9 +61,11 @@ def run(labels: Path, pred_dir: Path, fm: dict, b: int, seed: int, methods: dict
     for name, fname in methods.items():
         p = pred_dir / fname
         if not p.exists():
-            print(f"[건너뜀] {name}: {p} 없음")
-            continue
-        pred = {str(r["job_id"]): close_tags(r.get("tags") or [], implies) for r in read_jsonl(p)}
+            # 조용히 건너뛰면 쌍대 차이 표에서 행이 사라지고 헤더만 있는 CSV 가 정상 종료로 남는다 (2026-10-28 리뷰)
+            raise SystemExit(f"[중단] {name} 예측 파일 없음: {p}. --date 를 확인할 것")
+        recs = read_jsonl(p)
+        report_failed_rows(name, recs, ids)
+        pred = {str(r["job_id"]): close_tags(r.get("tags") or [], implies) for r in recs}
         missing = [j for j in ids if j not in pred]
         if missing:
             raise SystemExit(f"[중단] {name} 예측 없는 정답 {len(missing)}건: {missing[:5]}")
@@ -100,7 +103,7 @@ def main(argv: list[str] | None = None) -> None:
     a = ap.parse_args(argv)
 
     pdir = Path(a.processed_dir)
-    date = resolve_date(a.date, processed_dir=pdir)
+    date = resolve_date(a.date, processed_dir=pdir, prefer="processed")
     out = Path(a.out) if a.out else pdir / "bootstrap_ci.csv"
     n, rows = run(labels_path(a.labels), pdir / date, field_map(a.dict_path), a.b, a.seed, PRED_FILES,
                   implies=implies_map(a.dict_path))
