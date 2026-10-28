@@ -67,14 +67,14 @@ MAX_OUTPUT_TOKENS = 1024   # 태그 목록 출력용. 2026-10-28 리뷰: 512 에
 MAX_OUTPUT_TOKENS_CAP = 4096
 MAX_CHARS = 12_000  # 원티드 공고 본문은 대부분 이 안에 들어옴. 초과분은 잘리고 플래그가 남음.
 
-# USD / 1M tokens. 2026-08-12 기준. Sonnet 5는 2026-09-01부터 3/15로 바뀜 —
-# 리포트에 숫자 쓸 때 rate_date를 같이 박아둘 것.
+# USD / 1M tokens. 2026-10-28 공식 단가 페이지에서 재확인 (platform.claude.com/docs/en/about-claude/pricing).
+# Sonnet 5 의 2026-09-01 3/15 인상은 취소돼 2/10 이 표준가로 남았다(페이지 각주). 리포트엔 PRICING_AS_OF 를 같이 쓴다.
 PRICING = {
     "claude-haiku-4-5-20251001": (1.00, 5.00),
     "claude-sonnet-5": (2.00, 10.00),
     "claude-opus-5": (5.00, 25.00),
 }
-PRICING_AS_OF = "2026-08-12"
+PRICING_AS_OF = "2026-10-28"
 
 SYSTEM_PROMPT = """당신은 채용공고에서 '지원자에게 요구되는 기술 역량'만 골라내는 추출기다.
 

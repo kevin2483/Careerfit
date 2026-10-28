@@ -1,7 +1,7 @@
 {
   "model": "claude-opus-5",
   "date": "2026-07-30",
-  "pricing_as_of": "2026-08-12",
+  "pricing_as_of": "2026-10-28",
   "n_processed": 38,
   "n_error": 0,
   "n_parse_fail": 0,
