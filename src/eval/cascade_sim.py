@@ -33,7 +33,7 @@ import statistics
 from pathlib import Path
 
 from src.common.jsonl import read_jsonl
-from src.common.paths import DICT_PATH, PROCESSED_DIR, labels_path, resolve_date
+from src.common.paths import DICT_PATH, PROCESSED_DIR, corpus_size, labels_path, resolve_date
 from src.common.skill_dict import close_tags, field_map, implies_map
 from src.eval.pred_meta import report_failed_rows
 
@@ -132,11 +132,17 @@ def main(argv: list[str] | None = None) -> None:
     ap.add_argument("--regex-pred", default=None, help="기본: <processed>/<date>/regex_extract.jsonl")
     ap.add_argument("--opus-pred", default=None, help="기본: <processed>/<date>/llm_extract_claude-opus-5.jsonl")
     ap.add_argument("--opus-summary", default=None)
-    ap.add_argument("--n-docs", type=int, default=892, help="전체 코퍼스 고유 공고 수 (비용 환산용)")
+    ap.add_argument("--n-docs", type=int, default=None,
+                    help="전체 코퍼스 고유 공고 수 (비용 환산용). 생략 시 extracted_tags.jsonl 에서 센다")
     ap.add_argument("--random-trials", type=int, default=1000)
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--out", default=None, help="기본: <processed>/cascade_sim.csv")
     a = ap.parse_args(argv)
+    if a.n_docs is None:
+        a.n_docs = corpus_size()
+        if a.n_docs is None:
+            raise SystemExit("[중단] --n-docs 를 지정할 것 (extracted_tags.jsonl 없음)")
+        print(f"[정보] 코퍼스 고유 공고 {a.n_docs}건 (extracted_tags.jsonl 에서 집계)")
 
     date = resolve_date(a.date, processed_dir=a.processed_dir, prefer="processed")
     pdir = Path(a.processed_dir)

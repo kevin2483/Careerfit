@@ -10,6 +10,8 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from src.common.jsonl import read_jsonl
+
 JOBS = ["ds", "de", "mle", "da"]
 
 DATA_DIR = Path("data")
@@ -65,3 +67,12 @@ def resolve_date(explicit: str | None, *, raw_dir: str | Path = RAW_DIR,
             print(f"[날짜] --date 미지정 → 최신 배치 {cands[-1]} 사용")
             return cands[-1]
     raise SystemExit(f"[중단] 날짜를 찾을 수 없음. --date 를 지정할 것 (raw={raw_dir}, processed={processed_dir})")
+
+
+def corpus_size(extracted_tags_path: str | Path | None = None) -> int | None:
+    """전체 코퍼스 고유 공고 수(비용 환산 분모). extractor 산출물의 job_id 를 세며, 파일이 없으면 None.
+    예전엔 892 가 Makefile·compare_methods·cascade_sim 세 곳에 박혀 있었다 (2026-10-28 리뷰)."""
+    p = Path(extracted_tags_path) if extracted_tags_path else EXTRACT_REPORT_DIR / "extracted_tags.jsonl"
+    if not p.exists():
+        return None
+    return len({str(r["job_id"]) for r in read_jsonl(p)})

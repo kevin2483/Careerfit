@@ -69,3 +69,14 @@ def test_run_is_deterministic(tmp_path):
         outs.append({f: (out / f).read_bytes() for f in ("validation_summary.csv", "tag_frequency_by_job.csv",
                                                           "extracted_tags.jsonl", "field_difficulty_summary.csv")})
     assert outs[0] == outs[1]
+
+
+def test_corpus_size_counts_unique_job_ids(tmp_path):
+    """비용 환산 분모(892)는 하드코딩이 아니라 extracted_tags.jsonl 의 고유 job_id 수에서 온다."""
+    import json
+    from src.common.paths import corpus_size
+    p = tmp_path / "extracted_tags.jsonl"
+    p.write_text("".join(json.dumps({"job_id": j, "직무": "ds", "tags": []}) + "\n" for j in ("1", "2", "2", 3)),
+                 encoding="utf-8")
+    assert corpus_size(p) == 3
+    assert corpus_size(tmp_path / "missing.jsonl") is None

@@ -1,6 +1,9 @@
 """
 대화형 라벨링 도구 — 묻고, 답하면, 저장한다.
 
+[레거시] 2026-08 초기 정답셋(검수 방식) 구축용. 현재 정답셋은 블라인드 풀링(src/label/pool_cli.py)으로 관리하며
+이 스크립트는 새 템플릿을 만들 때만 쓴다. 현재 사전 기준으로 동작한다.
+
 사람이 하는 일: 본문을 읽고 y/n 로 판단. (판단은 사람 몫 — 순환논리 회피)
 도구가 하는 일: 화면 출력, 입력 받기, 파일 저장.
 
@@ -97,7 +100,7 @@ def review_one(idx: int, total: int, row: dict) -> str:
 
 def main() -> None:
     p = argparse.ArgumentParser()
-    p.add_argument("--infile", default="data/labeled/label_draft.jsonl")
+    p.add_argument("--labels", "--infile", dest="infile", default="data/labeled/label_draft.jsonl")
     p.add_argument("--n", type=int, help="특정 번호만")
     p.add_argument("--redo", action="store_true", help="검수한 것도 다시")
     args = p.parse_args()

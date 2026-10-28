@@ -133,8 +133,8 @@ def write_outputs(out_dir: Path, total, by_field, by_job, errors) -> None:
 
 def main(argv: list[str] | None = None) -> None:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--infile", default=None, help="정답셋. 기본: 비공개본이 있으면 그것, 없으면 공개본")
-    p.add_argument("--dict-path", default=str(DICT_PATH))
+    p.add_argument("--labels", "--infile", dest="infile", default=None, help="정답셋. 기본: 비공개본이 있으면 그것, 없으면 공개본")
+    p.add_argument("--dict", "--dict-path", dest="dict_path", default=str(DICT_PATH))
     p.add_argument("--out-dir", required=True)
     p.add_argument("--pred-file", default=None, help="예측 jsonl. 지정하면 regex 재실행 안 함")
     p.add_argument("--tag-key", default="tags")

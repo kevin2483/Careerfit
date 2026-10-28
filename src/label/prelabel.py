@@ -1,6 +1,9 @@
 """
 초벌 라벨링 생성기 (판단 기준 4를 규칙으로 적용)
 
+[레거시] 2026-08 초기 정답셋(검수 방식) 구축용. 현재 정답셋은 블라인드 풀링(src/label/pool_cli.py)으로 관리하며
+이 스크립트는 새 템플릿을 만들 때만 쓴다. 현재 사전 기준으로 동작한다.
+
 무엇을 하나:
   label_template.jsonl 의 각 공고에 대해, regex_prefilled 를 기준으로
   '초벌 gold_tags'를 만들되, 판단이 갈리는 태그는 review_flags 로 표시한다.
@@ -53,7 +56,7 @@ def prelabel_row(row: dict) -> dict:
 
 def main() -> None:
     p = argparse.ArgumentParser()
-    p.add_argument("--infile", default="data/labeled/label_template.jsonl")
+    p.add_argument("--labels", "--infile", dest="infile", default="data/labeled/label_template.jsonl")
     p.add_argument("--out", default="data/labeled/label_draft.jsonl")
     args = p.parse_args()
 

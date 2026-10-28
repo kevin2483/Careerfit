@@ -1,6 +1,9 @@
 """
 라벨링 템플릿 생성기 (4번 정답셋 구축의 출발점)
 
+[레거시] 2026-08 초기 정답셋(검수 방식) 구축용. 현재 정답셋은 블라인드 풀링(src/label/pool_cli.py)으로 관리하며
+이 스크립트는 새 템플릿을 만들 때만 쓴다. 현재 사전 기준으로 동작한다.
+
 무엇을 하나:
   07-30 수집분에서 직무별 15건씩(da는 데이터 직무만) 총 60건을 seed 고정으로 뽑아,
   '검수 방식' 라벨링 템플릿(JSONL)을 만든다.
@@ -91,7 +94,7 @@ def main() -> None:
     p.add_argument("--per-job", type=int, default=15)
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--raw-dir", default=str(RAW_DIR))
-    p.add_argument("--dict-path", default=str(DICT_PATH))
+    p.add_argument("--dict", "--dict-path", dest="dict_path", default=str(DICT_PATH))
     p.add_argument("--out", default="data/labeled/label_template.jsonl")
     args = p.parse_args()
 

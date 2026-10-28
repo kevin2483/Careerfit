@@ -4,7 +4,6 @@
 #   make extract     원문(data/raw, 레포 미포함)이 있을 때 추출 → 시장통계
 PY ?= python3
 DATE ?= 2026-07-30
-N_DOCS ?= 892
 P := data/processed
 
 .PHONY: install test lint reproduce extract stats check clean
@@ -25,8 +24,8 @@ reproduce:
 	$(PY) -m src.eval.evaluate_extraction --pred-file $(P)/$(DATE)/llm_extract_claude-sonnet-5.jsonl --out-dir $(P)/evaluation_llm_sonnet --label sonnet
 	$(PY) -m src.eval.evaluate_extraction --pred-file $(P)/$(DATE)/llm_extract_claude-opus-5.jsonl --out-dir $(P)/evaluation_llm_opus --label opus
 	$(PY) -m src.eval.bootstrap_ci --date $(DATE)
-	$(PY) -m src.eval.compare_methods --date $(DATE) --n-docs $(N_DOCS)
-	$(PY) -m src.eval.cascade_sim --date $(DATE) --n-docs $(N_DOCS)
+	$(PY) -m src.eval.compare_methods --date $(DATE)
+	$(PY) -m src.eval.cascade_sim --date $(DATE)
 	$(PY) -m src.eval.failed_rows --date $(DATE)
 
 # 재현 결과가 커밋본과 같은지 확인 (CI 와 동일)

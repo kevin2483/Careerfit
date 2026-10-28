@@ -4,7 +4,7 @@
 evaluation_*/eval_summary.csv 와 <processed>/<date>/llm_extract_*_summary.json 을 모아 한 표로 만든다.
 bootstrap_ci.csv 가 있으면 F1 95% 신뢰구간을 붙인다. 정확도-비용 파레토 판정까지 붙인다.
 
-    python -m src.eval.compare_methods --date 2026-07-30 --n-docs 892
+    python -m src.eval.compare_methods --date 2026-07-30          # --n-docs 생략 시 extracted_tags.jsonl 에서 집계
 
 산출: <processed>/method_comparison.csv  (전체 + 필드별 + 직무별)
 """
@@ -15,7 +15,7 @@ import csv
 import json
 from pathlib import Path
 
-from src.common.paths import PROCESSED_DIR, resolve_date
+from src.common.paths import PROCESSED_DIR, corpus_size, resolve_date
 
 # (표시이름, eval 디렉토리명, 모델 id 또는 None)  — 디렉토리는 <processed>/ 아래, 요약은 <processed>/<date>/ 아래
 METHODS = [
@@ -62,9 +62,15 @@ def main(argv: list[str] | None = None) -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--date", default=None)
     ap.add_argument("--processed-dir", default=str(PROCESSED_DIR))
-    ap.add_argument("--n-docs", type=int, default=892, help="전체 코퍼스 고유 공고 수 (비용 환산용)")
+    ap.add_argument("--n-docs", type=int, default=None,
+                    help="전체 코퍼스 고유 공고 수 (비용 환산용). 생략 시 extracted_tags.jsonl 에서 센다")
     ap.add_argument("--out", default=None, help="기본: <processed>/method_comparison.csv")
     a = ap.parse_args(argv)
+    if a.n_docs is None:
+        a.n_docs = corpus_size()
+        if a.n_docs is None:
+            raise SystemExit("[중단] --n-docs 를 지정할 것 (extracted_tags.jsonl 없음)")
+        print(f"[정보] 코퍼스 고유 공고 {a.n_docs}건 (extracted_tags.jsonl 에서 집계)")
 
     pdir = Path(a.processed_dir)
     date = resolve_date(a.date, processed_dir=pdir, prefer="processed")

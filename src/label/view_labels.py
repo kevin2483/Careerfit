@@ -74,7 +74,7 @@ def show_one(idx: int, total: int, row: dict, show_body: bool = True) -> None:
 
 def main() -> None:
     p = argparse.ArgumentParser()
-    p.add_argument("--infile", default="data/labeled/label_draft.jsonl")
+    p.add_argument("--labels", "--infile", dest="infile", default="data/labeled/label_draft.jsonl")
     p.add_argument("--only-flagged", action="store_true", help="확인필요 건만 보기")
     p.add_argument("--n", type=int, help="특정 번호 하나만 (1부터)")
     p.add_argument("--start", type=int, default=1, help="시작 번호")
