@@ -32,3 +32,6 @@ logs_*.txt
 
 # 2차 정답셋 확장 보류분 (22건 LLM 예측·폐기한 판정). 반영 전까지 레포 밖
 data/processed/*/round2_pending/
+
+# 개인 포트폴리오 작업 파일 (연락처 포함, 레포 밖)
+portfolio/
