@@ -203,8 +203,12 @@ def apply(args: argparse.Namespace) -> None:
     n_doc = added = removed = 0
     for r in rows:
         jid = str(r["job_id"])
-        if not r.get("reviewed") or jid not in new_gold:
+        if jid not in new_gold:
             continue
+        # 풀링 판정을 거친 공고는 사람이 확정한 것이다. 미검수 템플릿 행(2차 확장분)도 여기서 reviewed 가 된다.
+        if not r.get("reviewed"):
+            r["reviewed"] = True
+            print(f"  신규 확정: {jid}")
         old, new = set(r.get("gold_tags") or []), new_gold[jid]
         added += len(new - old)
         removed += len(old - new)

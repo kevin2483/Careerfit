@@ -23,6 +23,7 @@ import pandas as pd  # noqa: E402
 import streamlit as st  # noqa: E402
 
 from demo import loaders as L  # noqa: E402
+from demo.pdf_text import extract_text  # noqa: E402
 from src.analyze import gap_diagnosis as gd  # noqa: E402
 
 st.set_page_config(page_title="CareerFit", page_icon="📊", layout="wide")
@@ -99,9 +100,18 @@ with tab_gap:
     job2 = st.radio("대상 직무", JOB_OPTIONS, format_func=job_label, horizontal=True, key="job_gap", index=1)
     if "resume" not in st.session_state:
         st.session_state["resume"] = ""
-    b1, b2 = st.columns([1, 6])
+    b1, b2 = st.columns([1, 3])
     if b1.button("예시 이력서 넣기"):
         st.session_state["resume"] = SAMPLE_RESUME
+    up = b2.file_uploader("이력서·포트폴리오 PDF 또는 txt 올리기 (서버에 저장하지 않음)", type=["pdf", "txt"], label_visibility="visible")
+    if up is not None and st.session_state.get("_uploaded") != up.name:
+        text, note = extract_text(up.getvalue(), up.name)
+        st.session_state["_uploaded"] = up.name
+        if text:
+            st.session_state["resume"] = text
+            st.success(note)
+        else:
+            st.warning(note)
     resume = st.text_area("이력서 텍스트", key="resume", height=220, placeholder="경력·기술·프로젝트를 붙여 넣으세요.")
     if resume.strip():
         r = gd.run(resume_text=resume, target_job=job2, check_fresh=False)

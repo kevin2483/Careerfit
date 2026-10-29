@@ -873,3 +873,14 @@ P/R/F1·percentile·쌍대 차이·라우팅 비용 산식, job_id str 조인, f
 - 배운 것: haiku 의 오류는 라벨 이름을 몰라서가 아니라 요구/언급 구분이 약해서다. 표현 예·기준·스키마 모두 그 구분을 돕지 못했고 오히려 목록 안 오탐을 늘렸다.
   구조화 출력은 "환각 0" 을 보장하지만 F1 을 올리지는 않는다 — 환각 태그는 어차피 사전 밖이라 채점에서 FP 로만 들어가는데, 그 자리를 사전 안 FP 가 채웠다.
 - `make reproduce` 에 prompt_variants 포함. 데모 탭 3 에 표 추가.
+
+---
+
+## 2026-10-29 (5) — 정답셋 2차 확장 준비 (보강 5단계) + 데모 PDF 입력
+
+- 확장 대상: `label_draft.jsonl` 의 미검수 22건 (mle 10 · da 10 · de 2). 현재 38건에서 mle·da 가 5건씩이라 그쪽을 채운다. `data/labeled/gold_ids_round2.txt`.
+- 2차 교정(8-15)의 교훈대로 네 시스템을 한 번에 풀링한다: `src/label/make_pool.py` (N 파일 합집합, 출처 숨김, seed 셔플, 예측 없는 시스템 있으면 중단).
+- `pool_cli --apply` 가 reviewed=true 행만 갱신하던 것을 고침: 풀링 판정을 거친 미검수 행은 reviewed 로 승격. 안 고치면 22건 판정이 조용히 버려졌다.
+- 남은 순서: ① LLM 3종을 22건에 돌림(사용자 키, ~$0.6) → ② make_pool → ③ 사용자가 pool_cli 로 판정(후보 약 300건 예상, 2~3시간) → ④ apply → make_public_labels → gold_ids.txt 60건 → make extract(regex 예측) → make reproduce.
+  프롬프트 변형 파일은 38건뿐이므로 ④ 뒤 prompt_variants 는 1차 38건 교집합으로 제한해 채점해야 한다(또는 22건을 더 돌린다).
+- 데모: 이력서·포트폴리오 PDF/txt 업로드 → `demo/pdf_text.py`(pypdf) 로 본문 추출 → 같은 gap_diagnosis. 스캔 PDF 는 글자가 없어 안내만 한다. 서버 저장 없음.
