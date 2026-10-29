@@ -834,5 +834,14 @@ P/R/F1·percentile·쌍대 차이·라우팅 비용 산식, job_id str 조인, f
 - 892 하드코딩 3곳 제거: `paths.corpus_size()` 가 extracted_tags.jsonl 의 고유 job_id 를 센다. `--n-docs` 는 덮어쓰기용으로만 남김.
 - prelabel·label_cli·make_label_template 에 [레거시] 표시. 삭제하지 않은 이유: 초기 정답셋 구축 과정의 재현 경로.
 
+### 2026-10-29 — 361662 sonnet 재호출
+- 사용자가 키를 터미널에 넣고 `scripts/rerun_llm_rows.py --model claude-sonnet-5 --job-ids 361662` 실행 (백업 → 행 제거 → resume 호출 → 요약 재생성).
+- 결과: 17 태그, stop=end_turn, parse_ok=True, output_tokens 112, $0.0078. 512 로 잘렸던 것이 1024 에서는 112 토큰으로 끝났다 → 잘림의 원인은 출력 길이가 아니라 모델이 그 호출에서 길게 쓰기 시작했던 것으로 보인다(원문은 남아 있지 않음).
+- sonnet F1 0.845 → 0.854 [0.813, 0.890], FN 45 → 35, ① 0.936 → 0.947. 순위 opus 0.863 > sonnet 0.854 > regex 0.853 > haiku 0.828.
+- 쌍대 차이: regex−sonnet −0.001 [−0.032, +0.028]; sonnet−haiku +0.027 [+0.001, +0.056] P=0.98 → haiku<sonnet 도 확정. opus−regex 는 그대로 미확정.
+- 파레토: regex · sonnet · opus 셋. haiku 만 지배당함. 라우팅(regex+opus)은 불변.
+- `failed_rows_sensitivity.csv` 는 이제 실패 행 0 → 전체와 동일. 장치는 그대로 둔다.
+- 한계로 남긴 것: 38건 중 1건만 다른 날짜·다른 출력 예산으로 받은 응답.
+
 ### 남은 것
-- 361662 sonnet 재호출(API 키 필요, 약 $0.02). 그 뒤 본표 재생성. 환경에 키가 없어 이번엔 못 했다.
+- 사전 밖 역량 수록 여부, 정답셋 확대.
