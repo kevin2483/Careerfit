@@ -22,6 +22,7 @@
 - 평가 산출물: `data/processed/evaluation_{regex_pooled,llm_haiku,llm_sonnet,llm_opus}/eval_summary.csv`
   비교·CI·라우팅·실패민감도: `data/processed/{method_comparison,bootstrap_ci,cascade_sim,failed_rows_sensitivity}.csv`
 - `make reproduce` 가 공개 데이터만으로 위 전부를 다시 만들고, `make check` 가 커밋본과 diff 한다. CI 가 매번 돈다.
+- 데모(`demo/app.py`, `make demo`)는 위 CSV 와 `gap_diagnosis.run()` 만 읽는다. 데모 안에서 새 통계를 계산하지 않는다(README 와 두 벌이 됨).
 - 모든 표는 **항목 · 값 · 근거** 세 칸을 갖춘다. 근거 없는 수치는 내지 않는다.
 
 ## ④ 절대 하지 말 것
