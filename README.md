@@ -4,9 +4,9 @@
 
 이 프로젝트의 중심은 추출기가 아니라 **추출 결과가 맞는지 재는 장치**입니다. 정규식 베이스라인과 Claude 3종(haiku · sonnet · opus)을 같은 정답셋으로 비교했고, 그 과정에서 평가 장치 자체의 결함을 네 번 찾아 고쳤습니다. 두 번째 교정에서는 결론이 뒤집혔고, 세 번째에서는 "차이가 있다"는 주장을 "확정할 수 없다"로 바꿨으며, 네 번째(독립 코드 리뷰)에서는 sonnet의 순위가 API 호출 설정 한 건의 산물이었음이 드러나, 그 호출을 다시 받자 sonnet이 파레토 최적에 합류했습니다.
 
-[![ci](https://github.com/kevin2483/Careerfit/actions/workflows/ci.yml/badge.svg)](.github/workflows/ci.yml) · `make reproduce` 한 줄로 공개 데이터만으로 모든 평가 표가 다시 만들어집니다. · **데모:** `make demo` (배포 주소는 아래 [데모](#데모) 절)
+[![ci](https://github.com/kevin2483/Careerfit/actions/workflows/ci.yml/badge.svg)](.github/workflows/ci.yml) · `make reproduce` 한 줄로 공개 데이터만으로 모든 평가 표가 다시 만들어집니다. · **데모:** https://careerfit-kevin2483.streamlit.app
 
-> **English summary.** CareerFit extracts required skills from 1,190 Korean job postings (data scientist / engineer / ML engineer / analyst), builds per-role market maps, and diagnoses an individual's skill gaps. The core contribution is the *measurement apparatus*, not the extractor: a regex baseline and three Claude models are scored against a human-labeled gold set built by **blind pooling** (candidates from all systems, source hidden, order shuffled). Four rounds of correction were needed; the last one, from an independent code review, found that sonnet's rank rested on a single response truncated at max_tokens=512 and scored as an empty prediction. Re-issuing that one call moved sonnet from 0.845 to 0.854 and onto the Pareto frontier. Final F1 on 38 postings (dictionary v2, which closes tag sets under one human-confirmed implication rule, PySpark→Spark): opus 0.863, sonnet 0.854, regex 0.853, haiku 0.828. Bootstrap 95% CIs overlap; the opus–regex gap of +0.010 has CI [−0.016, +0.037], so only "haiku is below opus and sonnet" is statistically settled at this sample size. Explicit tool names are solved equally by all methods (F1 0.92–0.95); the difference is entirely in descriptive competencies. Length-based routing of 40% of postings to opus reaches opus-level F1 at 40% of the cost, but is only +1.1σ above random routing. Every evaluation table (`evaluation_{regex_pooled,llm_*}`, bootstrap CIs, method comparison, routing simulation, failure sensitivity) regenerates byte-identically from committed public files via `make reproduce`; CI verifies this on every push.
+> **English summary.** Live demo: https://careerfit-kevin2483.streamlit.app · CareerFit extracts required skills from 1,190 Korean job postings (data scientist / engineer / ML engineer / analyst), builds per-role market maps, and diagnoses an individual's skill gaps. The core contribution is the *measurement apparatus*, not the extractor: a regex baseline and three Claude models are scored against a human-labeled gold set built by **blind pooling** (candidates from all systems, source hidden, order shuffled). Four rounds of correction were needed; the last one, from an independent code review, found that sonnet's rank rested on a single response truncated at max_tokens=512 and scored as an empty prediction. Re-issuing that one call moved sonnet from 0.845 to 0.854 and onto the Pareto frontier. Final F1 on 38 postings (dictionary v2, which closes tag sets under one human-confirmed implication rule, PySpark→Spark): opus 0.863, sonnet 0.854, regex 0.853, haiku 0.828. Bootstrap 95% CIs overlap; the opus–regex gap of +0.010 has CI [−0.016, +0.037], so only "haiku is below opus and sonnet" is statistically settled at this sample size. Explicit tool names are solved equally by all methods (F1 0.92–0.95); the difference is entirely in descriptive competencies. Length-based routing of 40% of postings to opus reaches opus-level F1 at 40% of the cost, but is only +1.1σ above random routing. Every evaluation table (`evaluation_{regex_pooled,llm_*}`, bootstrap CIs, method comparison, routing simulation, failure sensitivity) regenerates byte-identically from committed public files via `make reproduce`; CI verifies this on every push.
 
 ---
 
@@ -108,8 +108,10 @@ API 호출 없이 기존 예측을 섞어 라우팅 정책을 시뮬레이션했
 
 직무별 요구 역량 지형도, 이력서를 붙여 넣으면 나오는 학습 우선순위, 그리고 위 평가 결과를 한 화면에서 봅니다. 공고 원문이나 API 키 없이 레포에 커밋된 CSV와 사전만 읽으므로 데모 숫자는 README 숫자와 같습니다. 갭 진단은 `src/analyze/gap_diagnosis.run()`을 그대로 호출해 산식이 두 벌이 되지 않습니다.
 
+**배포본:** https://careerfit-kevin2483.streamlit.app (Streamlit Community Cloud, 이 레포의 `main`에서 자동 배포)
+
 ```bash
-make demo        # http://localhost:8501
+make demo        # 로컬 실행 http://localhost:8501
 ```
 
 | 시장 지형도 | 평가 결과 |
