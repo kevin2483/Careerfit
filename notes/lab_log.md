@@ -858,3 +858,8 @@ P/R/F1·percentile·쌍대 차이·라우팅 비용 산식, job_id str 조인, f
 - 라우팅 음영을 transform_calculate 로 만들었더니 y 축이 0 부터 그려짐 → pandas 로 lo/hi 를 먼저 만들고 두 레이어에 같은 scale.
 - 의존성은 `requirements-demo.txt` 로 분리. CI 는 streamlit 을 설치하지 않고 로더·gap 호출 테스트 3건만 돈다.
 - 배포: Streamlit Community Cloud (사용자 계정 필요). 주소는 배포 후 README 에 추가.
+
+### 2026-10-29 (3) — 데모 컨테이너 (보강 4단계)
+- `Dockerfile` + `.dockerignore`: python:3.12-slim 에 데모가 읽는 파일만 복사(사전, market_stats, validation_summary, 평가 CSV 4개). 공고 원문·정답셋·예측 파일은 이미지에 없다 — 컨테이너 안에서 `ls` 로 확인.
+- 이미지 844MB(대부분 streamlit·pandas·altair). 헬스체크는 `/_stcore/health`. 컨테이너 안에서 로더·gap_diagnosis 스모크 실행해 README 와 같은 수치 확인.
+- 모니터링·오토스케일 같은 운영 요소는 범위 밖. README 에 그렇게 적는다.

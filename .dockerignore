@@ -1,0 +1,15 @@
+*
+!requirements.txt
+!requirements-demo.txt
+!src/
+!demo/
+!data/raw/dict/
+!data/processed/market_stats/
+!data/processed/job_skill_extract_report/validation_summary.csv
+!data/processed/job_skill_extract_report/tag_frequency_by_job.csv
+!data/processed/method_comparison.csv
+!data/processed/bootstrap_ci.csv
+!data/processed/cascade_sim.csv
+!data/processed/failed_rows_sensitivity.csv
+!.streamlit/
+**/__pycache__/

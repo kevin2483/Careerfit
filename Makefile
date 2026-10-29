@@ -6,7 +6,7 @@ PY ?= python3
 DATE ?= 2026-07-30
 P := data/processed
 
-.PHONY: install test lint reproduce extract stats check clean demo
+.PHONY: install test lint reproduce extract stats check clean demo demo-docker
 
 install:
 	$(PY) -m pip install -r requirements.txt
@@ -46,6 +46,10 @@ stats:
 demo:
 	$(PY) -m pip install -q -r requirements-demo.txt
 	$(PY) -m streamlit run demo/app.py
+
+demo-docker:
+	docker build -t careerfit-demo .
+	docker run --rm -p 8501:8501 careerfit-demo
 
 clean:
 	find . -name __pycache__ -type d -prune -exec rm -rf {} +
