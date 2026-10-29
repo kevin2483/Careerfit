@@ -52,7 +52,7 @@ from typing import Any, Iterable
 from anthropic import Anthropic
 
 from src.common.jsonl import iter_jsonl, read_jsonl
-from src.common.skill_dict import canonical_names
+from src.common.skill_dict import canonical_names, load_dict
 
 # ---------------------------------------------------------------- 스키마 어댑터
 
@@ -102,6 +102,59 @@ USER_TEMPLATE = """다음 채용공고에서 요구 기술 태그를 추출하�
 
 
 # ---------------------------------------------------------------- 로딩
+
+
+# ---------------------------------------------------------------- 프롬프트 변형 (notes/prompt_experiment_2026-10-29.md 에 사전 등록)
+# 각 변형은 기준 프롬프트에 한 가지씩만 더한다. 정답셋을 보고 반복 수정하지 않는다 — 한 번 돌리고 그대로 적는다.
+
+VARIANTS = {
+    "base": "기준 프롬프트",
+    "alias": "서술형(field 2) 태그에 사전 alias 를 '표현 예'로 덧붙임 (사전에서 기계 생성)",
+    "criteria": "사람이 쓴 라벨링 기준(notes/labeling_criteria.md 판단 3·4)을 시스템 프롬프트에 삽입",
+    "schema": "구조화 출력: JSON 스키마 enum=canonical 106 개로 형식·라벨 공간을 API 가 강제",
+}
+
+# 판단 3·4 를 notes/labeling_criteria.md 에서 옮겨 적음 (사람이 쓴 기준. 정답셋이 이 기준으로 만들어졌다)
+CRITERIA_TEXT = """
+정답 판정 기준 (정답셋을 만든 사람의 기준과 같다):
+- 명시된 기술/도구(단어 그대로)는 넣는다.
+- 의미가 명확한 서술형도 넣는다. 예: "운영 가능한 ML 시스템 구축" -> MLOps
+- 근거가 약한 추측은 넣지 않는다. 예: "실험 데이터 기반"만으로는 A/B테스트 근거가 약하다 -> 제외
+- 상위 개념이 아니라 구체적인 하위 태그를 넣는다. 예: "클라우드"가 아니라 공고에 적힌 AWS. 범주만 적혀 있으면("NoSQL 경험") 하위 도구(MongoDB)를 넣지 않는다.
+"""
+
+
+def tag_list_lines(dict_path: str | Path, variant: str) -> list[str]:
+    """허용 태그 목록 한 줄씩. alias 변형이면 field 2 태그에 사전 alias 를 '표현 예'로 붙인다."""
+    lines = []
+    for t in sorted(load_dict(dict_path), key=lambda t: t["canonical"]):
+        line = f"- {t['canonical']}"
+        if variant == "alias" and t["field"] == 2:
+            hints = [a for a in t["aliases"] if a.lower() != t["canonical"].lower()][:6]
+            if hints:
+                line += f"  (표현 예: {', '.join(hints)})"
+        lines.append(line)
+    return lines
+
+
+def build_system_prompt(dict_path: str | Path, variant: str = "base") -> str:
+    if variant not in VARIANTS:
+        raise SystemExit(f"[중단] 모르는 변형: {variant}. 가능: {sorted(VARIANTS)}")
+    prompt = SYSTEM_PROMPT.format(tag_list="\n".join(tag_list_lines(dict_path, variant)))
+    if variant == "criteria":
+        prompt = prompt.replace("\n규칙:\n", CRITERIA_TEXT + "\n규칙:\n")
+        assert CRITERIA_TEXT in prompt
+    if variant == "schema":
+        prompt = prompt.replace('출력은 JSON 배열 하나만. 설명·코드펜스·다른 텍스트 금지.\n예: ["Python", "SQL", "Airflow"]\n빈 경우: []',
+                                '출력은 {"tags": [...]} 형태의 JSON 객체 하나. 예: {"tags": ["Python", "SQL", "Airflow"]}  빈 경우: {"tags": []}')
+    return prompt
+
+
+def output_schema(canonical: list[str]) -> dict:
+    """schema 변형의 구조화 출력 스키마. enum 이 라벨 공간 자체라 목록 밖 태그가 나올 수 없다."""
+    return {"type": "object",
+            "properties": {"tags": {"type": "array", "items": {"type": "string", "enum": list(canonical)}}},
+            "required": ["tags"], "additionalProperties": False}
 
 
 def load_canonical_tags(dict_path: str | Path) -> list[str]:
@@ -174,6 +227,8 @@ def parse_tags(text: str, canonical: set[str]) -> tuple[list[str], list[str], bo
         except json.JSONDecodeError:
             return [], [], False
 
+    if isinstance(parsed, dict) and isinstance(parsed.get("tags"), list):  # schema 변형: {"tags": [...]}
+        parsed = parsed["tags"]
     if not isinstance(parsed, list):
         return [], [], False
 
@@ -194,6 +249,8 @@ def extract_one(
     canonical: set[str],
     rec: dict,
     max_retries: int = 5,
+    output_config: dict | None = None,
+    variant: str = "base",
 ) -> dict:
     job_id = _pick(rec, RAW_ID_KEYS)
     text = _pick(rec, RAW_TEXT_KEYS) or ""
@@ -205,6 +262,7 @@ def extract_one(
         PRED_TAGS_KEY: [],
         "_meta": {
             "model": model,
+            "variant": variant,
             "truncated": truncated,
             "n_chars": len(text),
             "hallucinated_tags": [],
@@ -229,6 +287,8 @@ def extract_one(
             }
             if use_temp:
                 kwargs["temperature"] = 0
+            if output_config:
+                kwargs["output_config"] = output_config
             t0 = time.perf_counter()
             resp = client.messages.create(**kwargs)
             latency_ms = int((time.perf_counter() - t0) * 1000)
@@ -292,16 +352,19 @@ def run(
     ids: set[str] | None = None,
     workers: int = 4,
     resume: bool = True,
+    variant: str = "base",
 ) -> dict:
-    """regex 추출기와 동일한 시그니처. 요약 dict 반환."""
+    """regex 추출기와 동일한 시그니처. 요약 dict 반환. variant 는 VARIANTS 중 하나 (base 가 기존 동작)."""
     canonical_list = load_canonical_tags(dict_path)
     canonical = set(canonical_list)
-    system_prompt = SYSTEM_PROMPT.format(tag_list="\n".join(f"- {t}" for t in canonical_list))
+    system_prompt = build_system_prompt(dict_path, variant)
+    out_cfg = {"format": {"type": "json_schema", "schema": output_schema(canonical_list)}} if variant == "schema" else None
 
     out_root = Path(out_dir) / date
     out_root.mkdir(parents=True, exist_ok=True)
-    pred_path = out_root / f"llm_extract_{_slug(model)}.jsonl"
-    summary_path = out_root / f"llm_extract_{_slug(model)}_summary.json"
+    stem = pred_stem(model, variant)
+    pred_path = out_root / f"{stem}.jsonl"
+    summary_path = out_root / f"{stem}_summary.json"
 
     done: set[str] = set()
     if resume and pred_path.exists():
@@ -341,7 +404,8 @@ def run(
     with pred_path.open("a" if resume else "w", encoding="utf-8") as fout:
         with ThreadPoolExecutor(max_workers=workers) as ex:
             futures = {
-                ex.submit(extract_one, client, model, system_prompt, canonical, rec): rec
+                ex.submit(extract_one, client, model, system_prompt, canonical, rec,
+                          output_config=out_cfg, variant=variant): rec
                 for rec in targets
             }
             for i, fut in enumerate(as_completed(futures), 1):
@@ -352,13 +416,17 @@ def run(
                 if i % 25 == 0 or i == len(targets):
                     print(f"  {i}/{len(targets)}")
 
-    summary = summarize(pred_path, model, date)
+    summary = summarize(pred_path, model, date, variant)
     summary_path.write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps(summary, ensure_ascii=False, indent=2))
     return summary
 
 
-def summarize(pred_path: Path, model: str, date: str) -> dict:
+def pred_stem(model: str, variant: str = "base") -> str:
+    return f"llm_extract_{_slug(model)}" + ("" if variant == "base" else f"__{variant}")
+
+
+def summarize(pred_path: Path, model: str, date: str, variant: str = "base") -> dict:
     """예측 파일 '전체'에서 요약을 다시 센다.
 
     이번 실행분만 세면 --resume 로 이어 돌린 뒤의 요약이 파일과 어긋난다
@@ -377,6 +445,7 @@ def summarize(pred_path: Path, model: str, date: str) -> dict:
     lat = sorted(r["_meta"].get("latency_ms", 0) for r in ok)
     return {
         "model": model,
+        "variant": variant,
         "date": date,
         "pricing_as_of": PRICING_AS_OF,
         "n_processed": len(rows),
@@ -405,17 +474,18 @@ def main() -> None:
     ap.add_argument("--ids-file", default=None, help="한 줄에 job_id 하나. 정답셋만 돌릴 때.")
     ap.add_argument("--workers", type=int, default=4)
     ap.add_argument("--no-resume", action="store_true")
+    ap.add_argument("--variant", default="base", choices=sorted(VARIANTS), help="프롬프트 변형 (notes/prompt_experiment_2026-10-29.md)")
     ap.add_argument("--resummarize", action="store_true",
                     help="API 호출 없이 기존 예측 파일 전체에서 _summary.json 만 다시 만든다")
     a = ap.parse_args()
 
     if a.resummarize:
         out_root = Path(a.out_dir) / a.date
-        pred_path = out_root / f"llm_extract_{_slug(a.model)}.jsonl"
+        pred_path = out_root / f"{pred_stem(a.model, a.variant)}.jsonl"
         if not pred_path.exists():
             raise SystemExit(f"[중단] 예측 파일 없음: {pred_path}")
-        summary = summarize(pred_path, a.model, a.date)
-        (out_root / f"llm_extract_{_slug(a.model)}_summary.json").write_text(
+        summary = summarize(pred_path, a.model, a.date, a.variant)
+        (out_root / f"{pred_stem(a.model, a.variant)}_summary.json").write_text(
             json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
         print(json.dumps(summary, ensure_ascii=False, indent=2))
         return
@@ -434,6 +504,7 @@ def main() -> None:
         ids=ids,
         workers=a.workers,
         resume=not a.no_resume,
+        variant=a.variant,
     )
 
 

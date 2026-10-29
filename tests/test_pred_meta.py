@@ -38,3 +38,19 @@ def test_sensitivity_drops_failed_doc_from_every_method(tmp_path):
     assert by[("a", "전체")]["F1"] == 0.667 and "2(max_tokens" in by[("a", "전체")]["제외문서"]
     assert by[("a", "실패문서제외")] | {"n": 1, "F1": 1.0, "제외문서": "2"} == by[("a", "실패문서제외")]
     assert by[("b", "실패문서제외")]["n"] == 1 and by[("b", "실패문서제외")]["F1"] == 0.667   # b 도 같은 문서를 뺀다
+
+
+def test_prompt_variants_zero_diff_for_identical_copy(tmp_path):
+    """변형 파일이 기준의 복사본이면 짝지은 차이는 정확히 0 이고 CI 도 [0, 0]. 채점기·부트스트랩이 같은 경로를 쓰는지 확인."""
+    import shutil
+    from src.common.paths import DICT_PATH, LABELS_PUBLIC
+    from src.common.skill_dict import field_map, implies_map
+    from src.eval.prompt_variants import run as pv
+    src = Path("data/processed/2026-07-30/llm_extract_claude-haiku-4-5-20251001.jsonl")
+    shutil.copy(src, tmp_path / src.name)
+    shutil.copy(src, tmp_path / "llm_extract_claude-haiku-4-5-20251001__alias.jsonl")
+    rows = pv(LABELS_PUBLIC, tmp_path, field_map(DICT_PATH), implies_map(DICT_PATH),
+              "claude-haiku-4-5-20251001", b=200, seed=1)
+    by = {r["변형"]: r for r in rows}
+    assert by["base"]["F1"] == by["alias"]["F1"] == 0.828
+    assert (by["alias - base"]["F1"], by["alias - base"]["CI_하한"], by["alias - base"]["CI_상한"]) == (0.0, 0.0, 0.0)
