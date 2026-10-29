@@ -6,7 +6,7 @@
 
 [![ci](https://github.com/kevin2483/Careerfit/actions/workflows/ci.yml/badge.svg)](.github/workflows/ci.yml) · `make reproduce` 한 줄로 공개 데이터만으로 모든 평가 표가 다시 만들어집니다. · **데모:** https://careerfit-kevin2483.streamlit.app
 
-> **English summary.** Live demo: https://careerfit-kevin2483.streamlit.app · CareerFit extracts required skills from 1,190 Korean job postings (data scientist / engineer / ML engineer / analyst), builds per-role market maps, and diagnoses an individual's skill gaps. The core contribution is the *measurement apparatus*, not the extractor: a regex baseline and three Claude models are scored against a human-labeled gold set built by **blind pooling** (candidates from all systems, source hidden, order shuffled). Four rounds of correction were needed; the last one, from an independent code review, found that sonnet's rank rested on a single response truncated at max_tokens=512 and scored as an empty prediction. Re-issuing that one call moved sonnet from 0.845 to 0.854 and onto the Pareto frontier. Final F1 on 38 postings (dictionary v2, which closes tag sets under one human-confirmed implication rule, PySpark→Spark): opus 0.863, sonnet 0.854, regex 0.853, haiku 0.828. Bootstrap 95% CIs overlap; the opus–regex gap of +0.010 has CI [−0.016, +0.037], so only "haiku is below opus and sonnet" is statistically settled at this sample size. Explicit tool names are solved equally by all methods (F1 0.92–0.95); the difference is entirely in descriptive competencies. Length-based routing of 40% of postings to opus reaches opus-level F1 at 40% of the cost, but is only +1.1σ above random routing. Every evaluation table (`evaluation_{regex_pooled,llm_*}`, bootstrap CIs, method comparison, routing simulation, failure sensitivity) regenerates byte-identically from committed public files via `make reproduce`; CI verifies this on every push.
+> **English summary.** Live demo: https://careerfit-kevin2483.streamlit.app · CareerFit extracts required skills from 1,190 Korean job postings (data scientist / engineer / ML engineer / analyst), builds per-role market maps, and diagnoses an individual's skill gaps. The core contribution is the *measurement apparatus*, not the extractor: a regex baseline and three Claude models are scored against a human-labeled gold set built by **blind pooling** (candidates from all systems, source hidden, order shuffled). Four rounds of correction were needed; the last one, from an independent code review, found that sonnet's rank rested on a single response truncated at max_tokens=512 and scored as an empty prediction. Re-issuing that one call moved sonnet from 0.845 to 0.854 and onto the Pareto frontier. Final F1 on 38 postings (dictionary v2, which closes tag sets under one human-confirmed implication rule, PySpark→Spark): opus 0.863, sonnet 0.854, regex 0.853, haiku 0.828. Bootstrap 95% CIs overlap; the opus–regex gap of +0.010 has CI [−0.016, +0.037], so only "haiku is below opus and sonnet" is statistically settled at this sample size. Explicit tool names are solved equally by all methods (F1 0.92–0.95); the difference is entirely in descriptive competencies. Length-based routing of 40% of postings to opus reaches opus-level F1 at 40% of the cost, but is only +1.1σ above random routing. Three pre-registered prompt variants for haiku (alias hints, human labeling criteria, structured-output enum) all scored lower; structured outputs removed hallucinated tags entirely but replaced them with in-vocabulary false positives. Every evaluation table (`evaluation_{regex_pooled,llm_*}`, bootstrap CIs, method comparison, routing simulation, failure sensitivity) regenerates byte-identically from committed public files via `make reproduce`; CI verifies this on every push.
 
 ---
 
@@ -102,6 +102,21 @@ API 호출 없이 기존 예측을 섞어 라우팅 정책을 시뮬레이션했
 
 같은 일이 조용히 반복되지 않도록 세 가지를 코드에 넣었습니다. 추출기는 잘린 응답을 예산을 늘려 즉시 재시도하고, 세 채점기는 실패 행을 빈 예측으로 두되 반드시 경고를 찍으며, `failed_rows_sensitivity.csv`가 실패 문서를 뺀 수치를 매번 같이 냅니다(지금은 실패 행이 없어 전체와 같습니다). → [`src/eval/pred_meta.py`](src/eval/pred_meta.py) · [`scripts/rerun_llm_rows.py`](scripts/rerun_llm_rows.py)
 
+### 8. 평가 장치로 haiku를 개선하려 했고, 세 변형 모두 실패했다
+
+평가 장치를 만들었으면 그걸로 무엇을 바꿨는지 보여야 합니다. 가장 싸고 점수가 낮은 haiku에 프롬프트 변형 세 가지를 시도했습니다. 정답셋 38건이 유일한 평가 데이터라 그것을 보며 프롬프트를 고치면 시험지를 보고 공부하는 셈이므로, **변형과 판정 기준을 실행 전에 문서로 고정하고 각 변형을 정확히 한 번만 돌렸습니다.** → [`notes/prompt_experiment_2026-10-29.md`](notes/prompt_experiment_2026-10-29.md) (결과보다 먼저 커밋됨)
+
+| 변형 | 바꾼 것 | F1 | 기준과의 차이 (95% CI) | 환각 태그 | FP |
+|---|---|---|---|---|---|
+| 기준 | 기존 프롬프트 | 0.828 | — | 16 | 78 |
+| alias | 서술형 태그 33개에 사전 alias를 표현 예로 추가 | 0.812 | −0.015 [−0.036, +0.005] | 5 | 90 |
+| criteria | 사람이 쓴 라벨링 기준을 프롬프트에 삽입 | 0.819 | −0.009 [−0.028, +0.011] | 18 | 82 |
+| schema | 구조화 출력으로 라벨 공간(106개 enum) 강제 | 0.806 | −0.022 [−0.048, +0.002] | **0** | 97 |
+
+세 변형 모두 점추정이 내려갔고, 사전 등록한 기준("차이의 CI가 0을 넘어야 확정")으로는 어느 쪽도 확정되지 않습니다. 가설이 맞은 것은 schema의 "환각 0, 파싱 실패 0" 하나뿐입니다. 그런데 목록 밖 태그가 사라진 자리를 목록 안의 오탐이 채웠습니다(FP 78 → 97). 표현 예를 준 alias도 같은 방향으로, 환각은 16에서 5로 줄었지만 서술형 태그를 더 넓게 붙여 ②서술형 F1이 0.692에서 0.659로 내려갔습니다. haiku의 문제는 "태그 이름을 몰라서"가 아니라 "요구가 아닌 언급도 요구로 읽어서"이고, 그건 프롬프트에 기준을 적어 줘도(criteria) 바뀌지 않았습니다.
+
+이 결과를 보고 변형을 고쳐 다시 돌리지 않았습니다. 다시 돌리면 그때부터는 38건에 맞추는 일이 됩니다. 개선은 정답셋을 늘린 뒤의 일로 남겼습니다. → [`src/eval/prompt_variants.py`](src/eval/prompt_variants.py) · [`data/processed/prompt_variants.csv`](data/processed/prompt_variants.csv)
+
 ---
 
 ## 데모
@@ -188,7 +203,7 @@ Claude Code 서브에이전트 3명(extractor · analyst · diagnoser)이 직렬
 ```bash
 pip install -r requirements.txt
 make test        # pytest 76건
-make reproduce   # evaluation_{regex_pooled,llm_*} · bootstrap_ci · method_comparison · cascade_sim · failed_rows_sensitivity 재생성
+make reproduce   # evaluation_{regex_pooled,llm_*} · bootstrap_ci · method_comparison · cascade_sim · failed_rows_sensitivity · prompt_variants 재생성
 make check       # 재생성 결과가 커밋본과 같은지 diff
 ```
 
@@ -218,12 +233,12 @@ python -m src.extract.llm_skill_extract --raw-dir data/raw --dict data/raw/dict/
 data/
   raw/dict/                 역량 태그 사전 v0 · v1 · v2 (v2 = v1 + 함의 규칙)
   labeled/                  정답셋 공개판 · 풀링 후보 · 판정 키
-  processed/<date>/         예측 파일 4종 (regex · haiku · sonnet · opus) + LLM 비용·지연 요약
+  processed/<date>/         예측 파일 4종 (regex · haiku · sonnet · opus) + haiku 프롬프트 변형 3종 + LLM 비용·지연 요약
   processed/evaluation_*/   방식별 평가 (eval_summary · error_analysis)
   processed/                bootstrap_ci · method_comparison · cascade_sim · failed_rows_sensitivity · 시장 통계
 demo/                       Streamlit 데모 (app.py · 로더 · 예시 이력서). 커밋된 산출물만 읽는다
 docs/agent_team.md          에이전트 팀 설계와 재현성 검증 기록
-notes/                      실험 로그 · 라벨링 기준
+notes/                      실험 로그 · 라벨링 기준 · 프롬프트 실험 사전 등록
 scripts/                    일회성 마이그레이션 (사전 v1 생성, 정답셋 정규화·교정, 공개판 생성, 예측 행 재호출)
 src/
   common/                   JSONL 읽기 · 사전 로딩 · 경로/날짜 해석 (하드코딩 금지 지점)

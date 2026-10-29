@@ -20,7 +20,8 @@
 ## ③ 결과는 어디에 어떤 형식으로 남기나
 - 추출 산출물: `data/processed/job_skill_extract_report/` (CSV 4종, 컬럼·행 순서 고정)
 - 평가 산출물: `data/processed/evaluation_{regex_pooled,llm_haiku,llm_sonnet,llm_opus}/eval_summary.csv`
-  비교·CI·라우팅·실패민감도: `data/processed/{method_comparison,bootstrap_ci,cascade_sim,failed_rows_sensitivity}.csv`
+  비교·CI·라우팅·실패민감도·프롬프트변형: `data/processed/{method_comparison,bootstrap_ci,cascade_sim,failed_rows_sensitivity,prompt_variants}.csv`
+- 프롬프트를 바꿔 다시 재려면 먼저 `notes/prompt_experiment_*.md` 에 변형·판정 기준을 적고 커밋한 뒤 한 번만 돌린다. 정답셋 38건을 보며 반복 수정하지 않는다.
 - `make reproduce` 가 공개 데이터만으로 위 전부를 다시 만들고, `make check` 가 커밋본과 diff 한다. CI 가 매번 돈다.
 - 데모(`demo/app.py`, `make demo`)는 위 CSV 와 `gap_diagnosis.run()` 만 읽는다. 데모 안에서 새 통계를 계산하지 않는다(README 와 두 벌이 됨).
 - 모든 표는 **항목 · 값 · 근거** 세 칸을 갖춘다. 근거 없는 수치는 내지 않는다.

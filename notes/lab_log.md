@@ -863,3 +863,13 @@ P/R/F1·percentile·쌍대 차이·라우팅 비용 산식, job_id str 조인, f
 - `Dockerfile` + `.dockerignore`: python:3.12-slim 에 데모가 읽는 파일만 복사(사전, market_stats, validation_summary, 평가 CSV 4개). 공고 원문·정답셋·예측 파일은 이미지에 없다 — 컨테이너 안에서 `ls` 로 확인.
 - 이미지 844MB(대부분 streamlit·pandas·altair). 헬스체크는 `/_stcore/health`. 컨테이너 안에서 로더·gap_diagnosis 스모크 실행해 README 와 같은 수치 확인.
 - 모니터링·오토스케일 같은 운영 요소는 범위 밖. README 에 그렇게 적는다.
+
+---
+
+## 2026-10-29 (4) — 프롬프트 변형 실험 (보강 3단계): 전부 실패, 사전 등록대로 기록
+
+- 설계와 결과는 `notes/prompt_experiment_2026-10-29.md`. 사전 등록 커밋(c57a173) → 코드(d31c26d) → 실행 → 결과 순서가 git log 에 남는다.
+- haiku base 0.828 vs alias 0.812 / criteria 0.819 / schema 0.806. 셋 다 CI 가 0 을 포함 → 확정 불가. 점추정은 전부 하락.
+- 배운 것: haiku 의 오류는 라벨 이름을 몰라서가 아니라 요구/언급 구분이 약해서다. 표현 예·기준·스키마 모두 그 구분을 돕지 못했고 오히려 목록 안 오탐을 늘렸다.
+  구조화 출력은 "환각 0" 을 보장하지만 F1 을 올리지는 않는다 — 환각 태그는 어차피 사전 밖이라 채점에서 FP 로만 들어가는데, 그 자리를 사전 안 FP 가 채웠다.
+- `make reproduce` 에 prompt_variants 포함. 데모 탭 3 에 표 추가.
