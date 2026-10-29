@@ -32,3 +32,9 @@ def test_gap_diagnosis_runs_without_freshness_check():
     assert "Python" in r["보유역량"] and "SQL" in r["보유역량"]
     assert 1 <= len(r["이번분기_학습로드맵(top5)"]) <= 5
     assert all(x["canonical"] not in r["보유역량"] for x in r["이번분기_학습로드맵(top5)"])
+
+
+def test_prompt_variants_loader():
+    rows = L.prompt_variants()
+    assert [r["변형"] for r in rows if r["지표"] == "F1"] == ["base", "alias", "criteria", "schema"]
+    assert all(r["파싱실패"] == 0 for r in rows if r["지표"] == "F1")

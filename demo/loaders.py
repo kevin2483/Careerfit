@@ -83,6 +83,10 @@ def failed_rows() -> list[dict]:
     return _typed(_read_csv(PROCESSED / "failed_rows_sensitivity.csv"))
 
 
+def prompt_variants() -> list[dict]:
+    return _typed(_read_csv(PROCESSED / "prompt_variants.csv"))
+
+
 def totals() -> list[dict]:
     """방식별 '전체' 행 + 비용 열 이름 정규화 (전체892건_예상비용USD → 전체비용)."""
     out = []

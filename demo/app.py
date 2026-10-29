@@ -187,6 +187,16 @@ with tab_eval:
     st.altair_chart((band + line).properties(height=260), use_container_width=True)
     st.caption("길이 기준 40%는 무작위 40%보다 +1.1σ. 38건으로는 '긴 공고를 고르는 것'의 효과를 구분하지 못한다. 음영 = 무작위 ±1σ.")
 
+    st.markdown("**haiku 프롬프트 변형 실험 — 사전 등록 후 각 1회, 전부 실패**")
+    pv = df("prompt_variants")
+    pv_f1 = pv[pv["지표"] == "F1"][["변형", "F1", "CI_하한", "CI_상한", "precision", "recall", "F1_①명시", "F1_②서술형", "환각태그", "파싱실패", "FP"]]
+    pv_d = pv[pv["지표"] == "F1 차이"][["변형", "F1", "CI_하한", "CI_상한", "P(차이>0)"]].rename(columns={"F1": "차이"})
+    cc1, cc2 = st.columns([3, 2])
+    cc1.dataframe(pv_f1, hide_index=True, use_container_width=True)
+    cc2.dataframe(pv_d, hide_index=True, use_container_width=True)
+    st.caption("alias = 서술형 태그에 사전 표현 예 추가 · criteria = 사람이 쓴 라벨링 기준 삽입 · schema = 구조화 출력(enum 106). "
+               "세 변형 모두 CI 가 0 을 포함해 확정 불가이며 점추정은 하락. schema 는 환각 0 이지만 목록 안 오탐이 늘었다. 변형을 고쳐 재실행하지 않았다.")
+
     st.markdown("**평가 장치 자체를 네 번 고쳤다**")
     st.dataframe(pd.DataFrame(L.CORRECTIONS), hide_index=True, use_container_width=True)
     fr = df("failed_rows")
