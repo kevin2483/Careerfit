@@ -4,8 +4,29 @@
     {
       "name": "careerfit-demo",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "streamlit", "run", "demo/app.py", "--server.port", "8501", "--server.headless", "true"],
+      "runtimeArgs": [
+        "-m",
+        "streamlit",
+        "run",
+        "demo/app.py",
+        "--server.port",
+        "8501",
+        "--server.headless",
+        "true"
+      ],
       "port": 8501
+    },
+    {
+      "name": "portfolio-site",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8787",
+        "-d",
+        "portfolio/site"
+      ],
+      "port": 8787
     }
   ]
 }
