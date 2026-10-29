@@ -7,6 +7,8 @@ data/labeled/*.jsonl
 !data/labeled/label_draft.public.jsonl
 !data/labeled/pool_candidates.jsonl
 !data/labeled/pool_key.jsonl
+!data/labeled/pool_candidates_round2.jsonl
+!data/labeled/pool_key_round2.jsonl
 *.bak_*
 
 # 이력서·공고 본문 덤프 (레포에 넣지 않는다)

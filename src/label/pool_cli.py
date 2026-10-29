@@ -84,7 +84,8 @@ def show_doc(row: dict, n_cand: int) -> None:
 
 def review(args: argparse.Namespace) -> None:
     cands = read_jsonl(args.pool)
-    labels = {str(r["job_id"]): r for r in read_jsonl(args.labels) if r.get("reviewed")}
+    # reviewed 여부와 무관하게 전부 읽는다. 2차 확장분(미검수 템플릿 행)도 판정 대상이다 (2026-10-29).
+    labels = {str(r["job_id"]): r for r in read_jsonl(args.labels)}
 
     by_doc: dict[str, list[dict]] = defaultdict(list)
     for c in cands:
