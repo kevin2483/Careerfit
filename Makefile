@@ -6,7 +6,7 @@ PY ?= python3
 DATE ?= 2026-07-30
 P := data/processed
 
-.PHONY: install test lint reproduce extract stats check clean
+.PHONY: install test lint reproduce extract stats check clean demo
 
 install:
 	$(PY) -m pip install -r requirements.txt
@@ -15,7 +15,7 @@ test:
 	$(PY) -m pytest
 
 lint:
-	$(PY) -m pyflakes src scripts tests
+	$(PY) -m pyflakes src scripts tests demo
 
 # 레포에 커밋된 예측 파일 4개 + 공개 정답셋만 쓴다. 결과는 커밋된 CSV 와 바이트 단위로 같아야 한다 (CI 가 diff).
 reproduce:
@@ -41,6 +41,11 @@ extract:
 
 stats:
 	$(PY) -m src.analyze.market_stats --date $(DATE)
+
+# 데모 (커밋된 CSV 와 사전만 읽는다. 공고 원문·API 불필요)
+demo:
+	$(PY) -m pip install -q -r requirements-demo.txt
+	$(PY) -m streamlit run demo/app.py
 
 clean:
 	find . -name __pycache__ -type d -prune -exec rm -rf {} +

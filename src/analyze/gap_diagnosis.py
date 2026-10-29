@@ -122,12 +122,18 @@ def run(
     junior_senior_path: Path = JUNIOR_SENIOR_PATH,
     top_n: int = TOP_N,
     extract_dir: Path = EXTRACT_REPORT_DIR,
+    check_fresh: bool = True,
 ) -> dict:
     if target_job not in JOBS:
         raise SystemExit(f"[중단] target_job은 {JOBS} 중 하나여야 함: {target_job!r}")
     if not resume_text or not resume_text.strip():
         raise SystemExit("[중단] 이력서 텍스트가 비어 있음. 리더가 텍스트를 전달했는지 확인 필요.")
-    check_inputs_fresh(Path(rank_by_job_path), Path(junior_senior_path), Path(extract_dir))
+    if check_fresh:
+        check_inputs_fresh(Path(rank_by_job_path), Path(junior_senior_path), Path(extract_dir))
+    else:  # 데모처럼 git clone 직후(mtime 이 체크아웃 시각) 커밋된 산출물을 읽을 때. 존재 여부는 본다.
+        for p in (Path(rank_by_job_path), Path(junior_senior_path)):
+            if not p.exists():
+                raise SystemExit(f"[중단] analyst 산출물 없음: {p}")
 
     resume_tags = extract_resume_tags(resume_text, dict_path)
     field3_tags = load_field3_tags(dict_path)
