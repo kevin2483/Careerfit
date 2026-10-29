@@ -253,6 +253,10 @@ CLAUDE.md                   에이전트 팀 운영 규칙
 
 Python 3.12 · 정규식 · Anthropic API (Claude haiku-4.5 · sonnet-5 · opus-5) · Claude Code 서브에이전트 · MCP (Notion, Google Drive) · pytest · GitHub Actions · Streamlit
 
+## 작성자
+
+안정재 · [kevin2483.github.io](https://kevin2483.github.io) · [github.com/kevin2483](https://github.com/kevin2483)
+
 ## 라이선스
 
 MIT. 공고 원문과 정답셋 본문은 레포에 포함하지 않으며, 라이선스는 코드·사전·공개 정답셋(태그만)에 적용됩니다.
