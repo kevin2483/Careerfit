@@ -8,7 +8,6 @@ data/labeled/*.jsonl
 !data/labeled/pool_candidates.jsonl
 !data/labeled/pool_key.jsonl
 !data/labeled/pool_candidates_round2.jsonl
-!data/labeled/pool_key_round2.jsonl
 *.bak_*
 
 # 이력서·공고 본문 덤프 (레포에 넣지 않는다)
@@ -30,3 +29,6 @@ logs_*.txt
 
 # OS
 .DS_Store
+
+# 2차 정답셋 확장 보류분 (22건 LLM 예측·폐기한 판정). 반영 전까지 레포 밖
+data/processed/*/round2_pending/

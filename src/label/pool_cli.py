@@ -28,6 +28,8 @@
     python -m src.label.pool_cli --stats         # 진행률만
     python -m src.label.pool_cli --apply         # 판정 결과를 gold_tags 에 반영
     python -m src.label.pool_cli --batch         # 공고별 한 화면, 아닌 것 번호만 입력 (빠름)
+      ※ --batch 는 기본값이 '유지'라 수용 편향이 생긴다. 2026-10-30 2차 확장에서 제외율이 1차 29% → 4% 로 떨어졌고
+        검수자 스스로 '거의 엔터로 넘겼다'고 보고해 판정 전체를 폐기했다. 하나씩 y/n 이 기본이다.
 
 조작
 ----
