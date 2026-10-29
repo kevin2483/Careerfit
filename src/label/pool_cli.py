@@ -27,6 +27,7 @@
     python -m src.label.pool_cli --redo          # 판정한 것도 다시
     python -m src.label.pool_cli --stats         # 진행률만
     python -m src.label.pool_cli --apply         # 판정 결과를 gold_tags 에 반영
+    python -m src.label.pool_cli --batch         # 공고별 한 화면, 아닌 것 번호만 입력 (빠름)
 
 조작
 ----
@@ -66,6 +67,29 @@ def ask(prompt: str, default: str = "y", allowed: set[str] | None = None) -> str
         if allowed is None or a in allowed:
             return a
         print(f"     ! {a!r} 는 허용되지 않음. {'/'.join(sorted(allowed))} 중 하나")
+
+
+def ask_reject_numbers(n: int):
+    """'아닌 것' 번호 집합을 돌려준다. 's' / 'q' 는 그대로. 범위 밖·오타는 다시 묻는다."""
+    while True:
+        try:
+            raw = input("  요구 역량이 아닌 번호 (쉼표/공백 구분, 전부 맞으면 엔터, s=공고건너뜀, q=저장종료): ").strip().lower()
+        except (EOFError, KeyboardInterrupt):
+            return "q"
+        if raw in ("s", "q"):
+            return raw
+        if not raw:
+            return set()
+        try:
+            nums = {int(x) for x in raw.replace(",", " ").split()}
+        except ValueError:
+            print("     ! 숫자만 입력하세요")
+            continue
+        bad = [x for x in nums if not 1 <= x <= n]
+        if bad:
+            print(f"     ! 범위 밖: {bad} (1~{n})")
+            continue
+        return nums
 
 
 def show_doc(row: dict, n_cand: int) -> None:
@@ -126,16 +150,31 @@ def review(args: argparse.Namespace) -> None:
         print(f"\n\n########## 공고 {k}/{len(todo)} ##########")
         show_doc(row, len(group))
 
-        for i, c in enumerate(group, 1):
-            a = ask(f"  [{i}/{len(group)}] {c['tag']}  요구 역량? [Y/n/s=공고건너뜀/q]: ", allowed=VERDICT_KEYS)
+        if args.batch:
+            # 한 화면에 번호로 보여 주고 '아닌 것' 번호만 받는다. 판정 수는 같고 입력만 1회 (2026-10-29, 208건 피로).
+            for i, c in enumerate(group, 1):
+                print(f"  {i:>2}. {c['tag']}")
+            a = ask_reject_numbers(len(group))
             if a == "q":
                 quit_now = True
                 break
             if a == "s":
                 print("  → 이 공고 건너뜀")
-                break
-            c["verdict"] = (a != "n")
-            print("     → " + ("유지" if c["verdict"] else "제외"))
+                continue
+            for i, c in enumerate(group, 1):
+                c["verdict"] = i not in a
+            print(f"     → 제외 {len(a)}개, 유지 {len(group) - len(a)}개")
+        else:
+            for i, c in enumerate(group, 1):
+                a = ask(f"  [{i}/{len(group)}] {c['tag']}  요구 역량? [Y/n/s=공고건너뜀/q]: ", allowed=VERDICT_KEYS)
+                if a == "q":
+                    quit_now = True
+                    break
+                if a == "s":
+                    print("  → 이 공고 건너뜀")
+                    break
+                c["verdict"] = (a != "n")
+                print("     → " + ("유지" if c["verdict"] else "제외"))
 
         if not quit_now:
             kept = sorted(c["tag"] for c in by_doc[jid] if c["verdict"])
@@ -235,6 +274,7 @@ def main() -> None:
     p.add_argument("--stats", action="store_true")
     p.add_argument("--apply", action="store_true")
     p.add_argument("--force", action="store_true", help="--apply 시 미판정 무시")
+    p.add_argument("--batch", action="store_true", help="공고별로 후보를 한 번에 보여 주고 아닌 것 번호만 입력")
     a = p.parse_args()
 
     if a.stats:
