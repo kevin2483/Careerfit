@@ -27,11 +27,12 @@ reproduce:
 	$(PY) -m src.eval.compare_methods --date $(DATE)
 	$(PY) -m src.eval.cascade_sim --date $(DATE)
 	$(PY) -m src.eval.failed_rows --date $(DATE)
+	$(PY) -m src.eval.prompt_variants --date $(DATE)
 
 # 재현 결과가 커밋본과 같은지 확인 (CI 와 동일)
 check: reproduce
 	git diff --exit-code -- $(P)/evaluation_regex_pooled $(P)/evaluation_llm_haiku $(P)/evaluation_llm_sonnet \
-		$(P)/evaluation_llm_opus $(P)/bootstrap_ci.csv $(P)/method_comparison.csv $(P)/cascade_sim.csv $(P)/failed_rows_sensitivity.csv
+		$(P)/evaluation_llm_opus $(P)/bootstrap_ci.csv $(P)/method_comparison.csv $(P)/cascade_sim.csv $(P)/failed_rows_sensitivity.csv $(P)/prompt_variants.csv
 	@echo "재현 일치"
 
 # 아래 둘은 공고 원문(data/raw/*/wanted_$(DATE).jsonl)이 있어야 한다
