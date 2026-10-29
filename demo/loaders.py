@@ -2,6 +2,7 @@
 데모가 읽는 커밋 산출물 로더. 숫자를 계산하지 않고 CSV 를 그대로 올린다 — 데모 수치 = README 수치 = CSV 수치.
 
 여기서 새 통계를 만들면 README 와 두 벌이 된다. 가공은 표시용 정렬·필터·이름 치환까지만.
+Streamlit Cloud 는 push 시 app.py 만 다시 읽고 이 모듈은 캐시된 채 둘 때가 있다(2026-10-29 AttributeError). 로더를 추가하면 이 파일도 바뀌어야 한다.
 """
 from __future__ import annotations
 
