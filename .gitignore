@@ -35,3 +35,6 @@ data/processed/*/round2_pending/
 
 # 개인 포트폴리오 작업 파일 (연락처 포함, 레포 밖)
 portfolio/
+
+# RAG 청크·임베딩 (공고 원문 포함 → 레포 미포함)
+data/processed/rag/*/

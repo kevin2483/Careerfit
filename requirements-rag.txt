@@ -1,0 +1,4 @@
+# RAG(벡터 검색) 전용. CI·데모에는 필요 없다 — torch 포함이라 무겁다. 2026-11-05 설치 기준.
+-r requirements.txt
+sentence-transformers==6.2.0
+numpy==1.26.4
