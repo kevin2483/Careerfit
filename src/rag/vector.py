@@ -53,19 +53,35 @@ def embed(texts: list[str], model: str = DEFAULT_MODEL, kind: str = "passage", b
     return vecs.astype(np.float32)
 
 
-def cache_paths(date: str, model: str) -> tuple[Path, Path]:
-    tag = model.split("/")[-1]
+# ctx_prefix 변형이 임베딩 앞에 붙이는 구역 이름 (원티드 공고의 구역 제목)
+SECTION_LABELS = {"intro": "회사 소개", "main_tasks": "주요업무", "requirements": "자격요건",
+                  "preferred_points": "우대사항", "benefits": "혜택 및 복지"}
+
+
+def ctx_prefix_text(chunk: dict) -> str:
+    """변형 ctx_prefix: "제목 · 회사 · 구역명" 을 청크 앞에 붙인다 (사전 등록 노트의 변형 표).
+    짧은 우대사항 문단이 어느 공고·구역 것인지 임베딩이 알게 하려는 것이다. 판정 화면과 BM25 에는 쓰지 않는다."""
+    head = " · ".join([chunk.get("title", ""), chunk.get("company", ""),
+                       SECTION_LABELS.get(chunk.get("section", ""), chunk.get("section", ""))])
+    return f"{head}\n{chunk['text']}"
+
+
+def cache_paths(date: str, model: str, variant: str = "") -> tuple[Path, Path]:
+    tag = model.split("/")[-1] + (f"__{variant}" if variant else "")
     d = RAG_DIR / date
     return d / f"emb_{tag}.npy", d / f"emb_{tag}.ids.json"
 
 
-def load_or_build(chunks: list[dict], date: str, model: str = DEFAULT_MODEL) -> np.ndarray:
-    npy, ids_path = cache_paths(date, model)
+def load_or_build(chunks: list[dict], date: str, model: str = DEFAULT_MODEL, variant: str = "") -> np.ndarray:
+    """variant="" 는 청크 본문 그대로, "ctx_prefix" 는 ctx_prefix_text() 를 임베딩한다. 캐시 파일이 따로다."""
+    if variant not in ("", "ctx_prefix"):
+        raise ValueError(f"모르는 임베딩 변형: {variant!r}")
+    npy, ids_path = cache_paths(date, model, variant)
     ids = [c["chunk_id"] for c in chunks]
     if npy.exists() and ids_path.exists() and json.loads(ids_path.read_text(encoding="utf-8")) == ids:
         return np.load(npy)
     t0 = time.time()
-    mat = embed([c["text"] for c in chunks], model)
+    mat = embed([ctx_prefix_text(c) if variant else c["text"] for c in chunks], model)
     np.save(npy, mat)
     ids_path.write_text(json.dumps(ids, ensure_ascii=False), encoding="utf-8")
     print(f"[임베딩] {len(ids)}개 · {mat.shape[1]}차원 · {time.time() - t0:.0f}초 → {npy}")

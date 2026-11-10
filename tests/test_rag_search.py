@@ -137,3 +137,28 @@ def test_committed_query_template_is_not_runnable_until_filled():
     else:
         with pytest.raises(SystemExit):
             rag_run.load_queries()
+
+
+# ── 변형·지연 ─────────────────────────────────────────────────────────
+def test_masked_index_combines_base_mask_with_query_filter():
+    from src.rag.filter import MaskedIndex
+    inner = _Fake([0, 1, 2, 3])
+    ix = MaskedIndex(inner, [True, True, False, True])
+    assert [i for i, _ in ix.search("q", 10)] == [0, 1, 3]
+    assert [i for i, _ in ix.search("q", 10, allowed=[False, True, True, True])] == [1, 3]
+
+
+def test_ctx_prefix_text_puts_title_company_section_before_body():
+    pytest.importorskip("numpy")
+    from src.rag.vector import cache_paths, ctx_prefix_text
+    c = {"title": "데이터 엔지니어", "company": "가나다", "section": "preferred_points", "text": "본문"}
+    assert ctx_prefix_text(c) == "데이터 엔지니어 · 가나다 · 우대사항\n본문"
+    assert cache_paths("2026-01-01", "a/b")[0] != cache_paths("2026-01-01", "a/b", "ctx_prefix")[0]   # 캐시가 섞이지 않는다
+
+
+def test_run_method_records_one_timing_per_query():
+    queries = [{"qid": "q01", "type": "A", "question": "Airflow", "filter": {}},
+               {"qid": "q02", "type": "A", "question": "없는단어", "filter": {}}]
+    timings = []
+    rag_run.run_method(BM25([c["text"] for c in CHUNKS]), CHUNKS, queries, timings=timings)
+    assert [t["qid"] for t in timings] == ["q01", "q02"] and all(t["ms"] >= 0 for t in timings)

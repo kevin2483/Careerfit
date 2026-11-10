@@ -196,3 +196,11 @@ def test_cli_output_is_byte_reproducible(tmp_path):
         outs.append((tmp_path / name).read_bytes())
     assert outs[0] == outs[1]
     assert read_jsonl(tmp_path / "j.jsonl")[0].keys() == {"qid", "chunk_id", "relevant"}
+
+
+def test_latency_rows_come_from_recorded_timings_only():
+    runs = _runs()
+    lat = {"bm25": [{"qid": f"q{i}", "ms": float(i)} for i in range(1, 12)]}
+    by = {r["항목"]: r["값"] for r in rag_eval.evaluate(QUERIES, runs, _judgments(runs), b=50, latency=lat)}
+    assert by["bm25 · 검색 지연"] == "중앙값 6ms · p90 10ms"
+    assert "vector · 검색 지연" not in by   # 재지 않은 방식은 지어내지 않는다

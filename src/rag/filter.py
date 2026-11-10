@@ -47,3 +47,15 @@ def allowed_mask(chunks: list[dict], flt: dict | None) -> list[bool] | None:
         return None
     validate(flt)
     return [passes(c, flt) for c in chunks]
+
+
+class MaskedIndex:
+    """색인의 일부만 검색 대상으로 삼는 껍데기. 변형 sec3(3구역만 색인)에 쓴다.
+    벡터 검색에는 코퍼스 통계가 없으므로, 전체 행렬에서 가리는 것과 3구역만 따로 색인하는 것의 결과가 같다."""
+
+    def __init__(self, index, base: list[bool]):
+        self.index, self.base = index, base
+
+    def search(self, query: str, k: int = 10, allowed: list[bool] | None = None) -> list[tuple[int, float]]:
+        mask = self.base if allowed is None else [b and a for b, a in zip(self.base, allowed)]
+        return self.index.search(query, k, allowed=mask)

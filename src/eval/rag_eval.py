@@ -24,10 +24,11 @@ import math
 import random
 from pathlib import Path
 
+from src.common.jsonl import read_jsonl
 from src.common.paths import PROCESSED_DIR
 from src.eval.bootstrap_ci import percentile
 from src.rag.judge import JUDGMENTS_PATH, REJUDGMENTS_PATH, build_pool, load_judgments, load_runs
-from src.rag.run import QUERIES_PATH, RUNS_DIR, TOP_K, load_queries
+from src.rag.run import LATENCY_DIR, QUERIES_PATH, RUNS_DIR, TOP_K, load_queries
 
 METRICS = ["Recall@10", "MRR@10", "nDCG@10", "공고 Recall@10"]
 PRIMARY_PAIRS = [("hybrid", "bm25"), ("hybrid", "vector"), ("ctx_prefix", "vector"),
@@ -58,7 +59,7 @@ def _ci(xs: list[float]) -> tuple[float, float]:
 
 
 def evaluate(queries: list[dict], runs: dict[str, list[dict]], judgments: dict, rejudgments: dict | None = None,
-             b: int = 10_000, seed: int = 42) -> list[dict]:
+             b: int = 10_000, seed: int = 42, latency: dict[str, list[dict]] | None = None) -> list[dict]:
     """rag_comparison.csv 의 행(항목·값·근거)을 만든다."""
     pool = build_pool(runs)
     pairs = [(q, c) for q, ids in pool.items() for c in ids]
@@ -143,6 +144,12 @@ def evaluate(queries: list[dict], runs: dict[str, list[dict]], judgments: dict, 
         value = f"중앙값 {_fmt(percentile(xs, 0.5))} (최소 {_fmt(xs[0])}, 최대 {_fmt(xs[-1])})" if xs else "결과 없음"
         add(f"{m} · D 유형 상위 1 점수", value, f"D 질문 {len(d_q)}개 중 결과가 있는 {len(xs)}개. 임계값 거절은 범위 밖")
 
+    for m in runs:
+        ms = [t["ms"] for t in (latency or {}).get(m, [])]
+        if ms:
+            add(f"{m} · 검색 지연", f"중앙값 {percentile(ms, 0.5):.0f}ms · p90 {percentile(ms, 0.9):.0f}ms",
+                f"질문 {len(ms)}개 각 1회, 예열 1건 뒤, 질의 임베딩 포함, 로컬 측정. 목표 p90 1000ms")
+
     high = [f"{m} {metric}" for (m, metric), v in point.items() if v >= SUSPICIOUS]
     if high:
         print(f"[경고] 지표가 {SUSPICIOUS} 이상: {high} — 질문 누수·판정 편향을 먼저 확인할 것 (CLAUDE.md ⑤)")
@@ -155,6 +162,7 @@ def main(argv: list[str] | None = None) -> None:
     ap.add_argument("--runs-dir", default=str(RUNS_DIR))
     ap.add_argument("--judgments", default=str(JUDGMENTS_PATH))
     ap.add_argument("--rejudgments", default=str(REJUDGMENTS_PATH))
+    ap.add_argument("--latency-dir", default=str(LATENCY_DIR))
     ap.add_argument("--b", type=int, default=10_000)
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--out", default=str(PROCESSED_DIR / "rag_comparison.csv"))
@@ -162,8 +170,11 @@ def main(argv: list[str] | None = None) -> None:
 
     if not Path(a.judgments).exists():
         raise SystemExit(f"[중단] 판정 파일 없음: {a.judgments}")
-    rows = evaluate(load_queries(a.queries), load_runs(a.runs_dir), load_judgments(a.judgments),
-                    load_judgments(a.rejudgments), a.b, a.seed)
+    runs = load_runs(a.runs_dir)
+    latency = {m: read_jsonl(Path(a.latency_dir) / f"{m}.jsonl") for m in runs
+               if (Path(a.latency_dir) / f"{m}.jsonl").exists()}
+    rows = evaluate(load_queries(a.queries), runs, load_judgments(a.judgments),
+                    load_judgments(a.rejudgments), a.b, a.seed, latency)
     out = Path(a.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     with out.open("w", newline="", encoding="utf-8-sig") as fh:

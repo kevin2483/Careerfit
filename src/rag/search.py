@@ -13,6 +13,8 @@ from src.common.paths import resolve_date
 from src.rag.bm25 import BM25
 from src.rag.chunk import RAG_DIR
 
+SEC3 = {"main_tasks", "requirements", "preferred_points"}   # 추출 단계가 보는 3구역과 같다
+
 
 def load_chunks(date: str) -> list[dict]:
     path = RAG_DIR / date / "chunks.jsonl"
@@ -28,6 +30,12 @@ def build(method: str, chunks: list[dict], date: str):
     if method == "vector":
         from src.rag.vector import VectorIndex, load_or_build
         return VectorIndex(load_or_build(chunks, date))
+    if method == "ctx_prefix":   # 변형: 제목·회사·구역명을 붙여 임베딩 (vector 에서 이것만 바꾼다)
+        from src.rag.vector import VectorIndex, load_or_build
+        return VectorIndex(load_or_build(chunks, date, variant="ctx_prefix"))
+    if method == "sec3":         # 변형: intro·benefits 를 빼고 3구역만 (vector 에서 이것만 바꾼다)
+        from src.rag.filter import MaskedIndex
+        return MaskedIndex(build("vector", chunks, date), [c["section"] in SEC3 for c in chunks])
     if method == "hybrid":
         from src.rag.hybrid import HybridIndex
         return HybridIndex(build("bm25", chunks, date), build("vector", chunks, date))
