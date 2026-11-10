@@ -10,6 +10,7 @@ data/labeled/*.jsonl
 !data/labeled/pool_candidates_round2.jsonl
 !data/labeled/rag_queries.jsonl
 !data/labeled/rag_judgments.jsonl
+!data/labeled/rag_rejudgments.jsonl
 *.bak_*
 
 # 이력서·공고 본문 덤프 (레포에 넣지 않는다)
