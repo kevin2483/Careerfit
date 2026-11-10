@@ -58,9 +58,11 @@ def test_pool_is_union_without_method_info_and_order_is_stable():
     assert all(isinstance(c, str) for ids in pool.values() for c in ids)   # 방식·순위·점수가 따라오지 않는다
 
 
-def test_pool_ignores_ranks_beyond_top_k():
-    runs = {"bm25": [{"qid": "q1", "rank": r, "chunk_id": f"{r}:a:0", "score": 0.0} for r in range(1, 13)]}
-    assert len(judge.build_pool(runs)["q1"]) == 10
+def test_pool_depth_is_five_and_three_for_d_questions():
+    runs = {"bm25": [{"qid": q, "rank": r, "chunk_id": f"{r}:a:0", "score": 0.0} for q in ("q1", "q4") for r in range(1, 11)]}
+    assert len(judge.build_pool(runs)["q1"]) == 5
+    pool = judge.build_pool(runs, depths=judge.depth_by_qid(QUERIES))
+    assert len(pool["q1"]) == 5 and len(pool["q4"]) == 3      # q4 는 D 유형 (부록 A7)
 
 
 # ── y/n 강제 ──────────────────────────────────────────────────────────
@@ -120,19 +122,24 @@ def test_bad_judgment_value_is_rejected(tmp_path):
 # ── 지표 ──────────────────────────────────────────────────────────────
 def test_query_metrics_by_hand():
     m = rag_eval.query_metrics(["x:a:0", "1:a:0", "1:b:0"], {"1:a:0", "1:b:0", "2:a:0"})
-    assert m["Recall@10"] == pytest.approx(2 / 3)
-    assert m["MRR@10"] == pytest.approx(1 / 2)
+    assert m["Recall@5"] == pytest.approx(2 / 3)
+    assert m["MRR@5"] == pytest.approx(1 / 2)
     dcg = 1 / math.log2(3) + 1 / math.log2(4)
     idcg = 1 / math.log2(2) + 1 / math.log2(3) + 1 / math.log2(4)
-    assert m["nDCG@10"] == pytest.approx(dcg / idcg)
-    assert m["공고 Recall@10"] == pytest.approx(1 / 2)   # 공고 1 은 찾았고 2 는 못 찾음
+    assert m["nDCG@5"] == pytest.approx(dcg / idcg)
+    assert m["공고 Recall@5"] == pytest.approx(1 / 2)   # 공고 1 은 찾았고 2 는 못 찾음
 
 
-def test_ndcg_ideal_is_capped_at_ten_when_more_relevant_than_k():
-    rel = {f"{i}:a:0" for i in range(15)}
+def test_ndcg_ideal_is_capped_at_k_when_more_relevant_than_k():
+    rel = {f"{i}:a:0" for i in range(8)}
     m = rag_eval.query_metrics([f"{i}:a:0" for i in range(10)], rel)
-    assert m["nDCG@10"] == pytest.approx(1.0)       # 상위 10 이 전부 정답이면 1
-    assert m["Recall@10"] == pytest.approx(10 / 15)  # Recall 은 상한이 1 미만 — nDCG 를 같이 보는 이유
+    assert m["nDCG@5"] == pytest.approx(1.0)       # 상위 5 가 전부 정답이면 1
+    assert m["Recall@5"] == pytest.approx(5 / 8)   # Recall 은 상한이 1 미만 — nDCG 를 같이 보는 이유
+
+
+def test_ranks_beyond_judged_depth_do_not_count():
+    m = rag_eval.query_metrics(["x1", "x2", "x3", "x4", "x5", "1:a:0"], {"1:a:0"})
+    assert m["Recall@5"] == 0.0 and m["MRR@5"] == 0.0   # 6위는 판정 범위 밖
 
 
 def test_unjudged_chunk_stops_evaluation():
@@ -151,8 +158,8 @@ def test_evaluate_rows_have_three_columns_and_expected_values():
     assert by["평가 질문 수 (A~C, 풀 안 정답 ≥1)"] == "2"
     assert by["정답 0개라 제외한 A~C 질문"] == "1"
     assert by["D 유형 중 정답이 발견된 질문"] == "0 / 1"
-    assert by["bm25 · Recall@10"].startswith("1.000")          # good: q1 2/2, q2 1/1
-    assert by["vector · Recall@10"].startswith("0.250")        # bad:  q1 1/2, q2 0/1
+    assert by["bm25 · Recall@5"].startswith("1.000")          # good: q1 2/2, q2 1/1
+    assert by["vector · Recall@5"].startswith("0.250")        # bad:  q1 1/2, q2 0/1
     assert by["자기 일치율 (재판정)"] == "미실시"
     assert "hybrid_rerank · D 유형 상위 1 점수" not in by       # 순위 기반 점수는 보고하지 않는다
 
@@ -160,17 +167,17 @@ def test_evaluate_rows_have_three_columns_and_expected_values():
 def test_only_primary_pairs_get_a_verdict():
     runs = _runs()
     by = {r["항목"]: r["값"] for r in rag_eval.evaluate(QUERIES, runs, _judgments(runs), b=200)}
-    primary = by["hybrid − vector · Recall@10"]
+    primary = by["hybrid − vector · Recall@5"]
     assert primary.endswith("확정") or primary.endswith("확정 불가")
-    assert by["bm25 − sec3 · Recall@10"].endswith("참고 (판정 안 함)")
-    assert sum(k.endswith("· Recall@10") and "−" in k and not v.endswith("참고 (판정 안 함)")
+    assert by["bm25 − sec3 · Recall@5"].endswith("참고 (판정 안 함)")
+    assert sum(k.endswith("· Recall@5") and "−" in k and not v.endswith("참고 (판정 안 함)")
                for k, v in by.items()) == len(rag_eval.PRIMARY_PAIRS)
 
 
 def test_identical_methods_are_not_confirmed():
     runs = _runs()   # bm25 와 hybrid 는 같은 순위 → 차이 0, CI [0, 0]
     by = {r["항목"]: r["값"] for r in rag_eval.evaluate(QUERIES, runs, _judgments(runs), b=200)}
-    assert by["hybrid − bm25 · Recall@10"].endswith("확정 불가")
+    assert by["hybrid − bm25 · Recall@5"].endswith("확정 불가")
 
 
 def test_self_agreement_uses_rejudgments_but_scores_use_first_pass():
@@ -179,7 +186,7 @@ def test_self_agreement_uses_rejudgments_but_scores_use_first_pass():
     rej = {("q1", "1:a:0"): True, ("q1", "2:a:0"): False}
     by = {r["항목"]: r["값"] for r in rag_eval.evaluate(QUERIES, runs, j, rej, b=50)}
     assert by["자기 일치율 (재판정)"] == "0.500"
-    assert by["bm25 · Recall@10"].startswith("1.000")
+    assert by["bm25 · Recall@5"].startswith("1.000")
 
 
 def test_cli_output_is_byte_reproducible(tmp_path):

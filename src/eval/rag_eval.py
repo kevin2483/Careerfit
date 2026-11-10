@@ -6,13 +6,14 @@
 산출: data/processed/rag_comparison.csv  (항목 · 값 · 근거)
 
 정의 (notes/rag_experiment_2026-11-05.md 본문 + 부록 A3, 실행 전 고정):
-  - Recall@10 (주 지표) = 상위 10 안의 정답 청크 수 / 풀 안 정답 청크 수. 풀 밖 정답은 모른다.
-  - MRR@10 = 1 / 첫 정답 순위 (상위 10 에 없으면 0).  nDCG@10 = 이진 이득, 이상 순위는 min(정답 수, 10) 개가 앞에.
-  - 공고 단위 Recall@10 = 정답 청크가 속한 공고 중 상위 10 에 하나라도 나온 공고 비율.
+  - 깊이 k = 5 (부록 A7: 판정 부담으로 10 에서 줄임. D 유형은 상위 3 만 판정).
+  - Recall@k (주 지표) = 상위 k 안의 정답 청크 수 / 풀 안 정답 청크 수. 풀 밖 정답은 모른다.
+  - MRR@k = 1 / 첫 정답 순위 (상위 k 에 없으면 0).  nDCG@k = 이진 이득, 이상 순위는 min(정답 수, k) 개가 앞에.
+  - 공고 단위 Recall@k = 정답 청크가 속한 공고 중 상위 k 에 하나라도 나온 공고 비율.
   - A~C 인데 풀 안 정답이 0 개인 질문은 평균에서 빼고 수를 적는다. D 는 넣지 않고 상위 1 점수 분포만 낸다.
   - 차이는 질문 단위 부트스트랩(B=10,000, seed 42)의 짝지은 95% CI. 0 을 포함하면 "확정 불가".
     주 비교 5쌍만 판정하고 나머지 쌍은 참고로만 싣는다.
-  - 상위 10 에 미판정 청크가 하나라도 있으면 수치를 내지 않고 멈춘다. 미판정을 오답으로 치지 않는다.
+  - 판정 범위 안에 미판정 청크가 하나라도 있으면 수치를 내지 않고 멈춘다. 미판정을 오답으로 치지 않는다.
 
     python -m src.eval.rag_eval
 """
@@ -27,17 +28,22 @@ from pathlib import Path
 from src.common.jsonl import read_jsonl
 from src.common.paths import PROCESSED_DIR
 from src.eval.bootstrap_ci import percentile
-from src.rag.judge import JUDGMENTS_PATH, REJUDGMENTS_PATH, build_pool, load_judgments, load_runs
-from src.rag.run import LATENCY_DIR, QUERIES_PATH, RUNS_DIR, TOP_K, load_queries
+from src.rag.judge import JUDGMENTS_PATH, REJUDGMENTS_PATH, build_pool, depth_by_qid, load_judgments, load_runs
+from src.rag.run import JUDGE_K, JUDGE_K_D, LATENCY_DIR, QUERIES_PATH, RUNS_DIR, load_queries
 
-METRICS = ["Recall@10", "MRR@10", "nDCG@10", "공고 Recall@10"]
+
+def metric_names(k: int = JUDGE_K) -> list[str]:
+    return [f"Recall@{k}", f"MRR@{k}", f"nDCG@{k}", f"공고 Recall@{k}"]
+
+
+METRICS = metric_names()
 PRIMARY_PAIRS = [("hybrid", "bm25"), ("hybrid", "vector"), ("ctx_prefix", "vector"),
                  ("sec3", "vector"), ("hybrid_rerank", "hybrid")]
 SCORE_METHODS = ["bm25", "vector", "ctx_prefix", "sec3"]   # RRF·리랭커 점수는 질문 간 비교가 안 된다
 SUSPICIOUS = 0.98   # CLAUDE.md ⑤: 비정상적으로 높은 지표는 누수를 의심
 
 
-def query_metrics(ranked: list[str], relevant: set[str], k: int = TOP_K) -> dict[str, float]:
+def query_metrics(ranked: list[str], relevant: set[str], k: int = JUDGE_K) -> dict[str, float]:
     """ranked: 1위부터의 chunk_id. relevant: 풀 안 정답 chunk_id (비어 있으면 호출하지 않는다)."""
     top = ranked[:k]
     hits = [c in relevant for c in top]
@@ -46,8 +52,9 @@ def query_metrics(ranked: list[str], relevant: set[str], k: int = TOP_K) -> dict
     idcg = sum(1 / math.log2(i + 1) for i in range(1, min(len(relevant), k) + 1))
     job = lambda c: c.split(":", 1)[0]   # noqa: E731  chunk_id = "<job_id>:<구역>:<번호>"
     rel_jobs = {job(c) for c in relevant}
-    return {"Recall@10": sum(hits) / len(relevant), "MRR@10": 1 / first if first else 0.0,
-            "nDCG@10": dcg / idcg, "공고 Recall@10": len({job(c) for c in top} & rel_jobs) / len(rel_jobs)}
+    values = [sum(hits) / len(relevant), 1 / first if first else 0.0, dcg / idcg,
+              len({job(c) for c in top} & rel_jobs) / len(rel_jobs)]
+    return dict(zip(metric_names(k), values))
 
 
 def _fmt(x: float) -> str:
@@ -61,11 +68,11 @@ def _ci(xs: list[float]) -> tuple[float, float]:
 def evaluate(queries: list[dict], runs: dict[str, list[dict]], judgments: dict, rejudgments: dict | None = None,
              b: int = 10_000, seed: int = 42, latency: dict[str, list[dict]] | None = None) -> list[dict]:
     """rag_comparison.csv 의 행(항목·값·근거)을 만든다."""
-    pool = build_pool(runs)
+    pool = build_pool(runs, depths=depth_by_qid(queries))
     pairs = [(q, c) for q, ids in pool.items() for c in ids]
     unjudged = [p for p in pairs if p not in judgments]
     if unjudged:
-        raise SystemExit(f"[중단] 상위 {TOP_K} 안에 미판정 청크 {len(unjudged)}건 (예: {unjudged[:3]}). "
+        raise SystemExit(f"[중단] 판정 범위(상위 {JUDGE_K}, D 는 {JUDGE_K_D}) 안에 미판정 청크 {len(unjudged)}건 (예: {unjudged[:3]}). "
                          "판정을 끝낸 뒤 평가한다. 미판정을 오답으로 치지 않는다.")
     known = {q["qid"] for q in queries}
     stray = sorted({q for q, _c in pairs} - known)
@@ -97,7 +104,7 @@ def evaluate(queries: list[dict], runs: dict[str, list[dict]], judgments: dict, 
         f"{t} {sum(q['type'] == t for q in queries)}" for t in "ABCD"))
     add("평가 질문 수 (A~C, 풀 안 정답 ≥1)", str(n), "Recall·MRR·nDCG 의 분모")
     add("정답 0개라 제외한 A~C 질문", str(len(no_gold)), ", ".join(no_gold) or "없음")
-    add("판정 풀", f"{len(pairs)}건", f"{len(runs)}개 방식 상위 {TOP_K} 합집합, 질문 {len(pool)}개")
+    add("판정 풀", f"{len(pairs)}건", f"{len(runs)}개 방식 상위 {JUDGE_K}(D 유형은 {JUDGE_K_D}) 합집합, 질문 {len(pool)}개")
     add("풀 안 정답 비율", _fmt(n_rel / len(pairs)), f"정답 {n_rel} / 판정 {len(pairs)}")
     if rejudgments:
         both = [p for p in rejudgments if p in judgments]
@@ -136,7 +143,8 @@ def evaluate(queries: list[dict], runs: dict[str, list[dict]], judgments: dict, 
                 ("주 비교, " if primary else "사전 등록한 주 비교가 아님, ") + f"같은 리샘플의 짝지은 차이 (질문 {n}개, B={b})")
 
     d_found = [q for q in d_q if relevant[q]]
-    add("D 유형 중 정답이 발견된 질문", f"{len(d_found)} / {len(d_q)}", ", ".join(d_found) or "없음")
+    add("D 유형 중 정답이 발견된 질문", f"{len(d_found)} / {len(d_q)}",
+        (", ".join(d_found) or "없음") + f" (방식별 상위 {JUDGE_K_D} 만 판정)")
     for m in SCORE_METHODS:
         if m not in runs:
             continue

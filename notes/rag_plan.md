@@ -26,7 +26,7 @@ CareerFit 에 RAG 검색 기능을 이어서 구현한다. 처음부터 다시 �
 | 3. 실행 기록 (`src/rag/run.py`) | 코드·테스트 완료, 실제 질문 실행 전 | 빈 질문·덮어쓰기 거부 |
 | 2~4. bm25 · vector · hybrid · sec3 · ctx_prefix 실행 | 완료 (각 1회, 2026-11-10) | `data/processed/rag_runs/` 5개 × 300행. 풀 924건(5개 방식 기준). 지연 p90: bm25 13ms · vector 236ms · hybrid 245ms · sec3 239ms · ctx_prefix 298ms (`rag_latency/`) |
 | 5. 리랭커 (bge-reranker-v2-m3) | 완료 (1회, 2026-11-10) | 노트 부록 A6. 지연 중앙값 4.9초 · p90 6.1초로 목표(1초) 초과 (스왑이 걸린 상태에서 잰 값). 실행 중 시스템 여유 메모리 최저 10%, 프로세스 최대 RSS 1.08GB |
-| 6. 판정 | **사용자 판정 대기** | 풀 934건 (6개 방식), 재판정 표본 94건. `python -m src.rag.judge` |
+| 6. 판정 | **사용자 판정 대기** | 풀 493건 (상위 5, D 는 상위 3 — 노트 부록 A7. 상위 10 기준 934건에서 축소), 재판정 표본 50건. `python -m src.rag.judge` |
 | 7. 평가 (`src/eval/rag_eval.py`, `make rag-eval`) | 코드·테스트 완료, 실제 수치 없음 | 판정 파일 커밋 뒤 reproduce·check 에 추가 |
 | 8~9 | 미착수 | |
 
@@ -39,7 +39,7 @@ CareerFit 에 RAG 검색 기능을 이어서 구현한다. 처음부터 다시 �
 6. **판정 도구와 판정** — 6개 방식 상위 10 합집합을 방식 이름을 가리고 섞어, 기본값 없이 한 건씩 y/n 을 강제하는 CLI
    (`src/label/pool_cli.py` 구조 참고, 엔터 넘기기·일괄 처리 금지). 결과 `data/labeled/rag_judgments.jsonl`. 10% 재판정으로 자기 일치율.
    판정은 내가 한다. 도구는 1~3 단계와 함께 미리 만들어도 되지만 실행은 5단계가 끝난 뒤 한 번.
-7. **평가** — Recall@10(주), MRR@10, nDCG@10, 공고 단위 Recall@10. D 유형은 상위 1 점수 분포만. 주 비교 5쌍의 짝지은 부트스트랩 CI
+7. **평가** — Recall@5(주), MRR@5, nDCG@5, 공고 단위 Recall@5 (부록 A7 에서 @10 → @5). D 유형은 상위 1 점수 분포만. 주 비교 5쌍의 짝지은 부트스트랩 CI
    (`src/eval/bootstrap_ci.py` 방식). `data/processed/rag_comparison.csv` (항목·값·근거). `make reproduce`·CI 에 추가(커밋된 runs·judgments 만 읽게).
    미판정 청크가 있으면 중단.
 8. **생성** — 별도 사전 등록 문서를 먼저 쓴다. 검색된 청크만으로 답하고, 답을 주장 단위로 나눠 근거 청크에 있는지 검사.

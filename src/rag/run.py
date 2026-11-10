@@ -28,7 +28,9 @@ QUERIES_PATH = LABELED_DIR / "rag_queries.jsonl"
 RUNS_DIR = PROCESSED_DIR / "rag_runs"
 LATENCY_DIR = PROCESSED_DIR / "rag_latency"   # 방식별 질문당 검색 시간. 실행 기록과 같은 1회 실행에서 잰다
 WARMUP_QUERY = "예열"                          # 첫 호출의 모델 초기화 시간을 측정에서 빼기 위한 질의 (질문 세트 밖)
-TOP_K = 10
+TOP_K = 10      # 실행 기록에 남기는 깊이
+JUDGE_K = 5     # 판정·평가하는 깊이 (A~C). 934건 → 493건으로 줄이려고 낮췄다 (사전 등록 부록 A7)
+JUDGE_K_D = 3   # D 유형은 "정답이 발견됐는가"만 보므로 상위 3
 QUERY_TYPES = {"A", "B", "C", "D"}
 # 사전 등록 부록 A4 의 비교 대상 6개. 판정 풀과 평가는 이 여섯의 실행 기록이 모두 있어야 시작한다.
 METHODS = ["bm25", "vector", "hybrid", "hybrid_rerank", "ctx_prefix", "sec3"]

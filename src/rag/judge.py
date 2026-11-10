@@ -2,7 +2,7 @@
 검색 결과 판정 — 블라인드 풀링, 한 건씩 y/n 강제.
 
 무엇을 하나:
-  여섯 방식의 상위 10 을 질문별로 합쳐(풀링), 어느 방식이 냈는지 감추고, 질문 안에서 순서를 섞어
+  여섯 방식의 상위 5(D 유형은 상위 3)를 질문별로 합쳐(풀링), 어느 방식이 냈는지 감추고, 질문 안에서 순서를 섞어
   "이 문단이 질문 조건을 직접 담고 있나"를 한 건씩 묻는다. 결과는 (qid, chunk_id, relevant).
 
 지키는 것 (notes/rag_experiment_2026-11-05.md 부록 A1):
@@ -26,7 +26,7 @@ from pathlib import Path
 
 from src.common.jsonl import read_jsonl, write_jsonl
 from src.common.paths import LABELED_DIR, resolve_date
-from src.rag.run import METHODS, QUERIES_PATH, RUNS_DIR, TOP_K, load_queries
+from src.rag.run import JUDGE_K, JUDGE_K_D, METHODS, QUERIES_PATH, RUNS_DIR, load_queries
 
 JUDGMENTS_PATH = LABELED_DIR / "rag_judgments.jsonl"
 REJUDGMENTS_PATH = LABELED_DIR / "rag_rejudgments.jsonl"
@@ -42,12 +42,18 @@ def load_runs(runs_dir: str | Path = RUNS_DIR, methods: list[str] = METHODS) -> 
     return {m: read_jsonl(Path(runs_dir) / f"{m}.jsonl") for m in methods}
 
 
-def build_pool(runs: dict[str, list[dict]], k: int = TOP_K) -> dict[str, list[str]]:
-    """질문별 후보 청크. 방식 정보는 버리고, 고정 시드로 섞어 순서가 힌트가 되지 않게 한다 (재개해도 순서가 같다)."""
+def depth_by_qid(queries) -> dict[str, int]:
+    """질문별 판정 깊이: D 유형은 JUDGE_K_D, 나머지는 JUDGE_K (부록 A7)."""
+    return {q["qid"]: JUDGE_K_D if q["type"] == "D" else JUDGE_K for q in queries}
+
+
+def build_pool(runs: dict[str, list[dict]], k: int = JUDGE_K, depths: dict[str, int] | None = None) -> dict[str, list[str]]:
+    """질문별 후보 청크. 방식 정보는 버리고, 고정 시드로 섞어 순서가 힌트가 되지 않게 한다 (재개해도 순서가 같다).
+    depths 가 있으면 질문마다 그 깊이까지, 없으면 k 까지 모은다."""
     pool: dict[str, set[str]] = {}
     for rows in runs.values():
         for r in rows:
-            if r["rank"] <= k:
+            if r["rank"] <= (depths or {}).get(r["qid"], k):
                 pool.setdefault(r["qid"], set()).add(r["chunk_id"])
     out: dict[str, list[str]] = {}
     for qid in sorted(pool):
@@ -133,7 +139,7 @@ def main(argv: list[str] | None = None) -> None:
     args = ap.parse_args(argv)
 
     queries = {q["qid"]: q for q in load_queries(args.queries)}
-    pool = build_pool(load_runs(args.runs_dir))
+    pool = build_pool(load_runs(args.runs_dir), depths=depth_by_qid(queries.values()))
     pairs = [(qid, cid) for qid, ids in pool.items() for cid in ids]
     first = load_judgments(args.out)
     left = [p for p in pairs if p not in first]
