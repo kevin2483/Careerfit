@@ -1,0 +1,30 @@
+{"qid": "q01", "type": "A", "question": "파이썬을 메인으로 쓰며 자바를 쓰지 않는 회사", "filter": {}}
+{"qid": "q02", "type": "A", "question": "PySpark를 활용한 대규모 데이터 처리 경험을 요구하는 곳", "filter": {}}
+{"qid": "q03", "type": "A", "question": "RAG 아키텍처 구축 경험을 우대하는 곳", "filter": {}}
+{"qid": "q04", "type": "A", "question": "PyTorch 기반의 머신러닝 모델링 경험을 요구하는 곳", "filter": {}}
+{"qid": "q05", "type": "A", "question": "FastAPI를 활용한 AI 서비스 백엔드 개발 경험이 있는 곳", "filter": {}}
+{"qid": "q06", "type": "A", "question": "데이터베이스(PostgreSQL, MySQL 등)와 SQL 튜닝 경험을 요구하는 곳", "filter": {}}
+{"qid": "q07", "type": "A", "question": "AWS 또는 GCP 클라우드 환경에서 AI 인프라를 운영하는 곳", "filter": {}}
+{"qid": "q08", "type": "A", "question": "에어플로우(Airflow) 등 스케줄링 도구를 활용한 파이프라인 자동화 경험을 요구하는 곳", "filter": {}}
+{"qid": "q09", "type": "B", "question": "대규모 데이터 수집 및 정제 파이프라인을 직접 구축하고 운영하는 곳", "filter": {}}
+{"qid": "q10", "type": "B", "question": "데이터 품질 검증 및 이상치 탐지 프로세스를 담당하는 팀", "filter": {}}
+{"qid": "q11", "type": "B", "question": "학습된 모델을 실제 프로덕션 환경에 안정적으로 배포하고 서빙하는 업무", "filter": {}}
+{"qid": "q12", "type": "B", "question": "다양한 모델의 성능 비교 실험을 설계하고 결과를 리포팅하는 업무", "filter": {}}
+{"qid": "q13", "type": "B", "question": "프로덕션 환경에서 발생한 데이터 파이프라인 장애 대응을 맡는 곳", "filter": {}}
+{"qid": "q14", "type": "B", "question": "복잡한 비즈니스 문제를 데이터 분석으로 해결한 경험을 중요시하는 회사", "filter": {}}
+{"qid": "q15", "type": "B", "question": "최신 AI 논문을 읽고 실무에 빠르게 적용하는 문화를 가진 곳", "filter": {}}
+{"qid": "q16", "type": "B", "question": "프로덕트 매니저 및 비즈니스 팀과 긴밀하게 협업하는 회사", "filter": {}}
+{"qid": "q17", "type": "B", "question": "데이터 분석 결과를 비기술 직군에게 설득하는 커뮤니케이션을 중시하는 곳", "filter": {}}
+{"qid": "q18", "type": "B", "question": "대용량 데이터 처리 경험이 있는 것을 우대하는 회사", "filter": {}}
+{"qid": "q19", "type": "C", "question": "완전한 원격(Fully Remote) 근무를 공식 허용하는 곳", "filter": {}}
+{"qid": "q20", "type": "C", "question": "신규 입사자에게 전담 시니어 사수를 1:1로 매칭해 주는 곳", "filter": {"annual_max": 0}}
+{"qid": "q21", "type": "C", "question": "직무 관련 공부와 성장을 적극 지원하는 곳", "filter": {}}
+{"qid": "q22", "type": "C", "question": "식대나 점심 쿠폰을 별도로 지원하는 회사", "filter": {}}
+{"qid": "q23", "type": "C", "question": "자율 출퇴근 제도나 유연근무제가 정착된 곳", "filter": {}}
+{"qid": "q24", "type": "C", "question": "랩톱 및 개발 장비를 자유롭게 선택할 수 있는 예산을 지원하는 회사", "filter": {}}
+{"qid": "q25", "type": "D", "question": "신입 사원에게 초봉으로 15만 달러 이상을 보장하는 곳", "filter": {}}
+{"qid": "q26", "type": "D", "question": "근무지가 미국 현지인 곳", "filter": {}}
+{"qid": "q27", "type": "D", "question": "H-1B 비자 스폰서십을 지원하는 회사", "filter": {}}
+{"qid": "q28", "type": "D", "question": "단기적인 기능 구현보다 모델의 장기적인 성능 개선을 우선시하는 팀", "filter": {}}
+{"qid": "q29", "type": "D", "question": "사내에 문서화된 데이터 아키텍처나 파이프라인 명세서가 아예 존재하지 않는 곳", "filter": {}}
+{"qid": "q30", "type": "D", "question": "데이터 직군임에도 비즈니스 의사결정에서 철저히 배제된 채 단순 쿼리 추출만 반복하는 팀", "filter": {}}
