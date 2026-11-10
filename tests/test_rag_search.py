@@ -162,3 +162,30 @@ def test_run_method_records_one_timing_per_query():
     timings = []
     rag_run.run_method(BM25([c["text"] for c in CHUNKS]), CHUNKS, queries, timings=timings)
     assert [t["qid"] for t in timings] == ["q01", "q02"] and all(t["ms"] >= 0 for t in timings)
+
+
+# ── 리랭커 (가짜 채점기 — 모델을 내려받지 않는다) ─────────────────────
+def test_rerank_reorders_base_top_depth_and_breaks_ties_by_base_rank():
+    from src.rag.rerank import RerankIndex
+    base = _Fake([3, 2, 1, 0])
+    scorer = lambda q, texts: [1.0 if "Spark" in t else 0.5 for t in texts]   # noqa: E731
+    ix = RerankIndex(base, CHUNKS, scorer=scorer, depth=3)
+    assert [i for i, _ in ix.search("q", 2)] == [1, 3]     # 1 이 점수 1위, 3 과 2 는 동점 → base 순위가 앞선 3
+    assert base.calls == [(3, None)]                        # 리랭커는 상위 depth 만 본다
+
+
+def test_rerank_passes_filter_and_scores_body_text_only():
+    from src.rag.rerank import RerankIndex
+    seen = []
+    scorer = lambda q, texts: (seen.extend(texts), [0.0] * len(texts))[1]   # noqa: E731
+    mask = [True, False, False, True]
+    out = RerankIndex(_Fake([0, 1, 2, 3]), CHUNKS, scorer=scorer).search("q", 10, allowed=mask)
+    assert [i for i, _ in out] == [0, 3]
+    assert seen == [CHUNKS[0]["text"], CHUNKS[3]["text"]]
+
+
+def test_rerank_stops_on_nan_scores():
+    from src.rag.rerank import RerankIndex
+    ix = RerankIndex(_Fake([0, 1]), CHUNKS, scorer=lambda q, t: [float("nan"), 0.1])
+    with pytest.raises(SystemExit, match="NaN"):
+        ix.search("q", 2)

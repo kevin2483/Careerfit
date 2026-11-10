@@ -39,6 +39,9 @@ def build(method: str, chunks: list[dict], date: str):
     if method == "hybrid":
         from src.rag.hybrid import HybridIndex
         return HybridIndex(build("bm25", chunks, date), build("vector", chunks, date))
+    if method == "hybrid_rerank":
+        from src.rag.rerank import RerankIndex
+        return RerankIndex(build("hybrid", chunks, date), chunks)
     raise SystemExit(f"[중단] 아직 없는 방식: {method}")
 
 
