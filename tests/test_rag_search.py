@@ -1,10 +1,8 @@
 """필터·hybrid·실행 기록 — 합성 데이터만 쓴다 (실제 질문·임베딩 모델 없이 돈다)."""
-import numpy as np
 import pytest
 
 from src.common.jsonl import read_jsonl, write_jsonl
 from src.rag import run as rag_run
-from src.rag import vector
 from src.rag.bm25 import BM25
 from src.rag.filter import allowed_mask, validate
 from src.rag.hybrid import HybridIndex, rrf
@@ -54,6 +52,8 @@ def test_bm25_filter_cuts_before_top_k_and_keeps_corpus_stats():
 
 
 def test_vector_filter_cuts_before_top_k(monkeypatch):
+    np = pytest.importorskip("numpy")   # numpy 는 requirements-rag.txt 에만 있다 (CI 는 건너뜀)
+    from src.rag import vector
     mat = np.array([[1.0, 0.0], [0.9, 0.1], [0.8, 0.2], [0.0, 1.0]], dtype=np.float32)
     monkeypatch.setattr(vector, "embed", lambda texts, model, kind="passage": np.array([[1.0, 0.0]], dtype=np.float32))
     ix = vector.VectorIndex(mat)

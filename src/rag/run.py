@@ -27,6 +27,8 @@ QUERIES_PATH = LABELED_DIR / "rag_queries.jsonl"
 RUNS_DIR = PROCESSED_DIR / "rag_runs"
 TOP_K = 10
 QUERY_TYPES = {"A", "B", "C", "D"}
+# 사전 등록 부록 A4 의 비교 대상 6개. 판정 풀과 평가는 이 여섯의 실행 기록이 모두 있어야 시작한다.
+METHODS = ["bm25", "vector", "hybrid", "hybrid_rerank", "ctx_prefix", "sec3"]
 
 
 def load_queries(path: str | Path = QUERIES_PATH) -> list[dict]:
