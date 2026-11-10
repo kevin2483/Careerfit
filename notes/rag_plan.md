@@ -24,7 +24,8 @@ CareerFit 에 RAG 검색 기능을 이어서 구현한다. 처음부터 다시 �
 | 1. 필터 (annual_from 메타데이터, `src/rag/filter.py`) | 완료 | 2026-11-10. 신입 필터 통과 683/4,573 청크 (공고 892 중 신입 133 · 미기재 41 제외 · 경력 718) |
 | 2. hybrid (`src/rag/hybrid.py`) | 코드·테스트 완료, 실제 질문 실행 전 | 2026-11-10 |
 | 3. 실행 기록 (`src/rag/run.py`) | 코드·테스트 완료, 실제 질문 실행 전 | 빈 질문·덮어쓰기 거부 |
-| 4. 변형 · 5. 리랭커 | 미착수 | 질문 30개 커밋 뒤 |
+| 2~4. bm25 · vector · hybrid · sec3 · ctx_prefix 실행 | 완료 (각 1회, 2026-11-10) | `data/processed/rag_runs/` 5개 × 300행. 풀 924건(5개 방식 기준). 지연 p90: bm25 13ms · vector 236ms · hybrid 245ms · sec3 239ms · ctx_prefix 298ms (`rag_latency/`) |
+| 5. 리랭커 | 후보 제시, 사용자 선택 대기 | 고르면 노트 표에 추가 커밋 후 hybrid_rerank 1회 실행 |
 | 6. 판정 도구 (`src/rag/judge.py`) | 코드·테스트 완료, 판정 전 | 2026-11-10. 여섯 방식 실행 기록이 다 있어야 시작됨 |
 | 7. 평가 (`src/eval/rag_eval.py`, `make rag-eval`) | 코드·테스트 완료, 실제 수치 없음 | 판정 파일 커밋 뒤 reproduce·check 에 추가 |
 | 8~9 | 미착수 | |
