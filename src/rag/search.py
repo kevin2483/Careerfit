@@ -28,6 +28,9 @@ def build(method: str, chunks: list[dict], date: str):
     if method == "vector":
         from src.rag.vector import VectorIndex, load_or_build
         return VectorIndex(load_or_build(chunks, date))
+    if method == "hybrid":
+        from src.rag.hybrid import HybridIndex
+        return HybridIndex(build("bm25", chunks, date), build("vector", chunks, date))
     raise SystemExit(f"[중단] 아직 없는 방식: {method}")
 
 
