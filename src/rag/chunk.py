@@ -69,7 +69,8 @@ def split_long(text: str, max_chars: int = MAX_CHARS) -> list[str]:
 
 
 def load_postings(date: str, raw_dir: Path = RAW_DIR) -> dict[str, dict]:
-    """직무 폴더 4개를 읽어 job_id 로 합친 고유 공고. 값: title, company, all_jobs, sections."""
+    """직무 폴더 4개를 읽어 job_id 로 합친 고유 공고. 값: title, company, all_jobs, annual_from, sections.
+    annual_from 은 필터용 메타데이터다 (0=신입가능 / ≥1=경력요구 / None=미기재, CLAUDE.md ②)."""
     postings: dict[str, dict] = {}
     for job in JOBS:
         path = Path(raw_dir) / job / f"wanted_{date}.jsonl"
@@ -84,7 +85,7 @@ def load_postings(date: str, raw_dir: Path = RAW_DIR) -> dict[str, dict]:
             jid = str(rec["job_id"])
             p = postings.setdefault(jid, {
                 "title": rec.get("title", ""), "company": rec.get("company", ""),
-                "all_jobs": [], "sections": rec.get("sections") or {},
+                "all_jobs": [], "annual_from": rec.get("annual_from"), "sections": rec.get("sections") or {},
             })
             if job not in p["all_jobs"]:
                 p["all_jobs"].append(job)
@@ -100,7 +101,7 @@ def make_chunks(postings: dict[str, dict]) -> list[dict]:
                 chunks.append({
                     "chunk_id": f"{jid}:{sec}:{i}", "job_id": jid, "section": sec,
                     "title": p["title"], "company": p["company"], "all_jobs": p["all_jobs"],
-                    "text": piece,
+                    "annual_from": p.get("annual_from"), "text": piece,
                 })
     return chunks
 

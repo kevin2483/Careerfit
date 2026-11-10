@@ -76,11 +76,14 @@ class VectorIndex:
     def __init__(self, matrix: np.ndarray, model: str = DEFAULT_MODEL):
         self.matrix, self.model = matrix, model
 
-    def search(self, query: str, k: int = 10) -> list[tuple[int, float]]:
+    def search(self, query: str, k: int = 10, allowed: list[bool] | None = None) -> list[tuple[int, float]]:
+        """allowed: 청크별 필터 통과 여부. 상위 k 를 자르기 전에 가린다 (사전 등록 부록 A2)."""
         q = embed([query], self.model, kind="query")[0]
         sims = self.matrix @ q
+        if allowed is not None:
+            sims = np.where(np.asarray(allowed, dtype=bool), sims, -np.inf)
         top = np.argsort(-sims, kind="stable")[:k]
-        return [(int(i), float(sims[i])) for i in top]
+        return [(int(i), float(sims[i])) for i in top if np.isfinite(sims[i])]
 
 
 def main(argv: list[str] | None = None) -> None:

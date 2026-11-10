@@ -56,6 +56,9 @@ class BM25:
                 out[i] = out.get(i, 0.0) + idf * norm
         return out
 
-    def search(self, query: str, k: int = 10) -> list[tuple[int, float]]:
+    def search(self, query: str, k: int = 10, allowed: list[bool] | None = None) -> list[tuple[int, float]]:
+        """allowed: 문서별 필터 통과 여부. IDF·평균 길이는 색인 전체 기준 그대로 두고 후보만 가린다 (사전 등록 부록 A2)."""
         s = self.scores(query)
+        if allowed is not None:
+            s = {i: v for i, v in s.items() if allowed[i]}
         return sorted(s.items(), key=lambda x: (-x[1], x[0]))[:k]
