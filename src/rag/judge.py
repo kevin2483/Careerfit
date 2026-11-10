@@ -14,6 +14,7 @@
 
 사용:
   python -m src.rag.judge              # 미판정부터 이어서
+  python -m src.rag.judge --group 10   # 같은 질문의 문단을 최대 10개씩 한 화면에, 답은 ynnyn 처럼 한 줄로 (부록 A8)
   python -m src.rag.judge --stats      # 진행률만
   python -m src.rag.judge --rejudge    # 1차가 끝난 뒤, 10% 를 이전 답을 가린 채 다시 판정 (자기 일치율)
 """
@@ -127,6 +128,69 @@ def session(todo: list[Pair], queries: dict[str, dict], chunks: dict[str, dict],
     return done
 
 
+def group_todo(todo: list[Pair], size: int) -> list[list[Pair]]:
+    """이어진 같은 질문끼리 최대 size 개씩 묶는다. 순서는 바꾸지 않는다."""
+    groups: list[list[Pair]] = []
+    for p in todo:
+        if groups and groups[-1][0][0] == p[0] and len(groups[-1]) < size:
+            groups[-1].append(p)
+        else:
+            groups.append([p])
+    return groups
+
+
+def ask_group(n: int) -> list[bool] | None:
+    """y/n 글자 n 개를 한 줄로 받는다 (공백은 무시). 개수가 다르거나 다른 글자가 섞이면 다시 묻는다. q = 종료(None)."""
+    while True:
+        try:
+            a = "".join(input(f"1~{n}번 답을 순서대로 y/n {n}글자 (q=저장종료): ").lower().split())
+        except (EOFError, KeyboardInterrupt):
+            return None
+        if a == "q":
+            return None
+        if len(a) == n and set(a) <= {"y", "n"}:
+            return [c == "y" for c in a]
+        print(f"     ! y/n 만으로 정확히 {n}글자여야 합니다 (입력 {len(a)}글자). 엔터만으로는 넘어가지 않습니다.")
+
+
+def ask_confirm() -> str:
+    """ok / r / q 만 받는다. 엔터만으로는 저장되지 않는다."""
+    while True:
+        try:
+            a = input("맞으면 ok, 다시 입력하려면 r (q=이 묶음 버리고 종료): ").strip().lower()
+        except (EOFError, KeyboardInterrupt):
+            return "q"
+        if a in ("ok", "r", "q"):
+            return a
+        print("     ! ok 또는 r 을 입력하세요.")
+
+
+def group_session(todo: list[Pair], queries: dict[str, dict], chunks: dict[str, dict],
+                  judgments: dict[Pair, bool], out_path: str | Path, size: int) -> int:
+    """같은 질문의 문단을 size 개까지 한 화면에 보여 주고 한 줄로 받는다. 묶음마다 확인 후 저장한다 (부록 A8)."""
+    done = 0
+    for group in group_todo(todo, size):
+        while True:
+            for i, (qid, cid) in enumerate(group, 1):
+                show(queries[qid], chunks[cid], done + i, len(todo))
+                print(f"↑ {i}번")
+            answers = ask_group(len(group))
+            if answers is None:
+                return done
+            print(f"\n질문 {group[0][0]}: {queries[group[0][0]]['question']}")
+            for i, ((_q, cid), v) in enumerate(zip(group, answers), 1):
+                print(f"  {i}번 · {chunks[cid].get('company', '')} · {chunks[cid].get('section', '')} → {'y' if v else 'n'}")
+            c = ask_confirm()
+            if c == "q":
+                return done
+            if c == "ok":
+                break
+        judgments.update(dict(zip(group, answers)))
+        save_judgments(out_path, judgments)
+        done += len(group)
+    return done
+
+
 def main(argv: list[str] | None = None) -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--date")
@@ -136,8 +200,13 @@ def main(argv: list[str] | None = None) -> None:
     ap.add_argument("--rejudge-out", default=str(REJUDGMENTS_PATH))
     ap.add_argument("--stats", action="store_true")
     ap.add_argument("--rejudge", action="store_true")
+    ap.add_argument("--group", type=int, default=1, help="같은 질문의 문단을 이 개수까지 한 화면에 (1 = 한 건씩)")
     args = ap.parse_args(argv)
 
+    if args.group < 1:
+        raise SystemExit("[중단] --group 은 1 이상")
+    if args.group > 1 and args.rejudge:
+        raise SystemExit("[중단] 재판정은 한 건씩만 한다 (부록 A8). --group 을 빼고 실행")
     queries = {q["qid"]: q for q in load_queries(args.queries)}
     pool = build_pool(load_runs(args.runs_dir), depths=depth_by_qid(queries.values()))
     pairs = [(qid, cid) for qid, ids in pool.items() for cid in ids]
@@ -162,7 +231,10 @@ def main(argv: list[str] | None = None) -> None:
     unknown = [c for _q, c in todo if c not in chunks]
     if unknown:
         raise SystemExit(f"[중단] 청크 파일에 없는 chunk_id {len(unknown)}건: {unknown[:3]} — 실행 기록과 같은 --date 인지 확인")
-    n = session(todo, queries, chunks, target, out_path)
+    if args.group > 1:
+        n = group_session(todo, queries, chunks, target, out_path, args.group)
+    else:
+        n = session(todo, queries, chunks, target, out_path)
     print(f"\n이번에 {n}건 판정 → {out_path}  (남음 {len(todo) - n}건)")
 
 

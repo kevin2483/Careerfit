@@ -97,6 +97,46 @@ def test_screen_never_shows_method_names(monkeypatch, capsys, tmp_path):
     assert not any(m in shown for m in METHODS)
 
 
+# ── 묶음 판정 (부록 A8) ───────────────────────────────────────────────
+def _group_fixture():
+    queries = {q["qid"]: q for q in QUERIES}
+    ids = ["1:a:0", "2:a:0", "3:a:0"]
+    chunks = {c: {"chunk_id": c, "text": "본문", "title": "t", "company": f"회사{c[0]}", "section": "a"} for c in ids}
+    return queries, chunks, [("q1", "1:a:0"), ("q1", "2:a:0"), ("q1", "3:a:0"), ("q2", "1:a:0")]
+
+
+def test_group_todo_keeps_order_and_never_mixes_questions():
+    todo = [("q1", str(i)) for i in range(5)] + [("q2", "0")]
+    assert [len(g) for g in judge.group_todo(todo, 2)] == [2, 2, 1, 1]
+    assert [p for g in judge.group_todo(todo, 2) for p in g] == todo
+
+
+def test_ask_group_needs_exact_length_and_only_yn(monkeypatch, capsys):
+    _feed(monkeypatch, ["", "yn", "yyyy", "yxn", "y n Y"])
+    assert judge.ask_group(3) == [True, False, True]
+    assert capsys.readouterr().out.count("정확히 3글자") == 4
+
+
+def test_group_session_saves_only_after_ok(monkeypatch, tmp_path):
+    queries, chunks, todo = _group_fixture()
+    out, judged = tmp_path / "j.jsonl", {}
+    _feed(monkeypatch, ["yny", "", "r", "nny", "ok", "y", "q"])   # 첫 입력은 r 로 버림, 둘째 묶음은 확인 전 종료
+    assert judge.group_session(todo, queries, chunks, judged, out, 10) == 3
+    assert judge.load_judgments(out) == {("q1", "1:a:0"): False, ("q1", "2:a:0"): False, ("q1", "3:a:0"): True}
+
+
+def test_group_screen_never_shows_method_names(monkeypatch, capsys, tmp_path):
+    queries, chunks, todo = _group_fixture()
+    _feed(monkeypatch, ["yny", "ok", "q"])
+    judge.group_session(todo, queries, chunks, {}, tmp_path / "j.jsonl", 10)
+    assert not any(m in capsys.readouterr().out for m in METHODS)
+
+
+def test_group_mode_is_refused_for_rejudge(tmp_path):
+    with pytest.raises(SystemExit, match="한 건씩만"):
+        judge.main(["--group", "10", "--rejudge"])
+
+
 def test_rejudge_sample_is_ten_percent_and_deterministic():
     pairs = [("q1", f"{i}:a:0") for i in range(95)]
     sample = judge.rejudge_sample(pairs)
