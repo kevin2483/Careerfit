@@ -25,8 +25,8 @@ CareerFit 에 RAG 검색 기능을 이어서 구현한다. 처음부터 다시 �
 | 2. hybrid (`src/rag/hybrid.py`) | 코드·테스트 완료, 실제 질문 실행 전 | 2026-11-10 |
 | 3. 실행 기록 (`src/rag/run.py`) | 코드·테스트 완료, 실제 질문 실행 전 | 빈 질문·덮어쓰기 거부 |
 | 2~4. bm25 · vector · hybrid · sec3 · ctx_prefix 실행 | 완료 (각 1회, 2026-11-10) | `data/processed/rag_runs/` 5개 × 300행. 풀 924건(5개 방식 기준). 지연 p90: bm25 13ms · vector 236ms · hybrid 245ms · sec3 239ms · ctx_prefix 298ms (`rag_latency/`) |
-| 5. 리랭커 | 후보 제시, 사용자 선택 대기 | 고르면 노트 표에 추가 커밋 후 hybrid_rerank 1회 실행 |
-| 6. 판정 도구 (`src/rag/judge.py`) | 코드·테스트 완료, 판정 전 | 2026-11-10. 여섯 방식 실행 기록이 다 있어야 시작됨 |
+| 5. 리랭커 (bge-reranker-v2-m3) | 완료 (1회, 2026-11-10) | 노트 부록 A6. 지연 중앙값 4.9초 · p90 6.1초로 목표(1초) 초과 (스왑이 걸린 상태에서 잰 값). 실행 중 시스템 여유 메모리 최저 10%, 프로세스 최대 RSS 1.08GB |
+| 6. 판정 | **사용자 판정 대기** | 풀 934건 (6개 방식), 재판정 표본 94건. `python -m src.rag.judge` |
 | 7. 평가 (`src/eval/rag_eval.py`, `make rag-eval`) | 코드·테스트 완료, 실제 수치 없음 | 판정 파일 커밋 뒤 reproduce·check 에 추가 |
 | 8~9 | 미착수 | |
 
