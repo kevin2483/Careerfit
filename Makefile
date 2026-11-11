@@ -6,7 +6,7 @@ PY ?= python3
 DATE ?= 2026-07-30
 P := data/processed
 
-.PHONY: install test lint reproduce rag-eval extract stats check clean demo demo-docker
+.PHONY: install test lint reproduce rag-eval rag-gen-eval extract stats check clean demo demo-docker
 
 install:
 	$(PY) -m pip install -r requirements.txt
@@ -33,6 +33,10 @@ reproduce:
 # 검색(RAG) 비교. 커밋된 실행 기록 6개 + 사람 판정만 읽는다 (원문·모델 불필요). reproduce 에 포함.
 rag-eval:
 	$(PY) -m src.eval.rag_eval
+
+# 생성 단계 평가. 답·주장 판정이 커밋되면 reproduce 와 check 에 넣는다 (그 전에는 파일이 없어 CI 가 깨진다).
+rag-gen-eval:
+	$(PY) -m src.eval.rag_gen_eval
 
 # 재현 결과가 커밋본과 같은지 확인 (CI 와 동일)
 check: reproduce
