@@ -132,9 +132,14 @@ def test_group_screen_never_shows_method_names(monkeypatch, capsys, tmp_path):
     assert not any(m in capsys.readouterr().out for m in METHODS)
 
 
-def test_group_mode_is_refused_for_rejudge(tmp_path):
-    with pytest.raises(SystemExit, match="한 건씩만"):
-        judge.main(["--group", "10", "--rejudge"])
+def test_rejudge_groups_cut_by_size_across_questions(monkeypatch, tmp_path):
+    queries, chunks, todo = _group_fixture()
+    assert [len(g) for g in judge.group_todo(todo, 3, same_question=False)] == [3, 1]
+    assert [len(g) for g in judge.group_todo(todo, 10, same_question=False)] == [4]
+    out = tmp_path / "r.jsonl"
+    _feed(monkeypatch, ["ynyn", "ok"])
+    assert judge.group_session(todo, queries, chunks, {}, out, 10, same_question=False) == 4
+    assert judge.load_judgments(out)[("q2", "1:a:0")] is False
 
 
 def test_rejudge_sample_is_ten_percent_and_deterministic():

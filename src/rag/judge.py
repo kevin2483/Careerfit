@@ -128,11 +128,12 @@ def session(todo: list[Pair], queries: dict[str, dict], chunks: dict[str, dict],
     return done
 
 
-def group_todo(todo: list[Pair], size: int) -> list[list[Pair]]:
-    """이어진 같은 질문끼리 최대 size 개씩 묶는다. 순서는 바꾸지 않는다."""
+def group_todo(todo: list[Pair], size: int, same_question: bool = True) -> list[list[Pair]]:
+    """이어진 같은 질문끼리 최대 size 개씩 묶는다. 순서는 바꾸지 않는다.
+    same_question=False (재판정: 질문이 섞여 있다) 이면 질문과 무관하게 size 개씩 자른다."""
     groups: list[list[Pair]] = []
     for p in todo:
-        if groups and groups[-1][0][0] == p[0] and len(groups[-1]) < size:
+        if groups and len(groups[-1]) < size and (not same_question or groups[-1][0][0] == p[0]):
             groups[-1].append(p)
         else:
             groups.append([p])
@@ -166,10 +167,10 @@ def ask_confirm() -> str:
 
 
 def group_session(todo: list[Pair], queries: dict[str, dict], chunks: dict[str, dict],
-                  judgments: dict[Pair, bool], out_path: str | Path, size: int) -> int:
+                  judgments: dict[Pair, bool], out_path: str | Path, size: int, same_question: bool = True) -> int:
     """같은 질문의 문단을 size 개까지 한 화면에 보여 주고 한 줄로 받는다. 묶음마다 확인 후 저장한다 (부록 A8)."""
     done = 0
-    for group in group_todo(todo, size):
+    for group in group_todo(todo, size, same_question):
         while True:
             for i, (qid, cid) in enumerate(group, 1):
                 show(queries[qid], chunks[cid], done + i, len(todo))
@@ -177,9 +178,9 @@ def group_session(todo: list[Pair], queries: dict[str, dict], chunks: dict[str, 
             answers = ask_group(len(group))
             if answers is None:
                 return done
-            print(f"\n질문 {group[0][0]}: {queries[group[0][0]]['question']}")
-            for i, ((_q, cid), v) in enumerate(zip(group, answers), 1):
-                print(f"  {i}번 · {chunks[cid].get('company', '')} · {chunks[cid].get('section', '')} → {'y' if v else 'n'}")
+            print()
+            for i, ((qid, cid), v) in enumerate(zip(group, answers), 1):
+                print(f"  {i}번 · {qid} {queries[qid]['question'][:24]} · {chunks[cid].get('company', '')} · {chunks[cid].get('section', '')} → {'y' if v else 'n'}")
             c = ask_confirm()
             if c == "q":
                 return done
@@ -205,8 +206,6 @@ def main(argv: list[str] | None = None) -> None:
 
     if args.group < 1:
         raise SystemExit("[중단] --group 은 1 이상")
-    if args.group > 1 and args.rejudge:
-        raise SystemExit("[중단] 재판정은 한 건씩만 한다 (부록 A8). --group 을 빼고 실행")
     queries = {q["qid"]: q for q in load_queries(args.queries)}
     pool = build_pool(load_runs(args.runs_dir), depths=depth_by_qid(queries.values()))
     pairs = [(qid, cid) for qid, ids in pool.items() for cid in ids]
@@ -232,7 +231,7 @@ def main(argv: list[str] | None = None) -> None:
     if unknown:
         raise SystemExit(f"[중단] 청크 파일에 없는 chunk_id {len(unknown)}건: {unknown[:3]} — 실행 기록과 같은 --date 인지 확인")
     if args.group > 1:
-        n = group_session(todo, queries, chunks, target, out_path, args.group)
+        n = group_session(todo, queries, chunks, target, out_path, args.group, same_question=not args.rejudge)
     else:
         n = session(todo, queries, chunks, target, out_path)
     print(f"\n이번에 {n}건 판정 → {out_path}  (남음 {len(todo) - n}건)")
