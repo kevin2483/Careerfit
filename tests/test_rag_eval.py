@@ -231,6 +231,7 @@ def test_self_agreement_uses_rejudgments_but_scores_use_first_pass():
     rej = {("q1", "1:a:0"): True, ("q1", "2:a:0"): False}
     by = {r["항목"]: r["값"] for r in rag_eval.evaluate(QUERIES, runs, j, rej, b=50)}
     assert by["자기 일치율 (재판정)"] == "0.500"
+    assert by["자기 일치율 · A 유형"] == "0.500" and "자기 일치율 · B 유형" not in by
     assert by["bm25 · Recall@5"].startswith("1.000")
 
 

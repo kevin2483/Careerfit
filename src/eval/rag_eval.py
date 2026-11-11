@@ -111,6 +111,12 @@ def evaluate(queries: list[dict], runs: dict[str, list[dict]], judgments: dict, 
         same = sum(rejudgments[p] == judgments[p] for p in both)
         add("자기 일치율 (재판정)", _fmt(same / len(both)) if both else "미실시",
             f"재판정 {len(both)}건 중 {same}건 일치. 점수에는 1차 판정만 사용")
+        qtype = {q["qid"]: q["type"] for q in queries}
+        for t in "ABCD":
+            sub = [p for p in both if qtype.get(p[0]) == t]
+            if sub:
+                k = sum(rejudgments[p] == judgments[p] for p in sub)
+                add(f"자기 일치율 · {t} 유형", _fmt(k / len(sub)), f"재판정 {len(sub)}건 중 {k}건 일치")
     else:
         add("자기 일치율 (재판정)", "미실시", "rag_rejudgments.jsonl 없음")
 
