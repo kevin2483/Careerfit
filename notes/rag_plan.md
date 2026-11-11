@@ -28,7 +28,8 @@ CareerFit 에 RAG 검색 기능을 이어서 구현한다. 처음부터 다시 �
 | 5. 리랭커 (bge-reranker-v2-m3) | 완료 (1회, 2026-11-10) | 노트 부록 A6. 지연 중앙값 4.9초 · p90 6.1초로 목표(1초) 초과 (스왑이 걸린 상태에서 잰 값). 실행 중 시스템 여유 메모리 최저 10%, 프로세스 최대 RSS 1.08GB |
 | 6. 판정 | 완료 (2026-11-11) | 1차 493건 · 재판정 50건. 자기 일치율 0.780 (A 0.600 · B 0.727 · C 1.000 · D 1.000). 입력 방식 변경 이력은 노트 부록 A8·A9 |
 | 7. 평가 (`src/eval/rag_eval.py`, `make rag-eval`) | 완료 (2026-11-11, 1회 실행) | `data/processed/rag_comparison.csv`. 주 지표 Recall@5 로 확정된 주 비교는 hybrid − vector 하나. reproduce·check 에 포함 |
-| 8~9 | 미착수 | |
+| 8. 생성 | 코드·테스트 완료, **사용자 실행 대기** | 사전 등록 `notes/rag_generation_2026-11-11.md`. hybrid 상위 5 → claude-sonnet-5-5, 주장 최대 2개, 사람 판정 최대 60건. `python -m src.rag.generate` → `python -m src.rag.claim_judge` |
+| 9. 정리 | 미착수 | |
 
 ## 단계 (이 순서대로)
 1. **필터** — `chunk.py` 에 `annual_from`·직무 메타데이터 추가. 질문의 `filter` 를 모든 방식에 똑같이 거는 함수 하나. 규칙은 부록 A2.
