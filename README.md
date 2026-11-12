@@ -117,6 +117,61 @@ API 호출 없이 기존 예측을 섞어 라우팅 정책을 시뮬레이션했
 
 ---
 
+## 공고 검색 (RAG)
+
+"FastAPI 경험을 요구하는 공고가 어디냐"처럼 통계로는 답할 수 없는 질문을 위해, 공고 892건을 문단 4,573개로 나눠 검색하고 그 문단만 근거로 답하는 기능을 붙였습니다. 여기서도 만들기 전에 재는 방법부터 정했습니다. 방식·파라미터·판정 기준을 [`notes/rag_experiment_2026-11-05.md`](notes/rag_experiment_2026-11-05.md)에 먼저 커밋하고, 방식마다 한 번만 돌렸습니다.
+
+### 검색 방식 비교
+
+직접 쓴 질문 30개(기술명 A 8 · 서술형 B 10 · 복지·근무조건 C 6 · 답이 없어야 하는 D 6). 여섯 방식의 상위 5개 문단을 합쳐 방식 이름을 가리고 섞은 493건을 직접 판정했습니다. 점수는 A~C 24개 질문 평균이고, 신뢰구간은 질문 단위 부트스트랩 10,000회입니다.
+
+| 방식 | Recall@5 | MRR@5 | nDCG@5 | 지연 p90 |
+|---|---|---|---|---|
+| BM25 (직접 구현, 한글 2-gram) | 0.350 | 0.903 | 0.848 | **13ms** |
+| 벡터 (multilingual-e5-small) | 0.281 | 0.781 | 0.746 | 236ms |
+| 하이브리드 (RRF) | 0.354 | 0.925 | 0.881 | 245ms |
+| 하이브리드 + 리랭커 (bge-reranker-v2-m3) | **0.375** | **0.967** | **0.927** | 6,130ms |
+| 벡터 + 문맥 접두 | 0.273 | 0.858 | 0.756 | 298ms |
+| 벡터, 3개 구역만 색인 | 0.243 | 0.637 | 0.608 | 239ms |
+
+| 사전 등록한 비교 (Recall@5 차이) | 점추정 | 95% CI | 판정 |
+|---|---|---|---|
+| 하이브리드 − 벡터 | +0.073 | [+0.022, +0.128] | 확정 |
+| 하이브리드 − BM25 | +0.004 | [−0.035, +0.038] | 확정 불가 |
+| 리랭커 − 하이브리드 | +0.022 | [−0.000, +0.048] | 확정 불가 |
+| 문맥 접두 − 벡터 | −0.008 | [−0.045, +0.035] | 확정 불가 |
+| 3개 구역 − 벡터 | −0.038 | [−0.090, +0.013] | 확정 불가 |
+
+- **확정된 것은 하나입니다.** 벡터 검색에 BM25를 섞으면 벡터 단독보다 낫습니다.
+- **하이브리드가 BM25 단독보다 낫다고는 말할 수 없습니다.** 차이가 0.004이고 BM25는 13ms입니다. 채용공고는 기술명이 그대로 적혀 있어 키워드 검색이 임베딩만큼 통합니다.
+- **리랭커는 순위 품질(nDCG +0.046 [+0.003, +0.100])은 올렸지만 주 지표로는 확정되지 않았고, 8GB 맥에서 p90 6.1초로 목표 1초를 넘었습니다.** 그래서 생성 단계에는 쓰지 않았습니다.
+- **두 변형은 효과가 없었습니다.** 문단 앞에 제목·회사를 붙여도 차이가 없었고, 구역을 줄이면 MRR·nDCG가 내려갔습니다.
+- **Recall@5의 절대값은 낮게 나올 수밖에 없습니다.** 판정한 문단의 65%가 정답이라 질문당 정답이 5개를 넘는 경우가 많습니다. 방식 간 차이로 읽어야 합니다.
+
+### 답변 생성
+
+하이브리드 상위 5개 문단을 claude-sonnet-5-5에 주고, 문단에 있는 내용만으로 주장을 최대 2개 쓰게 하며 주장마다 근거 문단 하나를 붙이게 했습니다([`notes/rag_generation_2026-11-11.md`](notes/rag_generation_2026-11-11.md), 질문당 1회 호출).
+
+| 항목 | 값 | 근거 |
+|---|---|---|
+| 실패 행 | 0 / 30 | 형식 오류·잘림·거절 없음 |
+| 근거 문단이 없는 질문 | 5개 중 5개 거절 | 검색 판정에서 전달 문단이 전부 무관이었던 질문. 지어낸 답 0건 |
+| 근거 문단이 있는 질문 | 25개 중 22개 답함, 3개 거절 | 거절 3건이 과잉 거절인지는 가리지 못함 |
+| 충실도 (주장이 인용 문단에 있는 말인가) | 43 / 43 | 직접 판정. Opus 5.5 판정도 43건 모두 일치 |
+| 생성 지연 | 중앙값 2.9초 · p90 3.8초 | 호출별 실측 |
+
+**충실도 1.000은 성과로 쓰지 않습니다.** 주장을 2개로 제한하고 문단 표현에 맞춰 쓰게 한 발췌형 과제라 틀릴 여지가 거의 없었습니다. 이 설정에서는 충실도 지표에 변별력이 없었다는 결과입니다. 실제로 정보가 있는 수치는 거절 쪽입니다.
+
+### 이 평가의 한계
+
+- **질문 30개, 판정자 1명입니다.** 다섯 비교 중 넷이 확정 불가인 이유입니다.
+- **판정이 흔들렸습니다.** 50건을 다시 판정했을 때 일치율이 78%였고, 유형별로는 A 60% · B 73% · C 100% · D 100%입니다. 기술명·서술형 질문의 차이는 약하게 읽어야 합니다.
+- **판정 절차를 도중에 바꿨습니다.** 판정 범위를 상위 10(934건)에서 상위 5(493건)로 줄였고, 입력 방식을 한 건씩과 10개 묶음 사이에서 여러 번 오갔습니다. 주장 판정 43건 중 1건은 판정 방법을 설명하느라 AI가 답을 시연했습니다. 변경 시점과 사유는 두 노트의 부록에 있습니다.
+- **답의 품질은 재지 않았습니다.** 답이 질문에 맞는지, 빠뜨린 공고가 있는지는 범위 밖입니다. PySpark를 물었는데 Apache Spark 공고로 답해도 충실도에는 잡히지 않습니다.
+- **검색은 레포만으로 다시 돌릴 수 없습니다.** 공고 원문이 비공개라 문단 본문과 주장 문장은 커밋하지 않았습니다. 실행 기록·판정·LLM 판정은 커밋되어 있어 위 표는 `make reproduce`로 다시 만들어집니다.
+
+---
+
 ## 데모
 
 직무별 요구 역량 지형도, 이력서를 붙여 넣으면 나오는 학습 우선순위, 그리고 위 평가 결과를 한 화면에서 봅니다. 공고 원문이나 API 키 없이 레포에 커밋된 CSV와 사전만 읽으므로 데모 숫자는 README 숫자와 같습니다. 갭 진단은 `src/analyze/gap_diagnosis.run()`을 그대로 호출해 산식이 두 벌이 되지 않습니다.
@@ -200,8 +255,8 @@ Claude Code 서브에이전트 3명(extractor · analyst · diagnoser)이 직렬
 
 ```bash
 pip install -r requirements.txt
-make test        # pytest 76건
-make reproduce   # evaluation_{regex_pooled,llm_*} · bootstrap_ci · method_comparison · cascade_sim · failed_rows_sensitivity · prompt_variants 재생성
+make test        # pytest 161건
+make reproduce   # evaluation_{regex_pooled,llm_*} · bootstrap_ci · method_comparison · cascade_sim · failed_rows_sensitivity · prompt_variants · rag_comparison · rag_generation 재생성
 make check       # 재생성 결과가 커밋본과 같은지 diff
 ```
 
@@ -230,10 +285,11 @@ python -m src.extract.llm_skill_extract --raw-dir data/raw --dict data/raw/dict/
   skills/careerfit팀-돌리기/   팀 운영 절차
 data/
   raw/dict/                 역량 태그 사전 v0 · v1 · v2 (v2 = v1 + 함의 규칙)
-  labeled/                  정답셋 공개판 · 풀링 후보 · 판정 키
+  labeled/                  정답셋 공개판 · 풀링 후보 · 판정 키 · 검색 질문 30개와 판정
   processed/<date>/         예측 파일 4종 (regex · haiku · sonnet · opus) + haiku 프롬프트 변형 3종 + LLM 비용·지연 요약
   processed/evaluation_*/   방식별 평가 (eval_summary · error_analysis)
   processed/                bootstrap_ci · method_comparison · cascade_sim · failed_rows_sensitivity · 시장 통계
+  processed/rag_*/          검색 실행 기록 6종 · 지연 · 생성 답 공개판 · LLM 판정
 demo/                       Streamlit 데모 (app.py · 로더 · 예시 이력서). 커밋된 산출물만 읽는다
 docs/agent_team.md          에이전트 팀 설계와 재현성 검증 기록
 notes/                      실험 로그 · 라벨링 기준 · 프롬프트 실험 사전 등록
@@ -243,15 +299,16 @@ src/
   crawl/                    수집
   extract/                  정규식 · LLM 추출, 한국어 경계 처리
   label/                    정답셋 라벨링 · 블라인드 풀링
-  eval/                     평가 · 부트스트랩 CI · 방식 비교 · 라우팅 시뮬레이션
+  eval/                     평가 · 부트스트랩 CI · 방식 비교 · 라우팅 시뮬레이션 · 검색·생성 평가
   analyze/                  시장 통계 · 갭 진단
-tests/                      76건. 경계 규칙 · 사전 함의 · 불변식 · 산식 · 풀링 반영 · 결정성 · LLM 출력 파싱 · 실패 행 판정
+  rag/                      청킹 · BM25 · 벡터 · 하이브리드 · 리랭커 · 필터 · 판정 도구 · 답변 생성
+tests/                      161건. 경계 규칙 · 사전 함의 · 불변식 · 산식 · 풀링 반영 · 결정성 · LLM 출력 파싱 · 실패 행 판정
 CLAUDE.md                   에이전트 팀 운영 규칙
 ```
 
 ## 기술
 
-Python 3.12 · 정규식 · Anthropic API (Claude haiku-4.5 · sonnet-5 · opus-5) · Claude Code 서브에이전트 · MCP (Notion, Google Drive) · pytest · GitHub Actions · Streamlit
+Python 3.12 · 정규식 · Anthropic API (Claude haiku-4.5 · sonnet-5 · opus-5 · sonnet-5.5 · opus-5.5) · BM25 · sentence-transformers (e5-small · bge-reranker-v2-m3) · RRF · Claude Code 서브에이전트 · MCP (Notion, Google Drive) · pytest · GitHub Actions · Streamlit
 
 ## 작성자
 
