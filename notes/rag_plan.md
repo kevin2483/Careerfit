@@ -29,7 +29,7 @@ CareerFit 에 RAG 검색 기능을 이어서 구현한다. 처음부터 다시 �
 | 6. 판정 | 완료 (2026-11-11) | 1차 493건 · 재판정 50건. 자기 일치율 0.780 (A 0.600 · B 0.727 · C 1.000 · D 1.000). 입력 방식 변경 이력은 노트 부록 A8·A9 |
 | 7. 평가 (`src/eval/rag_eval.py`, `make rag-eval`) | 완료 (2026-11-11, 1회 실행) | `data/processed/rag_comparison.csv`. 주 지표 Recall@5 로 확정된 주 비교는 hybrid − vector 하나. reproduce·check 에 포함 |
 | 8. 생성 | 완료 (2026-11-12, 1회 실행) | 사전 등록 `notes/rag_generation_2026-11-11.md` (부록 B1~B3). `data/processed/rag_generation.csv`. 충실도 1.000 은 발췌형 과제의 천장 효과라 성과로 쓰지 않음. 답함 22 · 거절 8 (근거 없는 5개 전부 거절, 답할 수 있던 3개 거절). reproduce·check 에 포함 |
-| 9. 정리 | 미착수 | |
+| 9. 정리 | README 완료 (2026-11-12), **포트폴리오 사이트는 보류** | README "공고 검색 (RAG)" 절 + 예시 답 3건(회사명 가림). 사이트(`portfolio/site`, 별도 저장소)는 사용자가 나중에 하기로 함: 테스트 수 84 → 161, RAG 요약, 기술 목록. 작업 전 로컬을 origin/main 에 맞출 것(1커밋 뒤처짐 + 중복 수정) |
 
 ## 단계 (이 순서대로)
 1. **필터** — `chunk.py` 에 `annual_from`·직무 메타데이터 추가. 질문의 `filter` 를 모든 방식에 똑같이 거는 함수 하나. 규칙은 부록 A2.
