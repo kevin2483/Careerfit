@@ -38,3 +38,14 @@ def test_prompt_variants_loader():
     rows = L.prompt_variants()
     assert [r["변형"] for r in rows if r["지표"] == "F1"] == ["base", "alias", "criteria", "schema"]
     assert all(r["파싱실패"] == 0 for r in rows if r["지표"] == "F1")
+
+
+def test_rag_loaders_read_committed_tables_without_recomputing():
+    methods = L.rag_methods()
+    assert [m["방식"] for m in methods] == list(L.RAG_METHOD_NAMES.values())
+    assert all(m["Recall@5_하한"] <= m["Recall@5"] <= m["Recall@5_상한"] and m["지연_p90_ms"] > 0 for m in methods)
+    pairs = L.rag_pairs()
+    assert len(pairs) == 5 and {p["판정"] for p in pairs} <= {"확정", "확정 불가"}
+    assert all((p["CI_하한"] > 0 or p["CI_상한"] < 0) == (p["판정"] == "확정") for p in pairs)
+    assert all(set(r) == {"항목", "값", "근거"} for r in L.rag_summary() + L.rag_generation())
+    assert any(r["항목"] == "충실도 (주 지표)" for r in L.rag_generation())

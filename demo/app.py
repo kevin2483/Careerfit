@@ -7,6 +7,7 @@ CareerFit 데모 — 커밋된 산출물만으로 동작한다 (공고 원문·A
 탭 1 시장 지형도: data/processed/market_stats/*.csv
 탭 2 갭 진단:     src.analyze.gap_diagnosis.run() 을 그대로 호출 (산식 중복 없음)
 탭 3 평가 결과:   method_comparison · bootstrap_ci · cascade_sim · failed_rows_sensitivity
+탭 4 공고 검색:   rag_comparison · rag_generation (검색 자체는 원문이 비공개라 여기서 돌지 않는다)
 """
 from __future__ import annotations
 
@@ -45,7 +46,7 @@ st.title("CareerFit")
 st.caption("채용공고 1,190건에서 뽑은 직무별 요구 역량, 이력서 대조 학습 우선순위, 그리고 그 추출이 맞는지 잰 결과. "
            "모든 숫자는 레포에 커밋된 CSV 그대로이며 `make reproduce` 로 다시 만들어진다.")
 
-tab_market, tab_gap, tab_eval = st.tabs(["시장 지형도", "갭 진단", "평가 결과"])
+tab_market, tab_gap, tab_eval, tab_rag = st.tabs(["시장 지형도", "갭 진단", "평가 결과", "공고 검색 (RAG)"])
 
 # ───────────────────────────────────────────── 탭 1
 with tab_market:
@@ -212,3 +213,53 @@ with tab_eval:
     fr = df("failed_rows")
     n_failed = sum(1 for r in L.failed_rows() if r["구분"] == "전체" and r["제외문서"])
     st.caption(f"예측 실패 행(출력 잘림·파싱 실패) 민감도 검사: 현재 실패 행 {n_failed}건. 자세한 경위는 레포 README 와 notes/lab_log.md.")
+
+# ───────────────────────────────────────────── 탭 4
+with tab_rag:
+    st.subheader("공고 892건을 문단 4,573개로 나눠 검색하고, 찾은 문단만 근거로 답한다")
+    st.info("이 탭은 검색창이 아니라 평가 결과다. 공고 원문이 비공개라 공개 데모에서는 검색을 돌릴 수 없다. "
+            "방식·파라미터·판정 기준을 실행 전에 문서로 고정하고 방식마다 한 번만 돌렸다 (notes/rag_experiment_2026-11-05.md).")
+    rm = df("rag_methods")
+    rag_order = list(rm.sort_values("Recall@5", ascending=False)["방식"])
+
+    c1, c2 = st.columns(2)
+    with c1:
+        st.markdown("**Recall@5 와 95% 신뢰구간** — 질문 24개, 직접 판정 493건")
+        base = alt.Chart(rm).encode(y=alt.Y("방식:N", sort=rag_order, title=None))
+        rule = base.mark_rule(strokeWidth=3).encode(x=alt.X("Recall@5_하한:Q", title="Recall@5", scale=alt.Scale(domain=[0.15, 0.45])), x2="Recall@5_상한:Q")
+        dot = base.mark_point(filled=True, size=120).encode(x="Recall@5:Q", tooltip=["방식", "Recall@5", "Recall@5_하한", "Recall@5_상한"])
+        st.altair_chart((rule + dot).properties(height=220), use_container_width=True)
+        st.caption("판정한 문단의 65%가 정답이라 질문당 정답이 5개를 넘는 경우가 많다. 절대값보다 방식 간 차이로 읽는다.")
+    with c2:
+        st.markdown("**검색 지연 p90 (로그 눈금)** — 목표 1,000ms")
+        lat = alt.Chart(rm).mark_bar().encode(
+            y=alt.Y("방식:N", sort=rag_order, title=None),
+            x=alt.X("지연_p90_ms:Q", title="p90 (ms)", scale=alt.Scale(type="log", domain=[5, 10000])),
+            tooltip=["방식", "지연"])
+        goal = alt.Chart(pd.DataFrame({"x": [1000]})).mark_rule(color="#dc2626", strokeDash=[4, 4]).encode(x="x:Q")
+        st.altair_chart((lat + goal).properties(height=220), use_container_width=True)
+        st.caption("BM25 는 13ms 로 하이브리드와 비슷한 점수를 낸다. 리랭커는 8GB 맥에서 6.1초라 생성 단계에 쓰지 않았다.")
+
+    st.markdown("**방식별 요약**")
+    st.dataframe(rm[["방식", "Recall@5", "MRR@5", "nDCG@5", "지연"]], hide_index=True, use_container_width=True)
+
+    c3, c4 = st.columns([3, 2])
+    with c3:
+        st.markdown("**사전 등록한 비교 5개** — CI 가 0 을 포함하면 확정 불가")
+        st.dataframe(df("rag_pairs"), hide_index=True, use_container_width=True)
+        st.caption("확정된 것은 '하이브리드가 벡터 단독보다 낫다' 하나다. 하이브리드가 BM25 보다 낫다고는 말할 수 없다.")
+    with c4:
+        st.markdown("**판정 요약**")
+        st.dataframe(df("rag_summary"), hide_index=True, use_container_width=True)
+
+    st.markdown("**답변 생성** — 하이브리드 상위 5개 문단 → claude-sonnet-5-5, 주장 최대 2개, 주장마다 근거 문단 1개")
+    st.dataframe(df("rag_generation"), hide_index=True, use_container_width=True)
+    st.caption("충실도 1.000 은 성과로 쓰지 않는다. 주장을 2개로 제한하고 문단 표현에 맞춰 쓰게 한 발췌형 과제라 틀릴 여지가 거의 없었다. "
+               "정보가 있는 수치는 거절 쪽이다: 근거 없는 질문 5개는 전부 거절했고, 답할 수 있던 25개 중 3개도 거절했다.")
+
+    st.markdown("**실제 답 세 건** — 생성된 문장 그대로, 회사명만 가림")
+    st.dataframe(pd.DataFrame(L.RAG_EXAMPLES), hide_index=True, use_container_width=True)
+
+    st.markdown("**한계**")
+    for line in L.RAG_LIMITS:
+        st.markdown(f"- {line}")

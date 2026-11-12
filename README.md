@@ -184,7 +184,7 @@ API 호출 없이 기존 예측을 섞어 라우팅 정책을 시뮬레이션했
 
 ## 데모
 
-직무별 요구 역량 지형도, 이력서를 붙여 넣으면 나오는 학습 우선순위, 그리고 위 평가 결과를 한 화면에서 봅니다. 공고 원문이나 API 키 없이 레포에 커밋된 CSV와 사전만 읽으므로 데모 숫자는 README 숫자와 같습니다. 갭 진단은 `src/analyze/gap_diagnosis.run()`을 그대로 호출해 산식이 두 벌이 되지 않습니다.
+직무별 요구 역량 지형도, 이력서를 붙여 넣으면 나오는 학습 우선순위, 그리고 위 평가 결과를 한 화면에서 봅니다. 공고 검색(RAG)은 평가 결과 탭으로만 들어 있습니다. 공고 원문이 비공개라 공개 데모에서 검색을 돌릴 수 없기 때문입니다. 공고 원문이나 API 키 없이 레포에 커밋된 CSV와 사전만 읽으므로 데모 숫자는 README 숫자와 같습니다. 갭 진단은 `src/analyze/gap_diagnosis.run()`을 그대로 호출해 산식이 두 벌이 되지 않습니다.
 
 **배포본:** https://careerfit-kevin2483.streamlit.app (Streamlit Community Cloud, 이 레포의 `main`에서 자동 배포)
 
@@ -265,7 +265,7 @@ Claude Code 서브에이전트 3명(extractor · analyst · diagnoser)이 직렬
 
 ```bash
 pip install -r requirements.txt
-make test        # pytest 161건
+make test        # pytest 162건
 make reproduce   # evaluation_{regex_pooled,llm_*} · bootstrap_ci · method_comparison · cascade_sim · failed_rows_sensitivity · prompt_variants · rag_comparison · rag_generation 재생성
 make check       # 재생성 결과가 커밋본과 같은지 diff
 ```
@@ -312,7 +312,7 @@ src/
   eval/                     평가 · 부트스트랩 CI · 방식 비교 · 라우팅 시뮬레이션 · 검색·생성 평가
   analyze/                  시장 통계 · 갭 진단
   rag/                      청킹 · BM25 · 벡터 · 하이브리드 · 리랭커 · 필터 · 판정 도구 · 답변 생성
-tests/                      161건. 경계 규칙 · 사전 함의 · 불변식 · 산식 · 풀링 반영 · 결정성 · LLM 출력 파싱 · 실패 행 판정
+tests/                      162건. 경계 규칙 · 사전 함의 · 불변식 · 산식 · 풀링 반영 · 결정성 · LLM 출력 파싱 · 실패 행 판정
 CLAUDE.md                   에이전트 팀 운영 규칙
 ```
 
