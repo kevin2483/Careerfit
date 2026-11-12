@@ -92,6 +92,13 @@ def test_main_refuses_to_overwrite_existing_answers(tmp_path):
         generate.main(["--out", str(tmp_path / "a.jsonl")])
 
 
+def test_public_rows_drop_only_claim_text():
+    rows = [{"qid": "q1", "error": None, "claims": [{"claim_id": "q1:1", "text": "비공개 문장", "chunk_id": "1:a:0"}]}]
+    pub = generate.public_rows(rows)
+    assert pub == [{"qid": "q1", "error": None, "claims": [{"claim_id": "q1:1", "chunk_id": "1:a:0"}]}]
+    assert rows[0]["claims"][0]["text"] == "비공개 문장"      # 원본은 그대로
+
+
 def test_llm_judge_waits_for_human_judgments(tmp_path):
     write_jsonl(tmp_path / "a.jsonl", [{"qid": "q1", "claims": [{"claim_id": "q1:1", "text": "ㄱ", "chunk_id": "1:a:0"}]}])
     with pytest.raises(SystemExit, match="사람 판정이 1건 남음"):

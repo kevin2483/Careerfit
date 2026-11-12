@@ -43,3 +43,6 @@ portfolio/
 
 # RAG 청크·임베딩 (공고 원문 포함 → 레포 미포함)
 data/processed/rag/*/
+
+# RAG 생성 답 원본 — 주장 문장에 공고 내용이 들어간다. 공개판(answers.public.jsonl)만 커밋한다
+data/processed/rag_generation/answers.jsonl

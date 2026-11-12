@@ -3,7 +3,7 @@
 
 정의는 notes/rag_generation_2026-11-11.md. 커밋된 파일만 읽는다 (API·원문 불필요):
   rag_queries.jsonl, rag_runs/hybrid.jsonl, rag_judgments.jsonl(검색 판정),
-  rag_generation/answers.jsonl, rag_claim_judgments.jsonl(+ rejudgments), rag_generation/llm_judge.jsonl(있으면)
+  rag_generation/answers.public.jsonl(주장 문장 제외), rag_claim_judgments.jsonl(+ rejudgments), rag_generation/llm_judge.jsonl(있으면)
 출력: data/processed/rag_generation.csv (항목 · 값 · 근거)
 """
 from __future__ import annotations
@@ -17,7 +17,7 @@ from src.common.jsonl import read_jsonl
 from src.common.paths import PROCESSED_DIR
 from src.eval.bootstrap_ci import percentile
 from src.rag.claim_judge import load_claim_judgments
-from src.rag.generate import (ANSWERS_PATH, CLAIM_JUDGMENTS_PATH, CLAIM_REJUDGMENTS_PATH, LLM_JUDGE_PATH, all_claims)
+from src.rag.generate import (ANSWERS_PUBLIC_PATH, CLAIM_JUDGMENTS_PATH, CLAIM_REJUDGMENTS_PATH, LLM_JUDGE_PATH, all_claims)
 from src.rag.judge import JUDGMENTS_PATH, load_judgments
 from src.rag.run import QUERIES_PATH, load_queries
 
@@ -107,7 +107,7 @@ def evaluate(queries: list[dict], answers: list[dict], search_judgments: dict, c
 def main(argv: list[str] | None = None) -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--queries", default=str(QUERIES_PATH))
-    ap.add_argument("--answers", default=str(ANSWERS_PATH))
+    ap.add_argument("--answers", default=str(ANSWERS_PUBLIC_PATH))
     ap.add_argument("--search-judgments", default=str(JUDGMENTS_PATH))
     ap.add_argument("--judgments", default=str(CLAIM_JUDGMENTS_PATH))
     ap.add_argument("--rejudgments", default=str(CLAIM_REJUDGMENTS_PATH))

@@ -29,19 +29,20 @@ reproduce:
 	$(PY) -m src.eval.failed_rows --date $(DATE)
 	$(PY) -m src.eval.prompt_variants --date $(DATE)
 	$(PY) -m src.eval.rag_eval
+	$(PY) -m src.eval.rag_gen_eval
 
 # 검색(RAG) 비교. 커밋된 실행 기록 6개 + 사람 판정만 읽는다 (원문·모델 불필요). reproduce 에 포함.
 rag-eval:
 	$(PY) -m src.eval.rag_eval
 
-# 생성 단계 평가. 답·주장 판정이 커밋되면 reproduce 와 check 에 넣는다 (그 전에는 파일이 없어 CI 가 깨진다).
+# 생성 단계 평가. 주장 문장을 뺀 공개판 답 + 사람 판정 + LLM 판정만 읽는다. reproduce 에 포함.
 rag-gen-eval:
 	$(PY) -m src.eval.rag_gen_eval
 
 # 재현 결과가 커밋본과 같은지 확인 (CI 와 동일)
 check: reproduce
 	git diff --exit-code -- $(P)/evaluation_regex_pooled $(P)/evaluation_llm_haiku $(P)/evaluation_llm_sonnet \
-		$(P)/evaluation_llm_opus $(P)/bootstrap_ci.csv $(P)/method_comparison.csv $(P)/cascade_sim.csv $(P)/failed_rows_sensitivity.csv $(P)/prompt_variants.csv $(P)/rag_comparison.csv
+		$(P)/evaluation_llm_opus $(P)/bootstrap_ci.csv $(P)/method_comparison.csv $(P)/cascade_sim.csv $(P)/failed_rows_sensitivity.csv $(P)/prompt_variants.csv $(P)/rag_comparison.csv $(P)/rag_generation.csv
 	@echo "재현 일치"
 
 # 아래 둘은 공고 원문(data/raw/*/wanted_$(DATE).jsonl)이 있어야 한다

@@ -9,6 +9,7 @@
 사용:
   python -m src.rag.generate                 # 답 생성 (이미 있으면 덮어쓰지 않고 멈춘다)
   python -m src.rag.generate --llm-judge     # 사람 판정 완료 후, 같은 주장을 LLM 이 판정
+  python -m src.rag.generate --make-public   # 주장 문장을 뺀 공개판 다시 만들기
 """
 from __future__ import annotations
 
@@ -29,7 +30,8 @@ EFFORT = "medium"
 MAX_TOKENS = 8000
 MAX_CLAIMS = 2
 GEN_DIR = PROCESSED_DIR / "rag_generation"
-ANSWERS_PATH = GEN_DIR / "answers.jsonl"
+ANSWERS_PATH = GEN_DIR / "answers.jsonl"                 # 주장 문장 포함. 레포 미포함 (공고 내용이 들어간다)
+ANSWERS_PUBLIC_PATH = GEN_DIR / "answers.public.jsonl"   # 주장 문장만 뺀 공개판. 평가는 이것만 읽는다
 LLM_JUDGE_PATH = GEN_DIR / "llm_judge.jsonl"
 CLAIM_JUDGMENTS_PATH = LABELED_DIR / "rag_claim_judgments.jsonl"
 CLAIM_REJUDGMENTS_PATH = LABELED_DIR / "rag_claim_rejudgments.jsonl"
@@ -151,6 +153,11 @@ def generate(client, queries: list[dict], passed: dict[str, list[str]], chunks: 
     return rows
 
 
+def public_rows(answers: list[dict]) -> list[dict]:
+    """주장 문장(text)만 뺀다. claim_id·chunk_id·판정에 필요한 나머지는 그대로."""
+    return [dict(a, claims=[{k: v for k, v in c.items() if k != "text"} for c in a["claims"]]) for a in answers]
+
+
 def all_claims(answers: list[dict]) -> list[dict]:
     return [dict(c, qid=a["qid"]) for a in answers for c in a["claims"]]
 
@@ -173,10 +180,16 @@ def main(argv: list[str] | None = None) -> None:
     ap.add_argument("--runs-dir", default=str(RUNS_DIR))
     ap.add_argument("--out", default=str(ANSWERS_PATH))
     ap.add_argument("--llm-judge", action="store_true")
+    ap.add_argument("--make-public", action="store_true", help="answers.jsonl 에서 공개판만 다시 만든다 (API 호출 없음)")
+    ap.add_argument("--public-out", default=str(ANSWERS_PUBLIC_PATH))
     ap.add_argument("--judgments", default=str(CLAIM_JUDGMENTS_PATH))
     ap.add_argument("--llm-out", default=str(LLM_JUDGE_PATH))
     a = ap.parse_args(argv)
 
+    if a.make_public:
+        write_jsonl(a.public_out, public_rows(read_jsonl(a.out)))
+        print(f"저장 -> {a.public_out}")
+        return
     out = Path(a.llm_out if a.llm_judge else a.out)
     if out.exists():
         raise SystemExit(f"[중단] {out} 이 이미 있다. 한 번만 돌린다 (사전 등록). 다시 하려면 새 사전 등록 문서를 쓴다.")
@@ -197,6 +210,8 @@ def main(argv: list[str] | None = None) -> None:
         rows = generate(client, queries, passed_chunks(queries, read_jsonl(Path(a.runs_dir) / f"{RETRIEVER}.jsonl")), chunks)
     out.parent.mkdir(parents=True, exist_ok=True)
     write_jsonl(out, rows)
+    if not a.llm_judge:
+        write_jsonl(a.public_out, public_rows(rows))
     failed = [r for r in rows if r["error"]]
     print(f"저장 -> {out} ({len(rows)}행)")
     if failed:
