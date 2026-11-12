@@ -121,6 +121,14 @@ def test_claim_session_has_no_default_and_saves_each(monkeypatch, tmp_path, caps
     assert "주장: 주장ㄱ" in shown and "본문1" in shown and "claude" not in shown
 
 
+def test_claim_group_session_saves_only_after_ok(monkeypatch, tmp_path):
+    todo = [{"claim_id": f"q1:{i}", "qid": "q1", "text": f"주장{i}", "chunk_id": f"{i}:a:0"} for i in (1, 2, 3)]
+    out, judged = tmp_path / "j.jsonl", {}
+    _feed(monkeypatch, ["yn", "yy", "", "r", "yn", "ok", "y", "q"])   # 2개 묶음: 첫 입력은 r 로 버림, 둘째 묶음은 확인 전 종료
+    assert claim_judge.group_session(todo, {"q1": "가"}, CHUNKS, judged, out, 2) == 2
+    assert claim_judge.load_claim_judgments(out) == {"q1:1": True, "q1:2": False}
+
+
 def test_rejudge_ids_are_ten_percent_rounded_up_and_stable():
     ids = [f"q{i}:1" for i in range(41)]
     assert len(claim_judge.rejudge_ids(ids)) == 5

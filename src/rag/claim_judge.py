@@ -1,10 +1,11 @@
 """
 생성된 주장 판정 — "이 주장이 인용한 문단에 실제로 있는 말인가?" 를 한 건씩 y/n 으로 받는다.
 
-기준과 절차는 notes/rag_generation_2026-11-11.md (판정 전 고정). 기본값 없음, 건마다 저장, 묶음 입력 없음.
+기준과 절차는 notes/rag_generation_2026-11-11.md (판정 전 고정). 기본값 없음, 건마다 저장. --group N 은 N 개씩 한 화면에 보여 주고 한 줄로 받는다 (부록 B2).
 
 사용:
   python -m src.rag.claim_judge              # 미판정부터 이어서
+  python -m src.rag.claim_judge --group 10   # 10개씩 묶어서 (재판정에도 쓸 수 있다)
   python -m src.rag.claim_judge --stats      # 진행률만
   python -m src.rag.claim_judge --rejudge    # 1차가 끝난 뒤 10% 를 1차 답을 가린 채 다시
 """
@@ -18,7 +19,7 @@ from pathlib import Path
 from src.common.jsonl import read_jsonl, write_jsonl
 from src.common.paths import resolve_date
 from src.rag.generate import (ANSWERS_PATH, CLAIM_JUDGMENTS_PATH, CLAIM_REJUDGMENTS_PATH, all_claims, chunk_header)
-from src.rag.judge import REJUDGE_FRACTION, SEED, ask_yn
+from src.rag.judge import REJUDGE_FRACTION, SEED, ask_confirm, ask_group, ask_yn
 from src.rag.run import QUERIES_PATH, load_queries
 
 
@@ -67,6 +68,33 @@ def session(todo: list[dict], questions: dict[str, str], chunks: dict[str, dict]
     return done
 
 
+def group_session(todo: list[dict], questions: dict[str, str], chunks: dict[str, dict],
+                  judgments: dict[str, bool], out_path: str | Path, size: int) -> int:
+    """size 개씩 한 화면에 보여 주고 y/n 을 한 줄로 받는다. 되보여 준 목록에 ok 를 쳐야 저장한다."""
+    done = 0
+    for start in range(0, len(todo), size):
+        group = todo[start:start + size]
+        while True:
+            for i, c in enumerate(group, 1):
+                show(c, questions[c["qid"]], chunks[c["chunk_id"]], start + i, len(todo))
+                print(f"↑ {i}번")
+            answers = ask_group(len(group))
+            if answers is None:
+                return done
+            print()
+            for i, (c, v) in enumerate(zip(group, answers), 1):
+                print(f"  {i}번 · {c['text'][:40]}… → {'y' if v else 'n'}")
+            confirm = ask_confirm()
+            if confirm == "q":
+                return done
+            if confirm == "ok":
+                break
+        judgments.update({c["claim_id"]: v for c, v in zip(group, answers)})
+        save_claim_judgments(out_path, judgments)
+        done += len(group)
+    return done
+
+
 def main(argv: list[str] | None = None) -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--date")
@@ -76,6 +104,7 @@ def main(argv: list[str] | None = None) -> None:
     ap.add_argument("--rejudge-out", default=str(CLAIM_REJUDGMENTS_PATH))
     ap.add_argument("--stats", action="store_true")
     ap.add_argument("--rejudge", action="store_true")
+    ap.add_argument("--group", type=int, default=1, help="이 개수씩 한 화면에 (1 = 한 건씩)")
     a = ap.parse_args(argv)
 
     claims = all_claims(read_jsonl(a.answers))
@@ -97,7 +126,10 @@ def main(argv: list[str] | None = None) -> None:
     from src.rag.search import load_chunks
     chunks = {c["chunk_id"]: c for c in load_chunks(resolve_date(a.date, prefer="processed"))}
     questions = {q["qid"]: q["question"] for q in load_queries(a.queries)}
-    n = session(todo, questions, chunks, target, out_path)
+    if a.group > 1:
+        n = group_session(todo, questions, chunks, target, out_path, a.group)
+    else:
+        n = session(todo, questions, chunks, target, out_path)
     print(f"\n이번에 {n}건 판정 → {out_path}  (남음 {len(todo) - n}건)")
 
 
