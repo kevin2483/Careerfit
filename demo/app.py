@@ -43,8 +43,8 @@ def df(name: str, *args) -> pd.DataFrame:
 
 
 st.title("CareerFit")
-st.caption("채용공고 1,190건에서 뽑은 직무별 요구 역량, 이력서 대조 학습 우선순위, 그리고 그 추출이 맞는지 잰 결과. "
-           "모든 숫자는 레포에 커밋된 CSV 그대로이며 `make reproduce` 로 다시 만들어진다.")
+st.caption("채용공고 1,190건에서 직무별로 요구하는 역량을 뽑았습니다. 탭 순서대로 ① 어떤 역량이 많이 요구되는지 ② 내 이력서에 무엇이 없는지 "
+           "③ 그 추출이 얼마나 정확한지 ④ 공고 검색(RAG)을 어떻게 평가했는지 볼 수 있습니다. 모든 숫자는 레포에 커밋된 CSV 그대로입니다.")
 
 tab_market, tab_gap, tab_eval, tab_rag = st.tabs(["시장 지형도", "갭 진단", "평가 결과", "공고 검색 (RAG)"])
 
@@ -54,9 +54,9 @@ with tab_market:
     job = st.radio("직무", JOB_OPTIONS, format_func=job_label, horizontal=True, key="job_market")
     p = pop[job]
     c1, c2, c3 = st.columns(3)
-    c1.metric("입력 공고", f"{p['입력공고수']:,}")
-    c2.metric("통과(모집단)", f"{p['통과']:,}")
-    c3.metric("직무불일치 제외", f"{p['직무불일치']:,}")
+    c1.metric("수집한 공고", f"{p['입력공고수']:,}")
+    c2.metric("통계에 쓴 공고 (통과)", f"{p['통과']:,}")
+    c3.metric("직무가 달라 뺀 공고", f"{p['직무불일치']:,}")
     note = L.da_note(job)
     if note:
         st.info(note)
@@ -66,14 +66,14 @@ with tab_market:
         st.subheader("요구 역량 상위 20")
         rank = df("rank_by_job", job, 20)
         chart = alt.Chart(rank).mark_bar().encode(
-            x=alt.X("출현율%:Q", title="출현율 (%)"),
+            x=alt.X("출현율%:Q", title="이 역량을 요구하는 공고 (%)"),
             y=alt.Y("canonical:N", sort="-x", title=None),
             tooltip=["순위", "canonical", "출현수", "모집단수", "출현율%"],
         ).properties(height=520)
         st.altair_chart(chart, use_container_width=True)
-        st.caption("출현율 분모는 통과 공고 수. 3건 미만 역량은 표본 부족으로 제외(아래 목록).")
+        st.caption("막대 길이 = 이 직무 공고 100건 중 그 역량을 요구한 건수. 분모는 위의 '통과' 공고 수이고, 3건 미만으로 나온 역량은 표본이 부족해 뺐습니다(아래 목록).")
     with right:
-        st.subheader("상위 20 역량의 신입 접근성")
+        st.subheader("그 역량을 요구한 공고에 신입도 지원할 수 있나")
         jvs = df("junior_vs_senior", job)
         top_names = list(rank["canonical"])
         jvs = jvs[jvs["canonical"].isin(top_names)].copy()
@@ -85,26 +85,38 @@ with tab_market:
             tooltip=["canonical", "신입가능", "경력요구", "미기재", "신입가능%", "경력요구%"],
         ).properties(height=520)
         st.altair_chart(sc, use_container_width=True)
-        st.caption("그 역량을 요구한 공고 중 신입 지원 가능(annual_from 0)인 비율. 갭 진단의 '신입접근성' 가중치가 이 값이다.")
+        st.caption("그 역량을 요구한 공고 중 신입 지원이 가능한(요구 경력 0년) 공고의 비율. 갭 진단 탭이 순서를 정할 때 이 값을 씁니다.")
 
         st.subheader("함께 요구되는 역량 쌍 상위 15")
-        st.dataframe(df("cooccurrence", job, 15)[["tag_a", "tag_b", "동시출현수"]], hide_index=True, use_container_width=True)
+        st.dataframe(df("cooccurrence", job, 15)[["tag_a", "tag_b", "동시출현수"]].rename(columns={"tag_a": "역량 A", "tag_b": "역량 B", "동시출현수": "함께 나온 공고 수"}), hide_index=True, use_container_width=True)
 
     with st.expander(f"표본 부족으로 제외한 역량 ({len(L.excluded_lowfreq(job))}건)"):
-        st.dataframe(df("excluded_lowfreq", job)[["canonical", "출현수", "제외사유"]], hide_index=True, use_container_width=True)
+        st.dataframe(df("excluded_lowfreq", job)[["canonical", "출현수", "제외사유"]].rename(columns={"canonical": "역량"}), hide_index=True, use_container_width=True)
 
 # ───────────────────────────────────────────── 탭 2
+RENAME = {"순위": "순위", "canonical": "역량", "출현율%": "요구하는 공고 (%)", "신입가능%": "그중 신입 가능 (%)", "우선순위점수": "우선순위 점수"}
+
+
+def roadmap_table(rows: list[dict]) -> pd.DataFrame:
+    """run() 결과를 읽기 쉬운 열 이름으로 바꾼다. 신입접근성(0~1)은 % 로만 바꿔 보여 준다 (값은 그대로)."""
+    if not rows:
+        return pd.DataFrame()
+    t = pd.DataFrame(rows)
+    t["신입가능%"] = (t["신입접근성"] * 100).round(1)
+    return t[list(RENAME)].rename(columns=RENAME)
+
+
 with tab_gap:
-    st.subheader("이력서와 시장 요구의 차이")
-    st.caption("우선순위 = 직무 출현율 × 미보유(1) × 신입접근성. 상위 5개만 이번 분기, 나머지는 다음 분기. "
-               "이력서는 서버에 저장하지 않으며 정규식으로 역량 태그만 뽑는다.")
-    job2 = st.radio("대상 직무", JOB_OPTIONS, format_func=job_label, horizontal=True, key="job_gap", index=1)
+    st.subheader("내 이력서에 없는데 공고가 자주 요구하는 역량은?")
+    st.markdown("**① 지원할 직무를 고르고 ② 이력서를 넣으면 ③ 먼저 채울 역량 5개를 알려 줍니다.** "
+                "이력서는 서버에 저장하지 않습니다.")
+    job2 = st.radio("① 지원할 직무", JOB_OPTIONS, format_func=job_label, horizontal=True, key="job_gap", index=1)
     if "resume" not in st.session_state:
         st.session_state["resume"] = ""
     b1, b2 = st.columns([1, 3])
-    if b1.button("예시 이력서 넣기"):
+    if b1.button("예시 이력서로 해 보기", type="primary"):
         st.session_state["resume"] = SAMPLE_RESUME
-    up = b2.file_uploader("이력서·포트폴리오 PDF 또는 txt 올리기 (서버에 저장하지 않음)", type=["pdf", "txt"], label_visibility="visible")
+    up = b2.file_uploader("② 이력서·포트폴리오 PDF 또는 txt 올리기", type=["pdf", "txt"], label_visibility="visible")
     if up is not None and st.session_state.get("_uploaded") != up.name:
         text, note = extract_text(up.getvalue(), up.name)
         st.session_state["_uploaded"] = up.name
@@ -113,31 +125,70 @@ with tab_gap:
             st.success(note)
         else:
             st.warning(note)
-    resume = st.text_area("이력서 텍스트", key="resume", height=220, placeholder="경력·기술·프로젝트를 붙여 넣으세요.")
-    if resume.strip():
+    resume = st.text_area("또는 여기에 붙여 넣기", key="resume", height=180, placeholder="경력·기술·프로젝트를 붙여 넣으세요.")
+    if not resume.strip():
+        st.info("이력서를 넣으면 결과가 여기에 나옵니다. 먼저 보고 싶으면 '예시 이력서로 해 보기'를 누르세요.")
+    else:
         r = gd.run(resume_text=resume, target_job=job2, check_fresh=False)
-        m1, m2, m3 = st.columns(3)
-        m1.metric("이력서에서 찾은 역량", r["이력서_보유태그수"])
-        m2.metric(f"{job2} 시장 역량 수", r["직무_전체태그수"])
-        m3.metric("이번 분기 학습 항목", len(r["이번분기_학습로드맵(top5)"]))
+        name = L.JOB_NAMES[job2]
+        have = set(r["보유역량"])
+        skipped = {x["canonical"] for x in r["제외_field3_암묵조건"]}
+        top = r["이번분기_학습로드맵(top5)"]
 
-        st.markdown("**이번 분기 학습 로드맵 (top 5)**")
-        top = pd.DataFrame(r["이번분기_학습로드맵(top5)"])
-        if len(top):
-            bar = alt.Chart(top).mark_bar().encode(
-                x=alt.X("우선순위점수:Q"), y=alt.Y("canonical:N", sort="-x", title=None),
-                tooltip=["순위", "canonical", "출현율%", "신입접근성", "우선순위점수"],
-            ).properties(height=200)
-            st.altair_chart(bar, use_container_width=True)
-            st.dataframe(top[["순위", "canonical", "출현율%", "신입접근성", "우선순위점수"]], hide_index=True, use_container_width=True)
-        st.markdown("**이미 보유한 역량** · " + (", ".join(r["보유역량"]) or "없음"))
-        with st.expander(f"다음 분기 후순위 ({len(r['다음분기_후순위'])}건)"):
-            st.dataframe(pd.DataFrame(r["다음분기_후순위"])[["순위", "canonical", "출현율%", "신입접근성", "우선순위점수"]]
-                         if r["다음분기_후순위"] else pd.DataFrame(), hide_index=True, use_container_width=True)
-        with st.expander("로드맵에서 뺀 암묵 조건 (field 3)"):
+        # 상위 20 역량에 보유 여부만 붙인다. 순위·비율은 시장 지형도 탭과 같은 CSV 값이다.
+        top20 = df("rank_by_job", job2, 20).copy()
+        top20["상태"] = ["공통 소양 (판정 안 함)" if c in skipped else "이력서에 있음" if c in have else "이력서에 없음"
+                         for c in top20["canonical"]]
+        judged = top20[top20["상태"] != "공통 소양 (판정 안 함)"]
+        n_have = int((judged["상태"] == "이력서에 있음").sum())
+
+        st.divider()
+        st.markdown(f"### ③ {name} 공고가 자주 요구하는 역량 {len(judged)}개 중 **{n_have}개**가 이력서에 있습니다")
+        if not have:
+            st.warning("이력서에서 역량을 하나도 읽지 못했습니다. 기술 이름이 글자로 적혀 있는지 확인하세요 (이미지로 된 PDF 는 읽지 못합니다).")
+
+        st.markdown("**이력서에서 읽은 역량**")
+        st.markdown(" ".join(f"`{c}`" for c in r["보유역량"]) or "없음")
+        st.caption("갖고 있는데 여기 없다면 이력서에 그 단어가 없거나 다르게 적힌 것입니다. 단어를 찾는 방식이라 숙련도는 구분하지 못합니다.")
+
+        st.markdown(f"**{name} 공고가 많이 요구하는 역량 20개와 내 이력서**")
+        status_color = alt.Scale(domain=["이력서에 있음", "이력서에 없음", "공통 소양 (판정 안 함)"], range=["#2563eb", "#f97316", "#cbd5e1"])
+        gap_chart = alt.Chart(top20).mark_bar().encode(
+            x=alt.X("출현율%:Q", title="이 역량을 요구하는 공고 (%)"),
+            y=alt.Y("canonical:N", sort="-x", title=None, axis=alt.Axis(labelOverlap=False, labelLimit=160)),
+            color=alt.Color("상태:N", scale=status_color, legend=alt.Legend(orient="top", title=None)),
+            tooltip=[alt.Tooltip("canonical", title="역량"), alt.Tooltip("출현율%", title="요구하는 공고 (%)"), "상태"],
+        ).properties(height=alt.Step(26))
+        st.altair_chart(gap_chart, use_container_width=True)
+        st.caption("주황색 막대가 길수록 많이 요구되는데 이력서에 없는 역량입니다. 회색은 협업·커뮤니케이션처럼 거의 모든 공고에 나와 따로 판정하지 않는 항목입니다.")
+
+        st.markdown("### 먼저 채울 역량 5개")
+        st.caption("많은 공고가 요구하고, 그 공고에 신입도 지원할 수 있을수록 앞에 옵니다.")
+        if not top:
+            st.success("이 직무에서 통계에 잡힌 역량은 이력서에 모두 있습니다.")
+        for row in top:
+            with st.container(border=True):
+                a, b = st.columns([3, 2])
+                a.markdown(f"**{row['순위']}. {row['canonical']}**")
+                a.markdown(f"{name} 공고 100건 중 **{row['출현율%']:.0f}건**이 요구합니다. "
+                           f"그 공고 가운데 신입이 지원할 수 있는 비율은 **{row['신입접근성'] * 100:.0f}%** 입니다.")
+                b.progress(min(row["출현율%"] / 100, 1.0), text=f"요구하는 공고 {row['출현율%']:.1f}%")
+
+        with st.expander(f"그다음에 볼 역량 ({len(r['다음분기_후순위'])}개)"):
+            st.dataframe(roadmap_table(r["다음분기_후순위"]), hide_index=True, use_container_width=True)
+        with st.expander("순서는 어떻게 정하나요?"):
+            st.markdown("우선순위 점수 = **요구하는 공고 비율(%) × 그중 신입 가능 비율**. 이력서에 이미 있는 역량은 0점으로 빠집니다. "
+                        "점수가 높은 5개만 '먼저 채울 역량'으로 보여 주고 나머지는 '그다음'으로 넘깁니다.")
+            st.dataframe(roadmap_table(top), hide_index=True, use_container_width=True)
+            st.caption(r["미보유가중치_방식"])
+        with st.expander("순서에서 뺀 공통 소양"):
             st.write(r["field3_제외기준"])
-            st.dataframe(pd.DataFrame(r["제외_field3_암묵조건"]), hide_index=True, use_container_width=True)
-        st.caption("이력서에 적히지 않은 역량은 미보유로 계산된다. 최근 경험이 빠진 이력서면 로드맵도 그만큼 어긋난다.")
+            st.dataframe(pd.DataFrame(r["제외_field3_암묵조건"]).rename(columns=RENAME), hide_index=True, use_container_width=True)
+
+        st.markdown("**이 결과를 읽을 때 알아 둘 점**")
+        st.markdown("- 이력서에 적히지 않은 역량은 없는 것으로 봅니다. 최근 경험을 안 적었다면 결과도 그만큼 어긋납니다.\n"
+                    "- 단어가 한 번이라도 나오면 '있음'입니다. 써 본 정도와 깊이는 구분하지 못합니다.\n"
+                    f"- 기준은 2026년 7월에 모은 {name} 공고입니다. 공고 수와 제외 기준은 '시장 지형도' 탭에 있습니다.")
 
 # ───────────────────────────────────────────── 탭 3
 with tab_eval:
